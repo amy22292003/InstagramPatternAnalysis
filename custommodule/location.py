@@ -1,0 +1,58 @@
+#from sets import Set
+import re
+
+"""file path"""
+LOCATIONDETAIL_FILE = "./data/LocationDetail_sel.txt"
+OUTPUT_LOCATIONDETIAL = "./data/LocationDetail_NY.txt"
+
+# NYC REGION
+MINLAT = 40.49
+MAXLAT = 40.92
+MINLNG = -74.26
+MAXLNG = -73.7
+
+class Location:
+    def __init__(self):
+        self.lid = ""
+        self.lname = ""
+        self.usercount = 0
+        self.lat = ""
+        self.lng = ""
+        self.posts = []
+        self.tags = set()
+
+# Get location Details Dict
+def get_locations_list(locationListFile = None):
+    sortedLocations = []
+    if not locationListFile:
+        locationListFile = LOCATIONDETAIL_FILE
+    f = open(locationListFile, "r")
+    line = f.readline()
+    for line in f:
+        res = re.match(r"(?P<lid>\w+)\t(?P<location>.*?)\t(?P<usercount>\w+)\t(?P<lat>.*?)\t(?P<lng>.*?)\n", line)
+        item = Location()
+        item.lid = res.group("lid")
+        item.lname = res.group("location")
+        item.usercount = int(res.group("usercount"))
+        item.lat = res.group("lat")
+        item.lng = res.group("lng")
+        sortedLocations.append(item)
+    return sortedLocations
+
+def get_in_region_locations_list():
+    sortedLocations = GetLocationsList()
+    newLocations = filter(lambda x: MAXLAT >= float(x.lat) >= MINLAT and MAXLNG >= float(x.lng) >= MINLNG, sortedLocations)
+    return newLocations
+
+def output_location_part_list(locations, f):
+    for item in locations:
+        f.write(item.lid + "\t" + item.lname + "\t" + str(item.usercount) + "\t" + item.lat + "\t" + item.lng + "\n")
+
+def output_location_list(sortedLocations, locationListFile = None):
+    if not locationListFile:
+        locationListFile = OUTPUT_LOCATIONDETIAL
+    f = open(locationListFile, "w")
+    f.write("lid\tlocation\tuser Count\tlatitude\tlongitude\n")
+    OutputLocationPartList(sortedLocations, f)
+    f.close()
+
