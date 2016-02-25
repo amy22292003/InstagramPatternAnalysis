@@ -1,8 +1,10 @@
-#from sets import Set
+import os
 import re
+from . import post
 
 """file path"""
 LOCATIONDETAIL_FILE = "./data/LocationDetail_sel.txt"
+LOCATION_POSTS_FILE = "./data/LocationPosts"
 OUTPUT_LOCATIONDETIAL = "./data/LocationDetail_NY.txt"
 
 # NYC REGION
@@ -21,6 +23,7 @@ class Location:
         self.posts = []
         self.tags = set()
 
+""" Location list related """
 # Get location Details Dict
 def get_locations_list(locationListFile = None):
     sortedLocations = []
@@ -55,4 +58,27 @@ def output_location_list(sortedLocations, locationListFile = None):
     f.write("lid\tlocation\tuser Count\tlatitude\tlongitude\n")
     OutputLocationPartList(sortedLocations, f)
     f.close()
+
+""" Location posts related """
+# get locations posts
+def get_location_posts(file_path = None):
+    print("Getting locations posts...")
+    locations = []
+    if not file_path:
+        file_path = LOCATION_POSTS_FILE
+    for root, dirs, files in os.walk(file_path):
+        for filename in files:
+            posts = post.get_file_posts(os.path.join(root, filename))
+            a_location = Location()
+            a_location.posts = posts
+            a_location.lid = posts[0].lid
+            locations.append(a_location)
+            del posts
+            if len(locations) % 100 == 0:
+                print("locations #:", len(locations))
+    print("End getting locations.")
+    return locations
+
+
+
 

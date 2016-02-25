@@ -9,7 +9,7 @@ import custommodule.tag as ctag
 """parameters"""
 MAX_FREQ_THRESHOLD = 500
 MIN_FREQ_THRESHOLD = 5
-INTERSECT_THRESHOLD = 25 # the min intersection tags count between the category locations and the candidate location
+INTERSECT_THRESHOLD = 0.1#25 # the min intersection tags count between the category locations and the candidate location
 CATEGORY_MIN_AMOUNT = 10
 
 """file path"""
@@ -76,7 +76,7 @@ def add_location_into_cate(cate_locations, free_locations):
     candidates = ListDict(*free_locations.keys())
     for a_location in cate_locations:
         # count the intersection tags of the initial location & candidate locations. (key of the location, count)
-        intersect_count = [(key, len(free_locations[key].clocation.tags & a_location.clocation.tags)) for key in candidates.keys()]
+        intersect_count = [(key, len(free_locations[key].clocation.tags & a_location.clocation.tags) / len(free_locations[key].clocation.tags)) for key in candidates.keys()]
 
         intersect_count = set(x for x in intersect_count if x[1] > INTERSECT_THRESHOLD) # the locations which intersect num > threshold num
         remove = set(candidates.keys()) - set(x[0] for x in intersect_count)

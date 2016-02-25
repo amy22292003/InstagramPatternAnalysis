@@ -10,7 +10,7 @@ USER_POSTS_FILE = "./data/UserPosts"
 
 class APost:
     def __init__(self):
-        #self.uid = uid
+        """"
         self.postid = ""
         self.uname = ""
         self.uid = ""
@@ -24,6 +24,7 @@ class APost:
         self.tags = []
         self.likes = 0
         self.comments = 0
+        """
 
     def fit_tags(self, tagStr):
         tags = filter(None, re.split(',|\"', tagStr))
@@ -45,16 +46,18 @@ class APost:
         self.text = res.group("text")
         
         #self.tags = res.group("tags")
-        self.tags = self.FitTags(res.group("tags"))
+        self.tags = self.fit_tags(res.group("tags"))
 
         self.likes = int(res.group("likes"))
         self.comments = int(res.group("comments"))
         del res
 
-def output_posts(posts, outputFile, mode):
+def output_posts(posts, outputFile, mode, phase_str = None):
     f = open(outputFile, mode)
     if mode is "w":
         f.write("uid\tuname\tpostid\ttime\tposttype\tlocation\tlocation Id\tlikes\tcomments\ttext\ttags\n")
+    if phase_str:
+        f.write(phase_str)
     for aPost in posts:
         f.write(aPost.uid + "\t" + aPost.uname + "\t" + aPost.postid + "\t" + str(aPost.time) + "\t" + str(aPost.posttype) + "\t" + aPost.lname + "\t" + aPost.lid + "\t" + str(aPost.likes) + "\t" + str(aPost.comments) + "\t" + aPost.text + "\t")
         for aTag in aPost.tags:
@@ -68,7 +71,7 @@ def get_file_posts(filePath):
     f.readline()
     for line in f:
         aPost = APost()
-        aPost.FitPost(line)
+        aPost.fit_post(line)
         posts.append(aPost)
     return posts
 

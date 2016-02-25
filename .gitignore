@@ -1,9 +1,7 @@
 # ignore files
 *.DS_Store
-
-# ignore sublime files
-*.sublime-project
-*.sublime-workspace
+data/
+temp.py
 
 #############################
 
