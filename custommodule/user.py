@@ -1,5 +1,6 @@
-#from sets import Set
 from bs4 import BeautifulSoup
+import io
+import os
 import requests
 import re
 import sys
@@ -78,6 +79,31 @@ def get_users_list(file_path = None):
     f.close()
     print("End Getting users #", len(users))
     return users
+
+"""posts"""
+def get_users_posts_afile(file_path = None):
+    print("Getting users posts...")
+    if not file_path:
+        file_path = USER_POSTS_FOLDER
+    users = UserDict()
+    for root, dirs, files in os.walk(file_path):
+        for filename in files:
+            print("file: ", filename)
+            f = open(os.path.join(root, filename), "r")
+            f.readline()
+            # split to each user's part: [uid, uname, content, uid, uname, content...]
+            iterator = filter(None, re.split(r"User ID:(\w+)\tUser Name:(.*?)\n", f.read()))
+            for uid in iterator:
+                a_user = AUser()
+                a_user.uid = uid
+                a_user.uname = next(iterator)
+                posts = cpost.get_part_posts(next(iterator))
+                a_user.posts = posts
+                users[uid] = a_user
+            f.close()
+    print("End Getting users posts.")
+    return users
+
 
 """Output"""
 def output_user_posts(users, file_path = None):

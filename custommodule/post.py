@@ -10,7 +10,6 @@ USER_POSTS_FILE = "./data/UserPosts"
 
 class APost:
     def __init__(self):
-        """"
         self.postid = ""
         self.uname = ""
         self.uid = ""
@@ -24,10 +23,9 @@ class APost:
         self.tags = []
         self.likes = 0
         self.comments = 0
-        """
 
     def fit_tags(self, tagStr):
-        tags = filter(None, re.split(',|\"', tagStr))
+        tags = list(filter(None, re.split(',|\"', tagStr)))
         return tags
 
     def fit_post(self, line):
@@ -38,7 +36,6 @@ class APost:
         self.uname = res.group("uname")
         self.time = int(res.group("time"))
 
-        self.posttype = res.group("posttype")
 
         self.posttype = res.group("posttype")
         self.lname = res.group("lname")
@@ -74,6 +71,16 @@ def get_file_posts(filePath):
         aPost.fit_post(line)
         posts.append(aPost)
     return posts
+
+def get_part_posts(lines):
+    posts = []
+    # split lines into single line with \n
+    for line in lines.splitlines(True):
+        aPost = APost()
+        aPost.fit_post(line)
+        posts.append(aPost)
+    return posts
+
 
 """
 def GetUserList():
