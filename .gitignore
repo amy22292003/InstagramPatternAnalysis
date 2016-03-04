@@ -2,6 +2,7 @@
 *.DS_Store
 data/
 temp.py
+custommodule/scikit-fuzzy-0.1.3/
 
 #############################
 
