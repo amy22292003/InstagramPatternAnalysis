@@ -26,19 +26,19 @@ def _cmeans0(data1, data2, u_old, c, w, m):
 	data1 = data1.T
 	cntr1 = um.dot(data1) / (np.ones((data1.shape[1],
 									1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	max1 = np.amax(data1)
 	data2 = data2.T
 	cntr2 = um.dot(data2) / (np.ones((data2.shape[1],
 									1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	max2 = np.amax(data2)
 
 	d1 = _distance(data1, cntr1)
+	max1 = np.amax(d1)
 	d2 = _distance(data2, cntr2)
+	max2 = np.amax(d2)
 
 	# convert distance to similarity
 	d1 = d1 / max1
 	d2 = d2 / max2
-	d = w * d1 + (1-w) * d2
+	d = w * d1 + (1-w) * (1-d2)
 	print("-- d1:", d1[0][0:5], " \n  ,d2:", d2[0][0:5], " \n  ,d:", d[0][0:5])
 	print("   std 1:", np.std(d1), " ,2:", np.std(d2), " ,d:", np.std(d))
 
