@@ -55,7 +55,7 @@ def each_cluster(locations, users):
     
     # for each cluster
     for c, a_group in groups.items():
-        print("In layer 1 - cluster:", c, ", #:", len(a_group))
+        print("In layer 2 - cluster:", c, ", #:", len(a_group))
         corpus = []
         for a_location in a_group:
             doc = " ".join([" ".join(x.tags) for x in a_location.posts])

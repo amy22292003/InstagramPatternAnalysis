@@ -88,7 +88,7 @@ def get_users_posts_afile(file_path = None):
     users = UserDict()
     for root, dirs, files in os.walk(file_path):
         for filename in files:
-            print("file: ", filename)
+            print("  file: ", filename)
             f = open(os.path.join(root, filename), "r")
             f.readline()
             # split to each user's part: [uid, uname, content, uid, uname, content...]
