@@ -26,9 +26,11 @@ def _cmeans0(data1, data2, u_old, c, w, m):
 	data1 = data1.T
 	cntr1 = um.dot(data1) / (np.ones((data1.shape[1],
 									1)).dot(np.atleast_2d(um.sum(axis=1))).T)
+
 	data2 = data2.T
 	cntr2 = um.dot(data2) / (np.ones((data2.shape[1],
 									1)).dot(np.atleast_2d(um.sum(axis=1))).T)
+
 
 	d1 = _distance(data1, cntr1)
 	max1 = np.amax(d1)
@@ -49,7 +51,6 @@ def _cmeans0(data1, data2, u_old, c, w, m):
 	u = d ** (- 2. / (m - 1))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	return cntr1, cntr2, u, jm, d1, d2, d
-
 
 def _distance(data, centers):
 	"""
@@ -158,7 +159,6 @@ def cmeans(data1, data2, c, w, m, error, maxiter, init=None, seed=None):
 		if seed is not None:
 			np.random.seed(seed=seed)
 		n = data1.shape[1]
-		print("data1.shape:", data1.shape, " ;data2.shape:", data2.shape)
 		u0 = np.random.rand(c, n)
 		u0 /= np.ones(
 			(c, 1)).dot(np.atleast_2d(u0.sum(axis=0))).astype(np.float64)
@@ -187,7 +187,6 @@ def cmeans(data1, data2, c, w, m, error, maxiter, init=None, seed=None):
 	fpc = _fp_coeff(u)
 
 	return cntr1, cntr2, u, u0, d1, d2, d, jm, p, fpc
-
 
 def cmeans_predict(test_data, cntr_trained, m, error, maxiter, init=None,
 				   seed=None):

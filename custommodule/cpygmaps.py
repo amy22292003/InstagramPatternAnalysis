@@ -1,6 +1,7 @@
 import pygmaps
+import random
 
-class googlemap(pygmaps.maps):
+class Googlemap(pygmaps.maps):
     def addpoint(self, lat, lng, color = '#FF0000', title = None):
         self.points.append((lat,lng,color[1:],title))
 
@@ -43,3 +44,15 @@ class googlemap(pygmaps.maps):
             '\'%s\'' % (self.coloricon.replace('XXXXXX',color)) +\
             ']'
         f.write(output_html)        
+
+def output_clusters(point_all, cluster_membership, c, output_file):
+    print("Outputing clusters' points on the map...")
+    mymap = Googlemap(40.758899, -73.9873197, 13)
+    """for a_point in point_cntr:
+        mymap.addpoint(a_point[0], a_point[1], "#AE0000")
+    """
+    rd = lambda: random.randint(0,255)
+    color = ["#000000"] + ["#%02X%02X%02X" % (rd(), rd(), rd()) for i in range(0, c)]
+    for i, a_point in enumerate(point_all):
+        mymap.addpoint(a_point[0], a_point[1], color[cluster_membership[i]], a_point[2])
+    mymap.draw(output_file) 

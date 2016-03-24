@@ -31,7 +31,7 @@ class Location:
     def add_post_attr(self, a_post, *args):
         # if only add part of arributes
         if args:
-            new_post = cpost.APost()
+            new_post = post.APost()
             for arg in args:
                 setattr(new_post, arg, getattr(a_post, arg))
             self.posts.append(new_post)
@@ -50,8 +50,10 @@ class LocationDict(dict):
 
     def fit_posts(self, posts, *args):
         if not args:
+            print("In fit_posts, no args!!!")
             for a_post in posts:
                 self[a_post.lid].posts.append(a_post)
+                #self[a_post.lid].add_post_attr(a_post)
         else:
             for a_post in posts:
                 self[a_post.lid].add_post_attr(a_post, *args)
@@ -113,6 +115,17 @@ def get_location_posts(file_path = None):
     print("End getting locations.")
     return locations
 
+""" mining """
+def fit_users_to_location(locations, users, *attr):
+    print("Fitting users to locations..., locations #=", len(locations))
+    all_posts = [y for x in users.values() for y in x.posts]
+    locations.fit_posts(all_posts, *attr)
 
+    # remove locations which no traveler had post there
+    remove = [key for key in locations.keys() if len(locations[key].posts) == 0]
+    for key in remove:
+        locations.pop(key)
+    print("after removing locations had no post, #=", len(locations))
+    return locations
 
 
