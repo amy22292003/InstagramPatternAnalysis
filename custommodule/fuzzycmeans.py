@@ -37,9 +37,9 @@ def cmeans_comb(coordinate, tag_feature, cluster_num, w = 0.4, e = 0.01):
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr1, cntr2, u, u0, d1, d2, d, jm, p, fpc, cluster_membership
 
-def cmeans_intersect(coordinate, similarity, cluster_num, w = 0.4, e = 0.01, algorithm="Original", para=20):
+def cmeans_intersect(coordinate, similarity, cluster_num, *para, w = 0.4, e = 0.01, algorithm="Original"):
     print("-fuzzy c means - gps + relation")
-    cntr1, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans_intersect(coordinate, similarity, cluster_num, w, 2, error=e, maxiter=10000, algorithm=algorithm, para=para)
+    cntr1, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans_intersect(coordinate, similarity, cluster_num, w, 2, e, 10000, algorithm, *para)
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr1, u, u0, d1, d2, d, jm, p, fpc, cluster_membership
 
