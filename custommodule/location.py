@@ -5,6 +5,7 @@ from . import post
 """file path"""
 LOCATIONDETAIL_FILE = "./data/LocationDetail_NY.txt"
 LOCATION_POSTS_FILE = "./data/LocationPosts"
+OUTPUT_LOCATION_DETAIL = "./data/LocationDetail_.txt"
 
 # NYC REGION
 MINLAT = 40.49
@@ -46,11 +47,10 @@ class LocationDict(dict):
 
     def update(self, news):
         for new in news:
-            self[new.lid] = AUser(new.lid, new.lname)
+            self[new.lid] = Location(new.lid, new.lname)
 
     def fit_posts(self, posts, *args):
         if not args:
-            print("In fit_posts, no args!!!")
             for a_post in posts:
                 self[a_post.lid].posts.append(a_post)
                 #self[a_post.lid].add_post_attr(a_post)
@@ -66,6 +66,7 @@ def get_locations_list(locationListFile = None):
     if not locationListFile:
         locationListFile = LOCATIONDETAIL_FILE
     f = open(locationListFile, "r")
+    print("open filename:", f.name)
     line = f.readline()
     for line in f:
         res = re.match(r"(?P<lid>\w+)\t(?P<location>.*?)\t(?P<usercount>\w+)\t(?P<lat>.*?)\t(?P<lng>.*?)\n", line)
@@ -83,16 +84,22 @@ def get_in_region_locations_list():
     newLocations = filter(lambda x: MAXLAT >= float(x.lat) >= MINLAT and MAXLNG >= float(x.lng) >= MINLNG, locations.values())
     return newLocations
 
+"""
 def output_location_part_list(locations, f):
     for item in locations:
         f.write(item.lid + "\t" + item.lname + "\t" + str(item.usercount) + "\t" + item.lat + "\t" + item.lng + "\n")
+"""
 
-def output_location_list(location_list, locationListFile = None):
-    if not locationListFile:
-        locationListFile = OUTPUT_LOCATIONDETIAL
-    f = open(locationListFile, "w")
-    f.write("lid\tlocation\tuser Count\tlatitude\tlongitude\n")
-    output_location_part_list(location_list, f)
+def output_location_list(location_list, mode, locationListFile = OUTPUT_LOCATION_DETAIL):
+    print("Outputing location list...")
+    f = open(locationListFile, mode)
+    if mode is "w":
+        f.write("lid\tlocation\tlatitude\tlongitude\tuser count\n")
+    for item in location_list:
+        f.write(item.lid + "\t" + item.lname + "\t" + item.lat + "\t" + item.lng)
+        if hasattr(item, 'usercount'):
+            f.write("\t" + str(item.usercount))
+        f.write("\n")
     f.close()
 
 """ Location posts related """
