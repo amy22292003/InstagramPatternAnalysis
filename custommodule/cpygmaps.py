@@ -21,7 +21,7 @@ class Googlemap(pygmaps.maps):
                 '\t\ticon: new google.maps.MarkerImage(locations[i][3]),\n' +\
                 '\t\tmap: map\n' +\
                 '\t\t});\n' +\
-                '\t\tgoogle.maps.event.addListener(marker, \'click\', (function(marker, i) {\n' +\
+                '\t\tgoogle.maps.event.addListener(marker, \'mouseover\', (function(marker, i) {\n' +\
                 '\t\treturn function() {\n' +\
                 '\t\tinfowindow.setContent(locations[i][0]);\n' +\
                 '\t\tinfowindow.open(map, marker);\n' +\

@@ -49,7 +49,7 @@ class APost:
         self.comments = int(res.group("comments"))
         del res
 
-def output_posts(posts, outputFile, mode, phase_str = "None"):
+def output_posts(posts, outputFile, mode, phase_str = None):
     f = open(outputFile, mode)
     if mode is "w":
         f.write("uid\tuname\tpostid\ttime\tposttype\tlocation\tlocation Id\tlikes\tcomments\ttext\ttags\n")

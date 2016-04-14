@@ -14,6 +14,7 @@ Recommended Use
 """
 __all__ = []
 
+"""
 try:
     from .version import version as __version__
 except ImportError:
@@ -21,6 +22,7 @@ except ImportError:
 else:
     del version
 
+"""
 ######################
 # Subpackage imports #
 ######################

@@ -90,11 +90,13 @@ def output_location_part_list(locations, f):
         f.write(item.lid + "\t" + item.lname + "\t" + str(item.usercount) + "\t" + item.lat + "\t" + item.lng + "\n")
 """
 
-def output_location_list(location_list, mode, locationListFile = OUTPUT_LOCATION_DETAIL):
+def output_location_list(location_list, mode, locationListFile = OUTPUT_LOCATION_DETAIL, phase_str = None):
     print("Outputing location list...")
     f = open(locationListFile, mode)
     if mode is "w":
         f.write("lid\tlocation\tlatitude\tlongitude\tuser count\n")
+    if phase_str:
+        f.write(phase_str)
     for item in location_list:
         f.write(item.lid + "\t" + item.lname + "\t" + item.lat + "\t" + item.lng)
         if hasattr(item, 'usercount'):

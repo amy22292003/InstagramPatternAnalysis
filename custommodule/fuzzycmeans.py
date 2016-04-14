@@ -43,16 +43,21 @@ def cmeans_intersect(coordinate, similarity, cluster_num, *para, w = 0.4, e = 0.
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr1, u, u0, d1, d2, d, jm, p, fpc, cluster_membership
 
+def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Original"):
+    print("-fuzzy c means - gps")
+    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cluster._cmeans_coordinate(coordinate, cluster_num, 2, e, 5000, algorithm, *para)
+    cluster_membership = numpy.argmax(u, axis=0)
+    return cntr, u, u0, d, jm, p, fpc, cluster_membership
+
+
 """ output """
 
 def output_location_cluster(location_list, cluster_key, output_file):
     sorted_locations = sorted(location_list, key=lambda x:getattr(x, cluster_key))
     groups = {x:list(y) for x, y in itertools.groupby(sorted_locations, lambda x:getattr(x, cluster_key))}
 
-    clocation.output_location_list([], output_file)
-    f = open(output_file, "a")
+    clocation.output_location_list([], "w", output_file)
     # for each cluster
     for c, a_group in groups.items():
-        f.write("Cluster:" + str(c) + "\t#:" + str(len(a_group)) + "\n")
-        clocation.output_location_part_list(a_group, f)
-    f.close()
+        phase_ste = "Cluster:" + str(c) + "\t#:" + str(len(a_group)) + "\n"
+        clocation.output_location_list(a_group, "a", output_file, phase_ste)
