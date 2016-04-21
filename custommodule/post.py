@@ -28,6 +28,7 @@ class APost:
         tags = list(filter(None, re.split(',|\"', tagStr)))
         return tags
 
+    # fit post string into a post
     def fit_post(self, line):
         #res = re.match(r"(?P<uname>.*?)\t(?P<postid>\w+)\t(?P<time>\w+)\t(?P<posttype>\w+)\t(?P<lname>.*?)\t(?P<lid>.*?)\t(?P<likes>\w+)\t(?P<comments>\w+)\t(?P<text>.*?)\t\[u\'\[(?P<tags>.*?)\]\'\].*?\n", line)
         res = re.match(r"(?P<uid>\w+)\t(?P<uname>.*?)\t(?P<postid>\w+)\t(?P<time>\w+)\t(?P<posttype>\w+)\t(?P<lname>.*?)\t(?P<lid>.*?)\t(?P<likes>\w+)\t(?P<comments>\w+)\t(?P<text>.*?)\t(?P<tags>.*?)\n", line)
@@ -62,7 +63,7 @@ def output_posts(posts, outputFile, mode, phase_str = None):
         f.write("\n")
     f.close()
 
-def get_file_posts(filePath):
+def open_file_posts(filePath):
     f = open(filePath, "r")
     posts = []
     f.readline()
@@ -72,7 +73,7 @@ def get_file_posts(filePath):
         posts.append(aPost)
     return posts
 
-def get_part_posts(lines):
+def txt_to_posts(lines):
     posts = []
     # split lines into single line with \n
     for line in lines.splitlines(True):

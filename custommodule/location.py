@@ -29,6 +29,10 @@ class Location:
             setattr(self, attrs[i], arg)
         self.posts = []
 
+    def add_attr(self, **kwargs):
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
     def add_post_attr(self, a_post, *args):
         # if only add part of arributes
         if args:
@@ -39,8 +43,16 @@ class Location:
         else:
             self.posts.append(a_post)
 
+    def txt_to_location(self, line):
+        res = re.match(r"(?P<lid>\w+)\t(?P<lname>.*?)\t(?P<lat>.*?)\t(?P<lng>.*?)\t(?P<usercount>.*?)\n", line)
+        self.lid = res.group("lid")
+        self.lname = res.group("lname")
+        self.lat = res.group("lat")
+        self.lng = res.group("lng")
+        if res.group("usercount"):
+            self.usercount = res.group("usercount")
+
 class LocationDict(dict):
-    # UserDict(posts)
     def __init__(self, *args, **kwargs):
         for arg in args:
             self.setdefault(arg.lid, Location(arg.lid, arg.lname))
@@ -60,12 +72,12 @@ class LocationDict(dict):
 
 """ Location list related """
 # Get location Details Dict
-def get_locations_list(locationListFile = None):
+def open_locations(file_path = None):
     #sortedLocations = []
     locations = LocationDict()
-    if not locationListFile:
-        locationListFile = LOCATIONDETAIL_FILE
-    f = open(locationListFile, "r")
+    if not file_path:
+        file_path = LOCATIONDETAIL_FILE
+    f = open(file_path, "r")
     print("open filename:", f.name)
     line = f.readline()
     for line in f:
@@ -79,8 +91,16 @@ def get_locations_list(locationListFile = None):
         locations[item.lid] = item
     return locations
 
+def txt_to_locations(lines):
+    locations = LocationDict()
+    for line in lines.splitlines(True):
+        a_location = Location()
+        a_location.txt_to_location(line)
+        locations[a_location.lid] = a_location
+    return locations
+
 def get_in_region_locations_list():
-    locations = get_locations_list()
+    locations = open_locations()
     newLocations = filter(lambda x: MAXLAT >= float(x.lat) >= MINLAT and MAXLNG >= float(x.lng) >= MINLNG, locations.values())
     return newLocations
 
@@ -98,15 +118,15 @@ def output_location_list(location_list, mode, locationListFile = OUTPUT_LOCATION
     if phase_str:
         f.write(phase_str)
     for item in location_list:
-        f.write(item.lid + "\t" + item.lname + "\t" + item.lat + "\t" + item.lng)
+        f.write(item.lid + "\t" + item.lname + "\t" + item.lat + "\t" + item.lng + "\t")
         if hasattr(item, 'usercount'):
-            f.write("\t" + str(item.usercount))
+            f.write(str(item.usercount))
         f.write("\n")
     f.close()
 
 """ Location posts related """
 # get locations posts
-def get_location_posts(file_path = None):
+def open_location_posts(file_path = None):
     print("Getting locations posts...")
     locations = []
     if not file_path:

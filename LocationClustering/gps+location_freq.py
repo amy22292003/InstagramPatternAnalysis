@@ -28,15 +28,9 @@ MAX_KTH = 20
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
 OUTPUT_MAP = "./data/LocationCluster/LocationMapCoor_klf_" + str(CLUSTER_NUM) +\
-    "k\'" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
+    "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
 OUTPUT_CLUSTER = "./data/LocationCluster/LocationClusterCoor_klf_" + str(CLUSTER_NUM) +\
-    "k\'" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
-
-
-def set_location_tags(locations):
-    for key in locations.keys():
-        tags = set(x for a_post in locations[key].posts for x in a_post.tags)
-        setattr(locations[key], "tags", tags)
+    "k" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
 
 def set_location_user_count(locations):
     for key in locations.keys():
@@ -52,8 +46,8 @@ def main():
     print("--------------------------------------")
     
     # getting data
-    locations = clocation.get_locations_list()
-    users = cuser.get_users_posts_afile(USER_POSTS_FILE)
+    locations = clocation.open_locations()
+    users = cuser.open_users_posts_afile(USER_POSTS_FILE)
     locations = clocation.fit_users_to_location(locations, users, "uid")
     del users
     set_location_user_count(locations)

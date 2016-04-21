@@ -4,7 +4,7 @@ import os
 import requests
 import re
 import sys
-from . import post as cpost
+from . import post
 
 """file path"""
 USER_LIST = "./data/Travelers.txt"
@@ -25,7 +25,7 @@ class AUser:
     def add_post_attr(self, a_post, *args):
         # if only add part of arributes
         if args:
-            new_post = cpost.APost()
+            new_post = post.APost()
             for arg in args:
                 setattr(new_post, arg, getattr(a_post, arg))
             self.posts.append(new_post)
@@ -63,7 +63,7 @@ class UserDict(dict):
             self[key].get_posts(sorted_key)
 
 """Users list related"""
-def get_users_list(file_path = None):
+def open_users(file_path = None):
     print("Getting users list...")
     users = UserDict()
     if not file_path:
@@ -81,7 +81,7 @@ def get_users_list(file_path = None):
     return users
 
 """posts"""
-def get_users_posts_afile(file_path = None):
+def open_users_posts_afile(file_path = None):
     print("Getting users posts...")
     if not file_path:
         file_path = USER_POSTS_FOLDER
@@ -97,7 +97,7 @@ def get_users_posts_afile(file_path = None):
                 a_user = AUser()
                 a_user.uid = uid
                 a_user.uname = next(iterator)
-                posts = cpost.get_part_posts(next(iterator))
+                posts = post.txt_to_posts(next(iterator))
                 a_user.posts = posts
                 users[uid] = a_user
             f.close()
@@ -112,7 +112,7 @@ def output_user_posts(users, file_path = None):
         file_path = USER_POSTS_FOLDER
     for a_user in users:
         output_file = file_path + "/UserPosts_" + a_user.uid + ".txt"
-        cpost.output_posts(a_user.posts, output_file, "w")
+        post.output_posts(a_user.posts, output_file, "w")
 
 def output_user_posts_afile(users, file_path = None, afile_num = 10000):
     print("Outputing users posts...")
@@ -124,7 +124,7 @@ def output_user_posts_afile(users, file_path = None, afile_num = 10000):
         if i % afile_num == 0:
             output_file = file_path + "/UserPosts_#" + str(i) + ".txt"
             print("Outputing file: ", output_file)
-            cpost.output_posts(a_user.posts, output_file, "w", seperate_str)
+            post.output_posts(a_user.posts, output_file, "w", seperate_str)
         else:
-            cpost.output_posts(a_user.posts, output_file, "a", seperate_str)
+            post.output_posts(a_user.posts, output_file, "a", seperate_str)
     print("End outputing users #:", len(users))
