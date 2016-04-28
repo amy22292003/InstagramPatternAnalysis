@@ -4,7 +4,7 @@ import os
 import requests
 import re
 import sys
-from . import post
+import custommodule.post as post
 
 """file path"""
 USER_LIST = "./data/Travelers.txt"
@@ -82,7 +82,7 @@ def open_users(file_path = None):
 
 """posts"""
 def open_users_posts_afile(file_path = None):
-    print("Getting users posts...")
+    print("[User] Getting users posts...")
     if not file_path:
         file_path = USER_POSTS_FOLDER
     users = UserDict()
@@ -98,6 +98,7 @@ def open_users_posts_afile(file_path = None):
                 a_user.uid = uid
                 a_user.uname = next(iterator)
                 posts = post.txt_to_posts(next(iterator))
+                posts = sorted(posts, key=lambda x:int(x.time))
                 a_user.posts = posts
                 users[uid] = a_user
             f.close()
@@ -128,3 +129,5 @@ def output_user_posts_afile(users, file_path = None, afile_num = 10000):
         else:
             post.output_posts(a_user.posts, output_file, "a", seperate_str)
     print("End outputing users #:", len(users))
+
+"""Operations"""

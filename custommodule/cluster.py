@@ -13,6 +13,7 @@ class Cluster():
         except:
             self.items = set()
 
+"""Open files"""
 def open_cluster_list(file_path = CLUSTERS):
     print("Getting clusters...")
     cluster_list = []

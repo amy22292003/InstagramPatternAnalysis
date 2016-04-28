@@ -1,6 +1,10 @@
 import pygmaps
 import random
 
+"""parameters"""
+MAP_LAT = 40.758899
+MAP_LNG = -73.9873197
+
 class Googlemap(pygmaps.maps):
     def addpoint(self, lat, lng, color = '#FF0000', title = None):
         self.points.append((lat,lng,color[1:],title))
@@ -74,23 +78,34 @@ def _get_color(num):
     color = ["#%02X%02X%02X" % (rd(), rd(), rd()) for i in range(0, num)]
     return color
 
-def output_clusters(point_all, cluster_membership, c, output_file):
+def output_clusters(point_all, cluster_membership, c, file_path):
     print("Outputing clusters' points on the map...")
-    mymap = Googlemap(40.758899, -73.9873197, 13)
+    mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
     color = _get_color(c)
     for i, a_point in enumerate(point_all):
         mymap.addpoint(a_point[0], a_point[1], color[cluster_membership[i]], a_point[2])
-    mymap.draw(output_file) 
+    mymap.draw(file_path) 
 
-def output_patterns(patterns, location_list, cluster_cntr, file_path):
-    mymap = Googlemap(40.758899, -73.9873197, 13)
-    color = _get_color(len(cluster_cntr))
-    for a_location in location_list:
-        mymap.addpoint(float(a_location.lat), float(a_location.lng), color[a_location.cluster], str(a_location.cluster))
-
-    # draw paths
-    for a_pattern in patterns:
-        path = [cluster_cntr[int(x)] for x in a_pattern[0]]
-        #mymap.addpath(path,"#000000")
-        mymap.addpath(path, color[int(a_pattern[0][0])])
+def output_patterns_l(trajectories, cluster_membership, c, file_path):
+    print("[cpygmaps] Outputing patterns...")
+    mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
+    color = _get_color(len(c))
+    for i, s in enumerate(trajectories):
+        path = [(a_point.lat, a_point.lng) for a_point in s]
+        print("path[0]", path[0])
+        mymap.addpoint(s[0].lat, s[0].lng, color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + s[0].lname)
+        mymap.addpoint(s[len(s)-1].lat, s[len(s)-1].lng, color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + s[0].lname)
+        mymap.addpath(path, color[cluster_membership[i]])
     mymap.draw(file_path)
+
+"""
+def output_patterns(patterns, cluster_cntr, cluster_membership, file_path):
+    mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
+    color = _get_color(len(cluster_cntr))
+    for i, a_point in enumerate(cluster_cntr):
+        mymap.addpoint(a_point[0], a_point[1], color[i], cluster_membership[i])
+    for a_pattern in patterns:
+        path = [cluster_cntr[cluster_membership.index(x)] for x in a_pattern]
+        mymap.addpath(path, color[cluster_membership.index(a_pattern[0])])
+    mymap.draw(file_path)
+"""

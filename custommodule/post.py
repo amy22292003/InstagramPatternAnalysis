@@ -50,6 +50,7 @@ class APost:
         self.comments = int(res.group("comments"))
         del res
 
+"""Output"""
 def output_posts(posts, outputFile, mode, phase_str = None):
     f = open(outputFile, mode)
     if mode is "w":
@@ -63,6 +64,7 @@ def output_posts(posts, outputFile, mode, phase_str = None):
         f.write("\n")
     f.close()
 
+"""Open files"""
 def open_file_posts(filePath):
     f = open(filePath, "r")
     posts = []
@@ -73,6 +75,7 @@ def open_file_posts(filePath):
         posts.append(aPost)
     return posts
 
+"""Get posts"""
 def txt_to_posts(lines):
     posts = []
     # split lines into single line with \n
@@ -81,115 +84,3 @@ def txt_to_posts(lines):
         aPost.fit_post(line)
         posts.append(aPost)
     return posts
-
-
-"""
-def GetUserList():
-    userList = []
-    for dir_entry in os.listdir(USER_POSTS_FILE):
-        res = re.match(r"UserPosts_(\w+)\.txt", dir_entry)
-        uid = res.group(1)
-        userList.append(uid)
-    return userList
-
-def GetAUserPosts(uid):
-    posts = Set()
-    user = AUser()
-    try:
-        f = open(USER_POSTS_FILE + "UserPosts_" + str(uid) + ".txt", "r")
-        line = f.readline()
-        #res = re.match(r"uid\t(\w+)\tallpostcount=(\w+)\tlocationPoastCount=(\w+).*?\n", line)
-        res = re.match(r"uid\t(\w+)\tfilterPostCount=(\w+)\tallPostCount=(\w+)\tlocationPostCount=(\w+).*?\n", line)
-        user.uid = res.group(1)
-        user.allPostCount = int(res.group(2))
-        user.locationPostCount = int(res.group(3))
-        f.readline()
-        for line in f:
-            aPost = APost(uid)
-            aPost.FitPost(line)
-            posts.add(aPost)
-            del aPost
-            del line
-        user.posts = posts
-        f.close()
-        return user
-    except:
-        print "EXCEPT: No such a user"
-        return None
-
-def GetAllPosts():
-    allPosts = Set()
-
-    for dir_entry in os.listdir(USER_POSTS_FILE):
-        dir_entry_path = os.path.join(USER_POSTS_FILE, dir_entry)
-        if os.path.isfile(dir_entry_path):
-            with open(dir_entry_path, "r") as f:
-                line = f.readline()
-                #res = re.match(r"uid\t(\w+)\tallpostcount=(\w+)\tlocationPoastCount=(\w+).*?\n", line)
-                res = re.match(r"uid\t(\w+)\tfilterPostCount=(\w+)\tallPostCount=(\w+)\tlocationPostCount=(\w+).*?\n", line)
-                uid = res.group(1)
-                del res
-                f.readline()
-                for line in f:
-                    aPost = APost(uid)
-                    aPost.FitPost(line)
-                    allPosts.add(aPost)
-                    del aPost
-                    del line
-                f.close()
-    return allPosts
-
-def GetSummary():
-    threshold = 5
-    allCount = []
-    zeroCount = 0
-    thresholdCount = 0
-    maxCount = 0
-    for dir_entry in os.listdir(USER_POSTS_SUMMARY_FILE):
-        dir_entry_path = os.path.join(USER_POSTS_SUMMARY_FILE, dir_entry)
-        if os.path.isfile(dir_entry_path):
-            with open(dir_entry_path, "r") as f:
-                line = f.readline()
-                res = re.match(r"uid\t(\w+)\tfilterPostCount=(\w+)\tallPostCount=(\w+)\tlocationPostCount=(\w+).*?\n", line)
-                if not res.group(3) == "0":
-                    allCount.append(int(res.group(2)))
-                    if int(res.group(2)) <= threshold:
-                        thresholdCount += 1
-                    if int(res.group(2)) > maxCount:
-                        maxCount = res.group(2)
-                else:
-                    zeroCount += 1
-    allCountAvg = float(sum(allCount)) / float(len(allCount))
-
-    f = open(SUMMARY_FILE, "w")
-    f.write("filtered post num=" + str(sum(allCount)) + "\n")
-    f.write("average post num= " + str(allCountAvg) + "\n")
-    f.write("Less than " + str(threshold) + " post num= " + str(thresholdCount) + "\n")
-    f.write("Zero post num= " + str(zeroCount) + "\n")
-    f.write("Max post num= " + str(maxCount) + "\n")
-    f.close()
-
-
-def GetUserBrief():
-    allUsers = []
-    securityAccount = 0
-    for dir_entry in os.listdir(USER_POSTS_FILE):
-        dir_entry_path = os.path.join(USER_POSTS_FILE, dir_entry)
-        if os.path.isfile(dir_entry_path):
-            with open(dir_entry_path, "r") as f:
-                line = f.readline()
-                res = re.match(r"uid\t(\w+)\tallpostcount=(\w+)\tlocationPoastCount=(\w+)\n", line)
-                try:
-                    propotion = float(res.group(3))/float(res.group(2))
-                    allUsers.append(propotion)
-                except:
-                    securityAccount += 1
-    locationPropotion = sum(allUsers) / float(len(allUsers))
-    del allUsers
-
-    f = open(BRIEFSUMMARY_FILE, "w")
-    f.write("location propotion: " + str(locationPropotion) + "\n")
-    f.write("security account: " + str(securityAccount) + "\n")
-    f.close
-
-"""

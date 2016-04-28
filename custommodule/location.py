@@ -1,6 +1,6 @@
 import os
 import re
-from . import post
+import custommodule.post as post
 
 """file path"""
 LOCATIONDETAIL_FILE = "./data/LocationDetail_NY.txt"
@@ -78,7 +78,7 @@ def open_locations(file_path = None):
     if not file_path:
         file_path = LOCATIONDETAIL_FILE
     f = open(file_path, "r")
-    print("open filename:", f.name)
+    print("[Location] Openning location list, filename:", f.name)
     line = f.readline()
     for line in f:
         res = re.match(r"(?P<lid>\w+)\t(?P<location>.*?)\t(?P<usercount>\w+)\t(?P<lat>.*?)\t(?P<lng>.*?)\n", line)
@@ -157,4 +157,12 @@ def fit_users_to_location(locations, users, *attr):
     print("after removing locations had no post, #=", len(locations))
     return locations
 
+def get_locations_from_cluster(cluster_list):
+    print("Getting locations from cluster list...")
+    locations = location.LocationDict()
+    for a_cluster in cluster_list:
+        for a_location in a_cluster.items:
+            a_location.add_attr(cluster = a_cluster.index)
+            locations[a_location.lid] = a_location
+    return locations
 
