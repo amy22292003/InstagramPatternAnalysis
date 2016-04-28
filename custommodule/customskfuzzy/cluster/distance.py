@@ -1,3 +1,4 @@
+import numpy
 import math
 from scipy.spatial.distance import cdist
 

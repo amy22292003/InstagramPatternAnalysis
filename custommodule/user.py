@@ -81,10 +81,8 @@ def open_users(file_path = None):
     return users
 
 """posts"""
-def open_users_posts_afile(file_path = None):
-    print("[User] Getting users posts...")
-    if not file_path:
-        file_path = USER_POSTS_FOLDER
+def open_users_posts_afile(file_path = USER_POSTS_FOLDER):
+    print("[User] Getting users posts..., folder:", file_path)
     users = UserDict()
     for root, dirs, files in os.walk(file_path):
         for filename in files:

@@ -17,11 +17,12 @@ class Location:
     def __init__(self):
         self.lid = ""
         self.lname = ""
-        #self.usercount = 0
         self.lat = ""
         self.lng = ""
         self.posts = []
-        #self.tags = set()
+        #self.usercount
+        #self.cluster
+        #self.membership
 
     def __init__(self, *args):
         attrs = ["lid", "lname", "lat", "lng"]
@@ -146,7 +147,7 @@ def open_location_posts(file_path = None):
 
 """ mining """
 def fit_users_to_location(locations, users, *attr):
-    print("Fitting users to locations..., locations #=", len(locations))
+    print("[Location] Fitting users to locations..., locations #=", len(locations))
     all_posts = [y for x in users.values() for y in x.posts]
     locations.fit_posts(all_posts, *attr)
 
@@ -154,7 +155,7 @@ def fit_users_to_location(locations, users, *attr):
     remove = [key for key in locations.keys() if len(locations[key].posts) == 0]
     for key in remove:
         locations.pop(key)
-    print("after removing locations had no post, #=", len(locations))
+    print("-- after removing locations had no post, #=", len(locations))
     return locations
 
 def get_locations_from_cluster(cluster_list):

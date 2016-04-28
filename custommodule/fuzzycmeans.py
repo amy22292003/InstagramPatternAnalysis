@@ -1,3 +1,4 @@
+import datetime
 import itertools
 import numpy
 import skfuzzy
@@ -54,8 +55,8 @@ def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algor
     print("[fuzzy c means] - no center.")
     distance = numpy.zeros((len(sequences), len(sequences)))
     for i, s1 in enumerate(sequences):
-        if i % 10 == 0:
-            print("  getting sequence distance, sequence#", i)
+        if i % 1000 == 0:
+            print("  getting sequence distance, sequence#", i, "\t", datetime.datetime.now())
         for j, s2 in enumerate(sequences):
             if i < j:
                 distance[i, j] = cskfuzzy.cluster.sequence_distance(s1, s2)
