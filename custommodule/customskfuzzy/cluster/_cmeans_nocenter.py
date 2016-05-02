@@ -6,7 +6,7 @@ import sys
 from scipy.spatial.distance import cdist
 
 # data1:coordinate; similarity2:tag intersect similarity
-def _cmeans0_ori(distance, u2, c, m, *para):
+def _cmeans0_ori(distance, u_old, c, m, *para):
 	# the kth for each cluster
 	k = para[0]
 
@@ -17,13 +17,13 @@ def _cmeans0_ori(distance, u2, c, m, *para):
 	um = u_old ** m
 
 	# remain the belonging rate >= the k-th max location of each cluster in um_c
-	filter_k = lambda row:row < sorted(row, reverse=True)[k-1]
-	fail_indices = np.apply_along_axis(filter_k, axis=1, arr=u)
-	print("fail_indices:", fail_indices.shape, fail_indices[0:2, 0:4])
+	filter_k = lambda row:row >= sorted(row, reverse=True)[k-1]
+	large_k_indices = np.apply_along_axis(filter_k, axis=1, arr=um)
+	#print("fail_indices:", fail_indices.shape, fail_indices[0:2, 0:4])
 
 	# Calculate the average distance from entity to cluster 
-	d = fail_indices.dot(distance) / np.ones((distance.shape[1],1)).dot(np.atleast_2d(fail_indices.sum(axis=1))).T
-	print("d:", d.shape, d[0:3, 0:3])
+	d = large_k_indices.dot(distance) / np.ones((distance.shape[1],1)).dot(np.atleast_2d(large_k_indices.sum(axis=1))).T
+	#print("d:", d.shape, d[0:3, 0:3])
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -69,7 +69,8 @@ def cmeans(distance, c, m, error, maxiter, algorithm, *para):
 
 	# Main cmeans loop
 	while p < maxiter - 1:
-		print(p, "---------------------------->")
+		if p % 100 == 0:
+			print("-", p, "---------------------------->")
 		u2 = u.copy()
 		[u, Jjm, d] = _cmeans0(distance, u2, c, m, *para)
 		jm = np.hstack((jm, Jjm))

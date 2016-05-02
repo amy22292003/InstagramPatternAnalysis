@@ -21,42 +21,26 @@ import Liu.custommodule.trajectory as ctrajectory
 import Liu.custommodule.user as cuser
 
 """parameters"""
+FILTER_TIME = 1451001600 # 2015/12/25 1448928000 # 2015/12/01
+SPLIT_DAY = 1
 LC_CLUSTER_NUM = 30
 LC_ERROR = 0.0001
 LC_MAX_KTH = 30
-SC_CLUSTER_NUM = 200
+SC_CLUSTER_NUM = 10
 SC_ERROR = 0.0001
-SC_MAX_KTH = 100
+SC_MAX_KTH = 50
 
 """file path"""
-CLUSTER_FILE = "./data/LocationCluster/LocationClusterCoor_klf_30k30e0.0001.txt"
 USER_POSTS_FOLDER = "./data/TravelerPosts"
 OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_c" + str(LC_CLUSTER_NUM) +\
-    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterMap_c" + str(SC_CLUSTER_NUM) +\
-    "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + ".html"
-OUTPUT_CLUSTER = "./data/Summary/SequenceCluster_c" + str(SC_CLUSTER_NUM) +\
-    "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + ".txt"
+    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
+OUTPUT_MAP = "./data/Summary/SequenceClusterMap_top10_c" + str(SC_CLUSTER_NUM) +\
+    "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
 
 def set_location_user_count(locations):
     for key in locations.keys():
         users = set(a_post.uid for a_post in locations[key].posts)
         setattr(locations[key], "usercount", len(users))
-
-def output_sequence_cluster(sequences, cluster_key, file_path):
-    sorted_sequences = sorted(sequences, key=lambda x:getattr(x, cluster_key))
-    groups = {x:list(y) for x, y in itertools.groupby(sorted_sequences, lambda x:getattr(x, cluster_key))}
-
-    f = open(file_path, "w")
-    # for each cluster
-    for c, a_group in groups.items():
-        f.write("Cluster:" + str(c) + "\t#:" + str(len(a_group)) + "\n")
-        for a_sequence in a_group:
-            output = [x.lid + x.lname for x in a_sequence]
-            output_str = output.join(" ->\t")
-            output_str = " " + len(output) + "> " + output_str + "\n"
-            f.write(output_str)
-    f.close()
 
 def main():
     print("--------------------------------------")
@@ -70,7 +54,7 @@ def main():
     # sample users
     print("Sampling users posts...")
     for key, a_user in users.items():
-        posts = [x for x in a_user.posts if x.time > 1448928000] # 2015/12/01 00:00:00 GMT
+        posts = [x for x in a_user.posts if (x.time > FILTER_TIME) and (x.time < 1451606400)]
         users[key].posts = posts
     locations = clocation.fit_users_to_location(locations, users, "uid")
 
@@ -87,19 +71,26 @@ def main():
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         membership, LC_CLUSTER_NUM, OUTPUT_LC_MAP)
-    print("u.type:", type(u[:,0]), u[:,0].shape)
 
     # Getting sequences cluster
-    print("users.type:", type(users))
-    sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], 3)
+    sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     vector_sequences = ctrajectory.get_vector_sequence(sequences, locations)
+    location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
 
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_location(vector_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
-    for i in range(0, len(sequences)):
-        setattr(sequences[i], "cluster", membership[i])
 
-    cpygmaps.output_patterns_l(sequences, membership, SC_CLUSTER_NUM, OUTPUT_MAP)
-    output_sequence_cluster(sequences, "cluster", OUTPUT_CLUSTER)
+    print("Start Outputting...")
+    for c in range(0, SC_CLUSTER_NUM):
+        this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
+        if len(this_cluster_indices) is not 0:
+            print(c, ">>", u[c, this_cluster_indices].shape)
+            top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x])[0:10]
+            print(type(top_10_indices), top_10_indices.shape)
+            print(u[c, this_cluster_indices][top_10_indices])
+            points_sequences = location_sequences[this_cluster_indices][top_10_indices]
+            color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
+            print("  color:", color)
+            cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

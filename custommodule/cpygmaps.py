@@ -53,7 +53,7 @@ class Googlemap(pygmaps.maps):
             geodesic = True,\
             strokeColor = "#FF0000",\
             strokeOpacity = 1.0,\
-            strokeWeight = 4
+            strokeWeight = 1
             ):
         f.write('var PolylineCoordinates = [\n')
         for coordinate in path:
@@ -89,12 +89,11 @@ def output_clusters(point_all, cluster_membership, c, file_path):
 def output_patterns_l(trajectories, cluster_membership, c, file_path):
     print("[cpygmaps] Outputing patterns...")
     mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
-    color = _get_color(len(c))
+    color = _get_color(c)
     for i, s in enumerate(trajectories):
-        path = [(a_point.lat, a_point.lng) for a_point in s]
-        print("path[0]", path[0])
-        mymap.addpoint(s[0].lat, s[0].lng, color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + s[0].lname)
-        mymap.addpoint(s[len(s)-1].lat, s[len(s)-1].lng, color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + s[0].lname)
+        path = [(float(a_point.lat), float(a_point.lng)) for a_point in s]
+        mymap.addpoint(float(s[0].lat), float(s[0].lng), color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
+        mymap.addpoint(float(s[len(s)-1].lat), float(s[len(s)-1].lng), color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
         mymap.addpath(path, color[cluster_membership[i]])
     mymap.draw(file_path)
 

@@ -1,4 +1,4 @@
-# trajectory = list of Locations
+# trajectory = list of posts
 
 """For posts sequences"""
 def split_trajectory(trajectories, split_day = 1):
@@ -17,7 +17,7 @@ def split_trajectory(trajectories, split_day = 1):
                 else:
                     i += 1
             sequences.append(a_trajectory)
-    print("--output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
+    print("  output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
     return sequences
 
 def get_vector_sequence(trajectories, locations):
@@ -26,5 +26,12 @@ def get_vector_sequence(trajectories, locations):
     for a_sequence in trajectories:
         a_vector_sequence = [locations[a_post.lid].membership for a_post in a_sequence]
         vector_sequences.append(a_vector_sequence)
-    print("vs:", type(vector_sequences[0]), type(vector_sequences[0][0]))
     return vector_sequences
+
+"""For location sequences"""
+def convertto_location_sequences(post_sequences, locations):
+    location_sequences = []
+    for s in post_sequences:
+        location_s = [locations[x.lid] for x in s]
+        location_sequences.append(location_s)
+    return location_sequences

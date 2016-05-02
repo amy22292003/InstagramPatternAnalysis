@@ -55,7 +55,7 @@ def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algor
     print("[fuzzy c means] - no center.")
     distance = numpy.zeros((len(sequences), len(sequences)))
     for i, s1 in enumerate(sequences):
-        if i % 1000 == 0:
+        if i % 100 == 0:
             print("  getting sequence distance, sequence#", i, "\t", datetime.datetime.now())
         for j, s2 in enumerate(sequences):
             if i < j:
@@ -63,10 +63,10 @@ def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algor
             else:
                 # for i >= j
                 distance[i, j] = distance[j, i]
-    print("--distance:", distance[0:4, 0:4])
+    print("-- distance:", distance[0:4, 0:4], numpy.amax(distance))
 
     u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, *para)
-    print("--looping time:", p)
+    print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership
 
