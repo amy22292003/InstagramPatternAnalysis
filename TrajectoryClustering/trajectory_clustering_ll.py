@@ -84,10 +84,12 @@ def main():
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
         if len(this_cluster_indices) is not 0:
             print(c, ">>", u[c, this_cluster_indices].shape)
-            top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x])[0:10]
-            print(type(top_10_indices), top_10_indices.shape)
+            top_10_u = sorted(u[c, this_cluster_indices], reverse=True)[9]
+            top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
+            #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
+            print(top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])
-            points_sequences = location_sequences[this_cluster_indices][top_10_indices]
+            points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             print("  color:", color)
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")

@@ -24,9 +24,6 @@ def sequence_distance(s1, s2):
 def lcs(s1, s2):
     md = numpy.empty([len(s2), len(s1)])
  
-    """Following steps build L[m+1][n+1] in bottom up fashion
-    Note: L[i][j] contains length of LCS of X[0..i-1]
-    and Y[0..j-1]"""
     for j in range(len())
     for i in range(m+1):
         for j in range(n+1):
