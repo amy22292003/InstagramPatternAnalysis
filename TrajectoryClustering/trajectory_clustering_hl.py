@@ -21,20 +21,20 @@ import Liu.custommodule.trajectory as ctrajectory
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME = 1451001600 # 2015/12/25 1448928000 # 2015/12/01
+FILTER_TIME = 1443657600 # 2015/10/01 1448928000 # 2015/12/01
 SPLIT_DAY = 1
 LC_CLUSTER_NUM = 30
 LC_ERROR = 0.0001
 LC_MAX_KTH = 30
-SC_CLUSTER_NUM = 30
+SC_CLUSTER_NUM = 10
 SC_ERROR = 0.0001
-SC_MAX_KTH = 20
+SC_MAX_KTH = 50
 
 """file path"""
 USER_POSTS_FOLDER = "./data/TravelerPosts"
-OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_hlna_c" + str(LC_CLUSTER_NUM) +\
+OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_hl_6m_c" + str(LC_CLUSTER_NUM) +\
     "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterMap_hlna_c" + str(SC_CLUSTER_NUM) +\
+OUTPUT_MAP = "./data/Summary/SequenceClusterMap_hl_6m_c" + str(SC_CLUSTER_NUM) +\
     "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
 
 def set_location_user_count(locations):
@@ -55,11 +55,13 @@ def main():
     print("Sampling users posts...")
     for key, a_user in users.items():
         posts = [x for x in a_user.posts if (x.time > FILTER_TIME) and (x.time < 1451606400)]
-        users[key].posts = posts
+        if len(posts) > 3:
+            users[key].posts = posts
+        else:
+            users[key].posts = []
     locations = clocation.fit_users_to_location(locations, users, "uid")
 
     set_location_user_count(locations)
-
     coordinate = numpy.array([(float(x.lat), float(x.lng)) for x in locations.values()])
     location_frequency = numpy.array([x.usercount for x in locations.values()])
     
@@ -76,6 +78,16 @@ def main():
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     cluster_sequences = ctrajectory.get_cluster_sequence(sequences, locations)
     location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
+
+    print("Filtering short trajectories...")
+    fail_indices = []
+    for i, s in enumerate(cluster_sequences):
+        if len(s) <= 4:
+            fail_indices.append(i)
+    sequences = [s for i, s in enumerate(sequences) if i not in set(fail_indices)]
+    cluster_sequences = [s for i, s in enumerate(cluster_sequences) if i not in set(fail_indices)]
+    location_sequences = [s for i, s in enumerate(location_sequences) if i not in set(fail_indices)]
+    print("  sequences #:", len(sequences))
 
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_cluster(cluster_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
 

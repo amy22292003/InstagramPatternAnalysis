@@ -79,7 +79,7 @@ def sequences_clustering_cluster(sequences, cluster_num, *para, e = 0.01, algori
         for j, s2 in enumerate(sequences):
             if i < j:
                 #distance[i, j] = 1 - cskfuzzy.cluster.longest_common_sequence(s1, s2)
-                length, lcs_set = cskfuzzy.cluster.longest_common_sequence(s1, s2)
+                length = cskfuzzy.cluster.longest_common_sequence(s1, s2)
                 distance[i, j] = length 
             else:
                 distance[i, j] = distance[j, i]
