@@ -26,15 +26,15 @@ SPLIT_DAY = 1
 LC_CLUSTER_NUM = 30
 LC_ERROR = 0.0001
 LC_MAX_KTH = 30
-SC_CLUSTER_NUM = 20
+SC_CLUSTER_NUM = 30
 SC_ERROR = 0.0001
-SC_MAX_KTH = 30
+SC_MAX_KTH = 20
 
 """file path"""
 USER_POSTS_FOLDER = "./data/TravelerPosts"
-OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_c" + str(LC_CLUSTER_NUM) +\
+OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_hlna_c" + str(LC_CLUSTER_NUM) +\
     "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterMap_top10_c" + str(SC_CLUSTER_NUM) +\
+OUTPUT_MAP = "./data/Summary/SequenceClusterMap_hlna_c" + str(SC_CLUSTER_NUM) +\
     "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
 
 def set_location_user_count(locations):
@@ -74,24 +74,29 @@ def main():
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
-    vector_sequences = ctrajectory.get_vector_sequence(sequences, locations)
+    cluster_sequences = ctrajectory.get_cluster_sequence(sequences, locations)
     location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
 
-    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_location(vector_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
+    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_cluster(cluster_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
 
     print("Start Outputting...")
     for c in range(0, SC_CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
+        print(c, " >> this cluster #:", len(this_cluster_indices))
         if len(this_cluster_indices) is not 0:
             print(c, ">>", u[c, this_cluster_indices].shape)
-            top_10_u = sorted(u[c, this_cluster_indices], reverse=True)[9]
+            top_10_u = sorted(u[c, this_cluster_indices], reverse=True)
+            print("  top_10_u len:", len(top_10_u))
+            if len(top_10_u) >= SC_MAX_KTH:
+                top_10_u = top_10_u[SC_MAX_KTH - 1]
+            else:
+                top_10_u = top_10_u[-1]
             top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
             #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
             print(top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
-            print("  color:", color)
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
 
     print("--------------------------------------")

@@ -8,8 +8,7 @@ __all__ = ['cmeans',
            'cmeans_predict',
            'cmeans_intersect',
            'cmeans_coordinate',
-           'cmeans_nocenter',
-           'sequence_distance'
+           'cmeans_nocenter'
            ]
 
 from ._cmeans import cmeans, cmeans_predict
@@ -20,4 +19,4 @@ from ._cmeans_coordinate import cmeans as cmeans_coordinate
 
 from ._cmeans_nocenter import cmeans as cmeans_nocenter
 
-from .distance import sequence_distance as sequence_distance
+from .distance import *

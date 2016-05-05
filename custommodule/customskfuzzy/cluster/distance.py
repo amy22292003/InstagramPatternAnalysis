@@ -1,5 +1,6 @@
-import numpy
+import datetime
 import math
+import numpy
 from scipy.spatial.distance import cdist
 
 # len(s1) > len(s2)
@@ -20,21 +21,30 @@ def sequence_distance(s1, s2):
     else:
         return _dynamic_programming(s2, s1, len(s2) - 1, len(s1) - 1) / len(s1)
 
-"""
-def lcs(s1, s2):
-    md = numpy.empty([len(s2), len(s1)])
- 
-    for j in range(len())
-    for i in range(m+1):
-        for j in range(n+1):
-            if i == 0 or j == 0 :
-                L[i][j] = 0
-            elif X[i-1] == Y[j-1]:
-                L[i][j] = L[i-1][j-1]+1
+def _lcs_length(s1, s2):
+    ml = numpy.zeros([len(s1) + 1, len(s2) + 1])
+    for i in range(1, len(s1) + 1):
+        for j in range(1, len(s2) + 1):
+            if s1[i - 1] == s2[j - 1]:
+                ml[i, j] = ml[i - 1, j - 1] + 1
             else:
-                L[i][j] = max(L[i-1][j] , L[i][j-1])
- 
-    # L[m][n] contains the length of LCS of X[0..n-1] & Y[0..m-1]
-    return L[m][n]
-#end of function lcs
-"""
+                ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
+    return ml
+
+def _lcs(ml, s1, s2, i, j):
+    if i == 0 or j == 0:
+        return set()
+    elif s1[i - 1] == s2[j - 1]:
+        return set([sub_s + s1[i - 1] for sub_s in _lcs(ml, s1, s2, i - 1, j - 1)])
+    else:
+        if ml[i, j - 1] > ml[i - 1, j]:
+            return _lcs(ml, s1, s2, i, j - 1)
+        elif ml[i - 1, j] > ml[i, j - 1]:
+            return _lcs(ml, s1, s2, i - 1, j)
+        else:
+            return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
+
+def longest_common_sequence(s1, s2):
+    ml = _lcs_length(s1, s2)
+    lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
+    return ml[len(s1), len(s2)], lcs_set # / min(len(s1), len(s2))
