@@ -22,7 +22,7 @@ import Liu.custommodule.user as cuser
 """parameters"""
 FILTER_TIME = 1443657600 # 2015/10/01 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
-ERROR = 0.0001
+ERROR = 0.001
 MAX_KTH = 30
 
 """file path"""

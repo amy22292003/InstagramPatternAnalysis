@@ -24,8 +24,8 @@ SPLIT_DAY = 1
 #LC_ERROR = 0.0001
 #LC_MAX_KTH = 30
 SC_CLUSTER_NUM = 10
-SC_ERROR = 0.0001
-SC_MAX_KTH = 20
+SC_ERROR = 0.001
+SC_MAX_KTH = 10
 
 """file path"""
 #OUTPUT_LC_MAP = "./data/Summary/HermesL_3m_c" + str(LC_CLUSTER_NUM) +\
@@ -48,7 +48,7 @@ def main():
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(cluster_sequences):
-        if len(s) < 10:
+        if len(s) >= 5 or len(s) <= 3:
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
@@ -59,18 +59,17 @@ def main():
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_cluster(cluster_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
 
     print("Start Outputting...")
-    for c in range(0, SC_CLUSTER_NUM):
+    for c in range(SC_CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
         print(c, " >> this cluster #:", len(this_cluster_indices))
         if len(this_cluster_indices) is not 0:
-            print(c, ">>", u[c, this_cluster_indices].shape)
             top_10_u = sorted(u[c, this_cluster_indices], reverse=True)
-            print("  top_10_u len:", len(top_10_u))
             if len(top_10_u) >= SC_MAX_KTH:
                 top_10_u = top_10_u[SC_MAX_KTH - 1]
             else:
                 top_10_u = top_10_u[-1]
             top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
+            print("  top_10_u len:", top_10_u.shape())
             #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
             print(top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])

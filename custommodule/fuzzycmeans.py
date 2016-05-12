@@ -52,17 +52,15 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
 """Sequence Clustering"""
 def _get_init_u(distance, cluster_num, *para):
     k = para[0]
-    u = numpy.zeros((cluster_num, len(distance.shape[0])))
-    print("  u:", u)
-    init = numpy.random.randint(0, len(distance.shape[0]) - 1, cluster_num)
-    print("  init:", init_seq)
+    u = numpy.zeros((cluster_num, distance.shape[0]))
+    init = numpy.random.randint(0, distance.shape[0] - 1, cluster_num)
+    print("[fuzzy c means]- get_init_u> init:", init)
     for i, center in enumerate(init):
-        sorted_indices = sorted(range(distance.shape[1]), key = lambda x: distance[x, center], reverse = True) # distance.shape[1] == distance.shape[0]
-        print("  center-", center, "-sorted indices:", sorted_indices)
-        u[i, sorted_indices] = 1
-    print("  u:", u[:, 0:5])
-    u /= numpy.ones((cluster_num, 1)).dot(numpy.atleast_2d(u.sum(axis=0))).astype(np.float64)
-    print("  u:", u[:, 0:5])
+        top_k = sorted(distance[:, center])[k - 1]
+        is_top_k = [True if x <= top_k else False for x in distance[:, center]]
+        u[i, numpy.array(is_top_k)] = 1
+    #u /= numpy.ones((cluster_num, 1)).dot(numpy.atleast_2d(u.sum(axis=0))).astype(numpy.float64)
+    print("--each cluster initial #:", u.sum(axis=1))
     return u
 
 def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algorithm="Original"):

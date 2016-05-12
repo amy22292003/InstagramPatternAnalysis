@@ -78,7 +78,7 @@ def cmeans(distance, c, m, error, maxiter, algorithm, *para, init = None, seed =
 		if np.linalg.norm(u - u2) < error:
 			break
 
-	print("end u.sum:", u.sum(axis=0), u.sum(axis=1))
+	print("end u.sum:", u.sum(axis=0)[0:6], u.sum(axis=1))
 	print("Fin u>>\n", u[:,0],u[:,1], u[:,2], "\nu std:", np.std(u))
 	# Final calculations
 	error = np.linalg.norm(u - u2)
