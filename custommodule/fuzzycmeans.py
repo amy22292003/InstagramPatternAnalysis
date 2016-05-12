@@ -25,7 +25,6 @@ def get_tfidf(corpus):
     return tfidf.toarray(), feature_name
 
 """Location Clustering"""
-
 def cmeans_ori(array, cluster_num):
     cntr, u, u0, d, jm, p, fpc = skfuzzy.cluster.cmeans(array, cluster_num, 2, error=0.01, maxiter=100000, init=None)
     cluster_membership = numpy.argmax(u, axis=0)
@@ -51,6 +50,21 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 """Sequence Clustering"""
+def _get_init_u(distance, cluster_num, *para):
+    k = para[0]
+    u = numpy.zeros((cluster_num, len(distance.shape[0])))
+    print("  u:", u)
+    init = numpy.random.randint(0, len(distance.shape[0]) - 1, cluster_num)
+    print("  init:", init_seq)
+    for i, center in enumerate(init):
+        sorted_indices = sorted(range(distance.shape[1]), key = lambda x: distance[x, center], reverse = True) # distance.shape[1] == distance.shape[0]
+        print("  center-", center, "-sorted indices:", sorted_indices)
+        u[i, sorted_indices] = 1
+    print("  u:", u[:, 0:5])
+    u /= numpy.ones((cluster_num, 1)).dot(numpy.atleast_2d(u.sum(axis=0))).astype(np.float64)
+    print("  u:", u[:, 0:5])
+    return u
+
 def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algorithm="Original"):
     print("[fuzzy c means] - no center.")
     distance = numpy.zeros((len(sequences), len(sequences)))
@@ -86,19 +100,9 @@ def sequences_clustering_cluster(sequences, cluster_num, *para, e = 0.01, algori
     distance = numpy.amax(distance) - distance
     print("-- distance:", distance[0:4, 0:4])
     print("-- distance max:", numpy.amax(distance), numpy.mean(distance), numpy.std(distance))
+    u = _get_init_u(distance, cluster_num, *para)
 
-    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, *para)
+    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, *para, init = u)
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership
-
-""" output """
-def output_location_cluster(location_list, cluster_key, output_file):
-    sorted_locations = sorted(location_list, key=lambda x:getattr(x, cluster_key))
-    groups = {x:list(y) for x, y in itertools.groupby(sorted_locations, lambda x:getattr(x, cluster_key))}
-
-    clocation.output_location_list([], "w", output_file)
-    # for each cluster
-    for c, a_group in groups.items():
-        phase_ste = "Cluster:" + str(c) + "\t#:" + str(len(a_group)) + "\n"
-        clocation.output_location_list(a_group, "a", output_file, phase_ste)

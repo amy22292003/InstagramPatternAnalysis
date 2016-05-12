@@ -19,6 +19,7 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.trajectory as ctrajectory
 import Liu.custommodule.user as cuser
+import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 FILTER_TIME = 1451001600 # 2015/12/25 1448928000 # 2015/12/01
@@ -47,6 +48,9 @@ def main():
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
+    users, locations = locationclustering.main()
+
+    """
     # Getting locations membership vectors
     locations = clocation.open_locations()
     users = cuser.open_users_posts_afile(USER_POSTS_FOLDER)
@@ -71,6 +75,7 @@ def main():
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         membership, LC_CLUSTER_NUM, OUTPUT_LC_MAP)
+    """
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)

@@ -79,7 +79,7 @@ def _get_color(num):
     return color
 
 def output_clusters(point_all, cluster_membership, c, file_path):
-    print("Outputing clusters' points on the map...")
+    print("[cpygmaps] Outputing clusters' points on the map...")
     mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
     color = _get_color(c)
     for i, a_point in enumerate(point_all):

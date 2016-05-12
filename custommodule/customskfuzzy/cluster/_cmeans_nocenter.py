@@ -41,9 +41,7 @@ def _fp_coeff(u):
 
 	return np.trace(u.dot(u.T)) / float(n)
 
-def cmeans(distance, c, m, error, maxiter, algorithm, *para):
-	init = None
-	seed = None
+def cmeans(distance, c, m, error, maxiter, algorithm, *para, init = None, seed = None):
 	# Setup u0
 	if init is None:
 		if seed is not None:

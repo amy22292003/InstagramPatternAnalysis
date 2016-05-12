@@ -112,7 +112,7 @@ def output_location_part_list(locations, f):
 """
 
 def output_location_list(location_list, mode, locationListFile = OUTPUT_LOCATION_DETAIL, phase_str = None):
-    print("Outputing location list...")
+    print("[Location] Outputing location list...")
     f = open(locationListFile, mode)
     if mode is "w":
         f.write("lid\tlocation\tlatitude\tlongitude\tuser count\n")

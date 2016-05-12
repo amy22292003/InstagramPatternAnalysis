@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-    command: 
-    output map file to: 
-"""
 import datetime
 import numpy
 import os
@@ -19,60 +15,30 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.trajectory as ctrajectory
 import Liu.custommodule.user as cuser
+import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 FILTER_TIME = 1443657600 # 2015/10/01 1448928000 # 2015/12/01
 SPLIT_DAY = 1
-LC_CLUSTER_NUM = 30
-LC_ERROR = 0.0001
-LC_MAX_KTH = 30
+#LC_CLUSTER_NUM = 30
+#LC_ERROR = 0.0001
+#LC_MAX_KTH = 30
 SC_CLUSTER_NUM = 10
 SC_ERROR = 0.0001
-SC_MAX_KTH = 50
+SC_MAX_KTH = 20
 
 """file path"""
-USER_POSTS_FOLDER = "./data/TravelerPosts"
-OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_hl_6m_c" + str(LC_CLUSTER_NUM) +\
-    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterMap_hl_6m_c" + str(SC_CLUSTER_NUM) +\
+#OUTPUT_LC_MAP = "./data/Summary/HermesL_3m_c" + str(LC_CLUSTER_NUM) +\
+#    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
+OUTPUT_MAP = "./data/Summary/SequenceClusterLocationsMap_hl_3m_c" + str(SC_CLUSTER_NUM) +\
     "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
-
-def set_location_user_count(locations):
-    for key in locations.keys():
-        users = set(a_post.uid for a_post in locations[key].posts)
-        setattr(locations[key], "usercount", len(users))
 
 def main():
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
-    # Getting locations membership vectors
-    locations = clocation.open_locations()
-    users = cuser.open_users_posts_afile(USER_POSTS_FOLDER)
-
-    # sample users
-    print("Sampling users posts...")
-    for key, a_user in users.items():
-        posts = [x for x in a_user.posts if (x.time > FILTER_TIME) and (x.time < 1451606400)]
-        if len(posts) > 3:
-            users[key].posts = posts
-        else:
-            users[key].posts = []
-    locations = clocation.fit_users_to_location(locations, users, "uid")
-
-    set_location_user_count(locations)
-    coordinate = numpy.array([(float(x.lat), float(x.lng)) for x in locations.values()])
-    location_frequency = numpy.array([x.usercount for x in locations.values()])
-    
-    cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans_coordinate(coordinate.T, LC_CLUSTER_NUM, LC_MAX_KTH, location_frequency, e=LC_ERROR, algorithm="kthCluster_LocationFrequency")
-    for i, key in enumerate(locations.keys()):
-        setattr(locations[key], "cluster", membership[i])
-        setattr(locations[key], "membership", numpy.atleast_2d(u[:,i]))
-
-    cpygmaps.output_clusters(\
-        [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
-        membership, LC_CLUSTER_NUM, OUTPUT_LC_MAP)
+    users, locations = locationclustering.main()
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
@@ -82,12 +48,13 @@ def main():
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(cluster_sequences):
-        if len(s) <= 4:
+        if len(s) < 10:
             fail_indices.append(i)
-    sequences = [s for i, s in enumerate(sequences) if i not in set(fail_indices)]
-    cluster_sequences = [s for i, s in enumerate(cluster_sequences) if i not in set(fail_indices)]
-    location_sequences = [s for i, s in enumerate(location_sequences) if i not in set(fail_indices)]
-    print("  sequences #:", len(sequences))
+    print("  will delete #:", len(fail_indices))
+    sequences = numpy.delete(numpy.array(sequences), fail_indices)
+    cluster_sequences = numpy.delete(numpy.array(cluster_sequences), fail_indices)
+    location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
+    print("  remain sequences #:", len(sequences))
 
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_cluster(cluster_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
 
