@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import lda
 import numpy
 import skfuzzy
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -12,9 +13,11 @@ import custommodule.location as clocation
 #ERROR = 0.0001 #0.01
 
 def get_tag_vector(corpus):
+    print("[fuzzy c means] getting tag vector...")
     vectorizer = CountVectorizer()
     vector = vectorizer.fit_transform(corpus) # location # x tags #
     feature_name =vectorizer.get_feature_names() # tags #
+    print("-- vector shape:", vector.shape)
     return vector.toarray(), feature_name
 
 def get_tfidf(corpus):
@@ -23,6 +26,22 @@ def get_tfidf(corpus):
     print("vector:", vector.shape)
     tfidf = transformer.fit_transform(vector)
     return tfidf.toarray(), feature_name
+
+"""LDA"""
+def fit_lda(corpus, tag_name):
+    print("[fuzzy c means] LDA")
+    model = lda.LDA(n_topics = 20, n_iter = 1000, random_state = 1)
+    model.fit(corpus)
+    topic_word = model.topic_word_
+    f = open("./data/Summary/TagTopics.txt", "w")
+    for i, topic_dist in enumerate(topic_word):
+        print(i, ">>")
+        print(type(topic_dist))
+        topic_words = numpy.array(tag_name)[numpy.argsort(topic_dist)][:-(10+1):-1]
+        print('Topic {}: {}'.format(i, ' '.join(topic_words)))
+        f.write('Topic {}: {}'.format(i, ' '.join(topic_words)))
+    f.close()
+
 
 """Location Clustering"""
 def cmeans_ori(array, cluster_num):

@@ -1,48 +1,64 @@
 import os
 import re
-from . import location
+import custommodule.location as location
 
 """default file path"""
-LOCATION_TAGS_FILE = "./data/LocationTags/"
+LOCATION_TAGS_FOLDER = "./data/LocationTags/"
 LOCATION_TAGS_AFILE = "./data/LocationTags.txt"
 OUTPUT_TAG_COUNT_FILE = "./data/Summary/TagCount.txt"
 OUTPUT_LOCATION_TAGS_AFILE = "./data/LocationTags.txt"
 
 class Tag():
     def __init__(self):
-        self.name = ""
+        self.tag = ""
         self.count = 0
 
-def get_file_tags(file_path, is_set = True):
-    f = open(file_path, "r")
-    line = f.readline()
-    res = re.match(r"location ID=(?P<lid>\w+)\tlocation Name=(?P<lname>.*?)\n", line)
-    lid = res.group("lid")
-    lname = res.group("lname")
-    post_tags = []
-    for line in f:
-        tags = set(filter(None, re.split(",", line.rstrip())))
-        post_tags.append(tags)
-    if is_set:
-        return lid, lname, set.union(*post_tags)
-    else:
-        return lid, lname, post_tags
+def add_attr_tag(a_object):
+    setattr(a_object, "tags", [])
+    return a_object
 
-def get_location_tags(file_path = None):
-    location_list = []
-    if not file_path:
-        file_path = LOCATION_TAGS_FILE
+"""Tag files"""
+def open_location_tags(file_path = LOCATION_TAGS_FOLDER):
+    print("[Tag] Getting locations tags..., folder:", file_path)
+    locations = location.LocationDict()
     for root, dirs, files in os.walk(file_path):
         for filename in files:
-            lid, lname, tag_set = get_file_tags(os.path.join(root, filename))
-            a_location = location.Location()
-            a_location.lid = lid
-            a_location.lname = lname
-            a_location.tags = tag_set
-            location_list.append(a_location)
-    return location_list
+            print("  file: ", filename)
+            f = open(os.path.join(root, filename), "r")
+            paragraphs = f.read().split("Location ID:")
+            # for each location
+            for it in paragraphs[1:]:
+                res = re.search(r"(?P<lid>\w+)\tLocation Name:(?P<lname>.*?)\n", it)
+                a_location = location.Location()
+                a_location.lid = res.group("lid")
+                a_location.lname = res.group("lname")
+                a_location = add_attr_tag(a_location)
 
-def get_location_tags_afile(file_path = None):
+                # for each tag
+                lines = it[res.end():]
+                for line in lines.splitlines(True):
+                    res = re.match(r"\t(?P<tag>.*?)\t(?P<count>\w+)\n", line)
+                    a_tag = Tag()
+                    a_tag.tag = res.group("tag")
+                    a_tag.count = int(res.group("count"))
+                    a_location.tags.append(a_tag)
+                locations[a_location.lid] = a_location
+            f.close()
+    print("-- End Getting users posts. locations #:", len(locations))
+    return locations
+
+"""Operations"""
+def get_corpus(tags_list):
+    print("[tag] getting corpus...")
+    corpus = []
+    for tags in tags_list:
+        doc_str = " ".join((x.tag + " ") * x.count for x in tags)
+        corpus.append(doc_str)
+    print("-- corpus doc #:", len(corpus))
+    return corpus
+
+"""
+def open_location_tags_afile(file_path = None):
     location_list = []
     if not file_path:
         file_path = LOCATION_TAGS_AFILE
@@ -75,4 +91,4 @@ def output_location_tags_afile(location_list, output_file = None):
             f.write("," + a_tag)
         f.write("\n")
     f.close()
-
+"""
