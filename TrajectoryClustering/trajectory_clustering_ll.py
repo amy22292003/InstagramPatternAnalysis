@@ -14,29 +14,23 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 sys.path.append(PACKAGE_PARENT)
 
 import Liu.custommodule.cluster as ccluster
+import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.fuzzycmeans as cfuzzy
 import Liu.custommodule.location as clocation
-import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.trajectory as ctrajectory
 import Liu.custommodule.user as cuser
 import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
-FILTER_TIME = 1451001600 # 2015/12/25 1448928000 # 2015/12/01
 SPLIT_DAY = 1
-LC_CLUSTER_NUM = 30
-LC_ERROR = 0.0001
-LC_MAX_KTH = 30
-SC_CLUSTER_NUM = 20
-SC_ERROR = 0.0001
-SC_MAX_KTH = 30
+CLUSTER_NUM = 20
+ERROR = 0.01
+MAX_KTH = 10
 
 """file path"""
 USER_POSTS_FOLDER = "./data/TravelerPosts"
-OUTPUT_LC_MAP = "./data/Summary/SequenceClusterLocationsMap_c" + str(LC_CLUSTER_NUM) +\
-    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterMap_top10_c" + str(SC_CLUSTER_NUM) +\
-    "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
+OUTPUT_MAP = "./data/Summary/SequenceClusterLL_1w_c" + str(CLUSTER_NUM) +\
+    "k" + str(MAX_KTH) + "e" + str(ERROR) + "d" + str(SPLIT_DAY)
 
 def set_location_user_count(locations):
     for key in locations.keys():
@@ -49,33 +43,6 @@ def main():
     print("--------------------------------------")
 
     users, locations = locationclustering.main()
-
-    """
-    # Getting locations membership vectors
-    locations = clocation.open_locations()
-    users = cuser.open_users_posts_afile(USER_POSTS_FOLDER)
-
-    # sample users
-    print("Sampling users posts...")
-    for key, a_user in users.items():
-        posts = [x for x in a_user.posts if (x.time > FILTER_TIME) and (x.time < 1451606400)]
-        users[key].posts = posts
-    locations = clocation.fit_users_to_location(locations, users, "uid")
-
-    set_location_user_count(locations)
-
-    coordinate = numpy.array([(float(x.lat), float(x.lng)) for x in locations.values()])
-    location_frequency = numpy.array([x.usercount for x in locations.values()])
-    
-    cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans_coordinate(coordinate.T, LC_CLUSTER_NUM, LC_MAX_KTH, location_frequency, e=LC_ERROR, algorithm="kthCluster_LocationFrequency")
-    for i, key in enumerate(locations.keys()):
-        setattr(locations[key], "cluster", membership[i])
-        setattr(locations[key], "membership", numpy.atleast_2d(u[:,i]))
-
-    cpygmaps.output_clusters(\
-        [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
-        membership, LC_CLUSTER_NUM, OUTPUT_LC_MAP)
-    """
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)

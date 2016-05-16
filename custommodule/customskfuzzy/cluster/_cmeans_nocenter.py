@@ -19,11 +19,9 @@ def _cmeans0_ori(distance, u_old, c, m, *para):
 	# remain the belonging rate >= the k-th max location of each cluster in um_c
 	filter_k = lambda row:row >= sorted(row, reverse=True)[k-1]
 	large_k_indices = np.apply_along_axis(filter_k, axis=1, arr=um)
-	#print("fail_indices:", fail_indices.shape, fail_indices[0:2, 0:4])
 
 	# Calculate the average distance from entity to cluster 
 	d = large_k_indices.dot(distance) / np.ones((distance.shape[1],1)).dot(np.atleast_2d(large_k_indices.sum(axis=1))).T
-	#print("d:", d.shape, d[0:3, 0:3])
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -65,21 +63,28 @@ def cmeans(distance, c, m, error, maxiter, algorithm, *para, init = None, seed =
 		print("Error, nonexistent fuzzy c means algorithm:", algorithm)
 		sys.exit()
 
+	error_list = []
 	# Main cmeans loop
 	while p < maxiter - 1:
 		if p % 100 == 0:
-			print("-", p, "---------------------------->")
+			print("--", p, "---------------------------->")
 		u2 = u.copy()
 		[u, Jjm, d] = _cmeans0(distance, u2, c, m, *para)
 		jm = np.hstack((jm, Jjm))
 		p += 1
+		error_list.append(np.linalg.norm(u - u2))
 
 		# Stopping rule
 		if np.linalg.norm(u - u2) < error:
 			break
+	print("  error avg:", sum(error_list) / len(error_list))
+	#f = open("./data/Summary/error.txt", "w")
+	#for i, x in enumerate(error_list):
+	#	f.write(str(i) + "\t" + str(x) + "\n")
+	#f.close()
 
-	print("end u.sum:", u.sum(axis=0)[0:6], u.sum(axis=1))
-	print("Fin u>>\n", u[:,0],u[:,1], u[:,2], "\nu std:", np.std(u))
+	print("--End> u.sum:", u.sum(axis=0)[0:6], u.sum(axis=1))
+	print("  Fin u>>\n", u[:,0],u[:,1], u[:,2], "\n  u avg:", u.sum() / (u.shape()[0] * u.shape()[1]), "\nu std:", np.std(u))
 	# Final calculations
 	error = np.linalg.norm(u - u2)
 	fpc = _fp_coeff(u)

@@ -92,8 +92,10 @@ def output_patterns_l(trajectories, cluster_membership, c, file_path):
     color = _get_color(c)
     for i, s in enumerate(trajectories):
         path = [(float(a_point.lat), float(a_point.lng)) for a_point in s]
-        mymap.addpoint(float(s[0].lat), float(s[0].lng), color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
-        mymap.addpoint(float(s[len(s)-1].lat), float(s[len(s)-1].lng), color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
+        for j, a_point in enumerate(s):
+            mymap.addpoint(float(a_point.lat), float(a_point.lng), color[cluster_membership[i]], str(cluster_membership[i]) + ">" + str(j) + ":" + a_point.lname)
+        #mymap.addpoint(float(s[0].lat), float(s[0].lng), color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
+        #mymap.addpoint(float(s[len(s)-1].lat), float(s[len(s)-1].lng), color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
         mymap.addpath(path, color[cluster_membership[i]])
     mymap.draw(file_path)
 

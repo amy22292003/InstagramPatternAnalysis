@@ -18,20 +18,14 @@ import Liu.custommodule.user as cuser
 import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
-FILTER_TIME = 1443657600 # 2015/10/01 1448928000 # 2015/12/01
 SPLIT_DAY = 1
-#LC_CLUSTER_NUM = 30
-#LC_ERROR = 0.0001
-#LC_MAX_KTH = 30
-SC_CLUSTER_NUM = 10
-SC_ERROR = 0.001
-SC_MAX_KTH = 10
+CLUSTER_NUM = 10
+ERROR = 0.01
+MAX_KTH = 10
 
 """file path"""
-#OUTPUT_LC_MAP = "./data/Summary/HermesL_3m_c" + str(LC_CLUSTER_NUM) +\
-#    "k" + str(LC_MAX_KTH) + "e" + str(LC_ERROR) + "d" + str(SPLIT_DAY) + ".html"
-OUTPUT_MAP = "./data/Summary/SequenceClusterLocationsMap_hl_3m_c" + str(SC_CLUSTER_NUM) +\
-    "k" + str(SC_MAX_KTH) + "e" + str(SC_ERROR) + "d" + str(SPLIT_DAY)
+OUTPUT_MAP = "./data/Summary/SequenceClusterHL_3m_c" + str(CLUSTER_NUM) +\
+    "k" + str(MAX_KTH) + "e" + str(ERROR) + "d" + str(SPLIT_DAY)
 
 def main():
     print("--------------------------------------")
@@ -48,7 +42,7 @@ def main():
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(cluster_sequences):
-        if len(s) >= 5 or len(s) <= 3:
+        if len(s) <= 2:
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
@@ -56,26 +50,32 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences))
 
-    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_cluster(cluster_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_cluster(cluster_sequences, CLUSTER_NUM, MAX_KTH, e = ERROR, algorithm="Original")
 
     print("Start Outputting...")
-    for c in range(SC_CLUSTER_NUM):
+    for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
         print(c, " >> this cluster #:", len(this_cluster_indices))
         if len(this_cluster_indices) is not 0:
             top_10_u = sorted(u[c, this_cluster_indices], reverse=True)
-            if len(top_10_u) >= SC_MAX_KTH:
-                top_10_u = top_10_u[SC_MAX_KTH - 1]
+            if len(top_10_u) >= MAX_KTH:
+                top_10_u = top_10_u[MAX_KTH - 1]
             else:
                 top_10_u = top_10_u[-1]
             top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
-            print("  top_10_u len:", top_10_u.shape())
             #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
-            print(top_10_indices)
+            print("  top_10:", top_10_u, ">", top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
+
+            #print("  center:", this_cluster_indices[top_10_indices[0]], " ;distance:", distance[:, this_cluster_indices[top_10_indices[0]]])
+            #closest_indices = [i for i, x in enumerate(distance[:, this_cluster_indices[top_10_indices[0]]]) if x <= 0.25]
+            #print("  closest_indices:", closest_indices)
+            #dist_points_sequences = numpy.array(location_sequences)[closest_indices]
+            #dist_color = range(len(dist_points_sequences))
+            #cpygmaps.output_patterns_l(dist_points_sequences, dist_color, len(dist_points_sequences), "./data/Summary/distance_" + str(c) + ".html")
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

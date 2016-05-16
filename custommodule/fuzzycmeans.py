@@ -76,6 +76,7 @@ def sequences_clustering_location(sequences, cluster_num, *para, e = 0.01, algor
                 # for i >= j
                 distance[i, j] = distance[j, i]
     print("-- distance:", distance[0:4, 0:4], numpy.amax(distance))
+    u = _get_init_u(distance, cluster_num, *para)
 
     u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, *para)
     print("-- looping time:", p)
@@ -89,8 +90,9 @@ def sequences_clustering_cluster(sequences, cluster_num, *para, e = 0.01, algori
         if i % 100 == 0:
             print("  getting sequence distance, sequence#", i, "\t", datetime.datetime.now())
         for j, s2 in enumerate(sequences):
-            if i < j:
-                #distance[i, j] = 1 - cskfuzzy.cluster.longest_common_sequence(s1, s2)
+            if i == j:
+                distance[i, j] = 1
+            elif i < j:
                 length = cskfuzzy.cluster.longest_common_sequence(s1, s2)
                 distance[i, j] = length 
             else:
@@ -103,4 +105,4 @@ def sequences_clustering_cluster(sequences, cluster_num, *para, e = 0.01, algori
     u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, *para, init = u)
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
-    return u, u0, d, jm, p, fpc, cluster_membership
+    return u, u0, d, jm, p, fpc, cluster_membership, distance
