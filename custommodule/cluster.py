@@ -8,6 +8,7 @@ import custommodule.tag as ctag
 """file path"""
 CLUSTERS = "./data/LocationCluster/LocationCluster.txt"
 TAG_TOPICS = "./data/LocationCluster/TagTopic.txt"
+LOCATION_TOPICS = "./data/LocationCluster/LocationTopic.txt"
 
 class Cluster():
     def __init__(self, index, items = None):
@@ -40,6 +41,18 @@ def open_tag_topic(file_path = TAG_TOPICS):
         topic_word.append([float(x) for x in words])
     return tag_name, numpy.array(topic_word)
 
+def open_doc_topic(file_path = LOCATION_TOPICS):
+    print("[cluster] Opening location topic, file path:", file_path)
+    location_id = []
+    doc_topic = []
+    f = open(file_path, "r")
+    f.readline()
+    for line in f:
+        words = line.split()
+        location_id.append(words[0]) # the first word is the location id
+        doc_topic.append([float(x) for x in words[1:]])
+    return location_id, numpy.array(doc_topic)
+
 """ output """
 def output_location_cluster(location_list, cluster_key, output_file):
     sorted_locations = sorted(location_list, key=lambda x:getattr(x, cluster_key))
@@ -51,9 +64,12 @@ def output_location_cluster(location_list, cluster_key, output_file):
         phase_ste = "Cluster:" + str(c) + "\t#:" + str(len(a_group)) + "\n"
         clocation.output_location_list(a_group, "a", output_file, phase_ste)
 
-def output_tag_topic(topic_word, tag_name, file_path = TAG_TOPICS):
-    print("[cluster] Outputting tag topic...")
-    f = open(file_path, "w")
+def output_topics(topic_word, doc_topic, tag_name, doc_name, file_path_tag = TAG_TOPICS, file_path_doc = LOCATION_TOPICS):
+    print("[cluster] Outputting topic...")
+    # output topic_word
+    print("-- outputing tag topics...")
+    f = open(file_path_tag, "w")
+    f.write("topics\\tags")
     for a_tag in tag_name:
         f.write("\t" + a_tag)
     f.write("\n")
@@ -63,3 +79,25 @@ def output_tag_topic(topic_word, tag_name, file_path = TAG_TOPICS):
             f.write("\t" + str(x))
         f.write("\n")
     f.close()
+    # output doc_topic
+    print("-- outputing doc topics...")
+    f = open(file_path_doc, "w")
+    f.write("docs\\topics")
+    for i in range(doc_topic.shape[1]):
+        f.write("\t" + str(i))
+    f.write("\n")
+    for i, topic_dist in enumerate(doc_topic):
+        f.write(doc_name[i])
+        for x in topic_dist:
+            f.write("\t" + str(x))
+        f.write("\n")
+    f.close()
+
+"""mining"""
+def fit_locations_semantic_membership(locations, doc_topic, doc_list, attr = "semantic_mem"):
+    print("[cluster] Fitting the semantic membership of locations...")
+    print("locations #:", len(locations), "\tdoc x topic shape:", doc_topic.shape)
+    for i, doc_id in enumerate(doc_list):
+        if doc_id in locations:
+            setattr(locations[doc_id], attr, numpy.atleast_2d(doc_topic[i,:]))
+    return locations

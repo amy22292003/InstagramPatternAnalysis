@@ -50,7 +50,7 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences))
 
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_cluster(cluster_sequences, CLUSTER_NUM, MAX_KTH, e = ERROR, algorithm="Original")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Cluster", vector_sequences, CLUSTER_NUM, MAX_KTH, e = ERROR, algorithm="Original")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

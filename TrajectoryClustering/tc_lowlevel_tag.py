@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-    command: 
-    output map file to: 
-"""
 import datetime
 import numpy
 import os
@@ -24,46 +20,60 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 """parameters"""
 SPLIT_DAY = 1
 CLUSTER_NUM = 20
-ERROR = 0.01
-MAX_KTH = 10
+ERROR = 21
+MAX_KTH = 5
 
 """file path"""
-USER_POSTS_FOLDER = "./data/TravelerPosts"
-OUTPUT_MAP = "./data/Summary/SequenceClusterLL_1w_c" + str(CLUSTER_NUM) +\
-    "k" + str(MAX_KTH) + "e" + str(ERROR) + "d" + str(SPLIT_DAY)
-
-def set_location_user_count(locations):
-    for key in locations.keys():
-        users = set(a_post.uid for a_post in locations[key].posts)
-        setattr(locations[key], "usercount", len(users))
+LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
+OUTPUT_MAP = "./data/Summary/TC_ll&tag_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
+    # Getting data
     users, locations = locationclustering.main()
+    location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
+    locations = ccluster.fit_locations_semantic_membership(locations, doc_topic, location_id)
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     vector_sequences = ctrajectory.get_vector_sequence(sequences, locations)
+    semantic_sequences = ctrajectory.get_vector_sequence(sequences, locations, "semantic_mem")
     location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
 
-    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_location(vector_sequences, SC_CLUSTER_NUM, SC_MAX_KTH, e = SC_ERROR, algorithm="Original")
+    print("Filtering short trajectories...")
+    fail_indices = []
+    for i, s in enumerate(sequences):
+        if len(s) <= 2:
+            fail_indices.append(i)
+    print("  will delete #:", len(fail_indices))
+    sequences = numpy.delete(numpy.array(sequences), fail_indices)
+    vector_sequences = numpy.delete(numpy.array(vector_sequences), fail_indices)
+    semantic_sequences = numpy.delete(numpy.array(semantic_sequences), fail_indices)
+    location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
+    print("  remain sequences #:", len(sequences))
+
+
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, e = ERROR, algorithm="2Distance")
 
     print("Start Outputting...")
-    for c in range(0, SC_CLUSTER_NUM):
+    for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
+        print(c, " >> this cluster #:", len(this_cluster_indices))
         if len(this_cluster_indices) is not 0:
-            print(c, ">>", u[c, this_cluster_indices].shape)
-            top_10_u = sorted(u[c, this_cluster_indices], reverse=True)[9]
+            top_10_u = sorted(u[c, this_cluster_indices], reverse=True)
+            if len(top_10_u) >= MAX_KTH:
+                top_10_u = top_10_u[MAX_KTH - 1]
+            else:
+                top_10_u = top_10_u[-1]
             top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
             #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
-            print(top_10_indices)
+            print("  top_10:", top_10_u, ">", top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
-            print("  color:", color)
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
 
     print("--------------------------------------")

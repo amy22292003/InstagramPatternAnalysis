@@ -23,6 +23,7 @@ class Location:
         #self.usercount
         #self.cluster
         #self.membership
+        #self.semantic_mem
 
     def __init__(self, *args):
         attrs = ["lid", "lname", "lat", "lng"]
