@@ -135,7 +135,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para):
 		p += 1
 
 		# Stopping rule
-		if np.linalg.norm(u - u2) < error:
+		if np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]) < error:
 			break
 
 	print(">>> p=", p)

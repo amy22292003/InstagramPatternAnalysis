@@ -20,7 +20,7 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME = 1443657600 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
+FILTER_TIME = 1448928000 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
 ERROR = 0.01
 MAX_KTH = 30
@@ -57,14 +57,13 @@ def main():
     location_frequency = numpy.array([x.usercount for x in locations.values()])
     
     # intersect clustering with the kth locations in each cluster & location frequency as weight
-    cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans_coordinate(coordinate.T, CLUSTER_NUM, MAX_KTH, location_frequency, e=ERROR, algorithm="kthCluster_LocationFrequency")
-    for i, key in enumerate(locations.keys()):
-        setattr(locations[key], "cluster", membership[i])
-        setattr(locations[key], "membership", numpy.atleast_2d(u[:,i]))
+    cntr, u, u0, d, jm, p, fpc, cluster_membership = cfuzzy.cmeans_coordinate(coordinate.T, CLUSTER_NUM, MAX_KTH, location_frequency, e=ERROR, algorithm="kthCluster_LocationFrequency")
+    locations = ccluster.fit_locations_membership(locations, u, locations.keys())
+    locations = ccluster.fit_locations_cluster(locations, cluster_membership, locations.keys())
 
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
-        membership, CLUSTER_NUM, OUTPUT_MAP)
+        cluster_membership, CLUSTER_NUM, OUTPUT_MAP)
 
     ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
 

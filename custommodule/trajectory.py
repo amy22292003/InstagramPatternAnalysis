@@ -29,13 +29,13 @@ def get_vector_sequence(trajectories, locations, attr = "membership"):
         vector_sequences.append(a_vector_sequence)
     return vector_sequences
 
-def get_cluster_sequence(trajectories, locations):
+def get_cluster_sequence(trajectories, locations, attr = "cluster"):
     cluster_sequences = []
     for a_sequence in trajectories:
         cluster_sequence = []
         for a_post in a_sequence:
-            if len(cluster_sequence) == 0 or cluster_sequence[-1] != locations[a_post.lid].cluster:
-                cluster_sequence.append(locations[a_post.lid].cluster)
+            if len(cluster_sequence) == 0 or cluster_sequence[-1] != getattr(locations[a_post.lid], attr):
+                cluster_sequence.append(getattr(locations[a_post.lid], attr))
         cluster_sequences.append(cluster_sequence)
     return cluster_sequences
 

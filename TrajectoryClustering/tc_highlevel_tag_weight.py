@@ -22,10 +22,11 @@ SPLIT_DAY = 1
 CLUSTER_NUM = 20
 ERROR = 0.0001
 MAX_KTH = 5
+GPS_WEIGHT = 0.7
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_ll&tag_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Summary/TC_hl&tag_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
@@ -36,11 +37,13 @@ def main():
     users, locations = locationclustering.main()
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
+    semantic_cluster = numpy.argmax(doc_topic, axis = 1)
+    locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
-    vector_sequences = ctrajectory.get_vector_sequence(sequences, locations)
-    semantic_sequences = ctrajectory.get_vector_sequence(sequences, locations, "semantic_mem")
+    cluster_sequences = ctrajectory.get_cluster_sequence(sequences, locations)
+    semantic_sequences = ctrajectory.get_cluster_sequence(sequences, locations, "semantic_cluster")
     location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
 
     print("Filtering short trajectories...")
@@ -50,13 +53,12 @@ def main():
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
-    vector_sequences = numpy.delete(numpy.array(vector_sequences), fail_indices)
+    cluster_sequences = numpy.delete(numpy.array(cluster_sequences), fail_indices)
     semantic_sequences = numpy.delete(numpy.array(semantic_sequences), fail_indices)
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences))
 
-
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, e = ERROR, algorithm="2Distance")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Cluster", cluster_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

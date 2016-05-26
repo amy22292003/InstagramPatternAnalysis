@@ -19,13 +19,14 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-CLUSTER_NUM = 20
+CLUSTER_NUM = 30
 ERROR = 0.0001
 MAX_KTH = 5
+GPS_WEIGHT = 0.5
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_ll&tag_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
@@ -46,7 +47,7 @@ def main():
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(sequences):
-        if len(s) <= 2:
+        if len(s) <= 4 or len(s) >= 8:
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
@@ -56,7 +57,7 @@ def main():
     print("  remain sequences #:", len(sequences))
 
 
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, e = ERROR, algorithm="2Distance")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

@@ -41,26 +41,26 @@ def fit_lda(corpus, tag_name, topic_num):
 
 """Location Clustering"""
 def cmeans_ori(array, cluster_num):
-    cntr, u, u0, d, jm, p, fpc = skfuzzy.cluster.cmeans(array, cluster_num, 2, error=0.01, maxiter=100000, init=None)
+    cntr, u, u0, d, jm, p, fpc = skfuzzy.cluster.cmeans(array, cluster_num, 2, error=0.01, maxiter=100, init=None)
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 # w = the weight of gps side
 def cmeans_comb(coordinate, tag_feature, cluster_num, w = 0.4, e = 0.01):
     print("[fuzzy c means] - gps + relation")
-    cntr1, cntr2, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans(coordinate, tag_feature, cluster_num, w, 2, error=e, maxiter=100000)
+    cntr1, cntr2, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans(coordinate, tag_feature, cluster_num, w, 2, error=e, maxiter=100)
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr1, cntr2, u, u0, d1, d2, d, jm, p, fpc, cluster_membership
 
 def cmeans_intersect(coordinate, similarity, cluster_num, *para, w = 0.4, e = 0.01, algorithm="Original"):
     print("[fuzzy c means] - gps + relation")
-    cntr1, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans_intersect(coordinate, similarity, cluster_num, w, 2, e, 10000, algorithm, *para)
+    cntr1, u, u0, d1, d2, d, jm, p, fpc = cskfuzzy.cluster.cmeans_intersect(coordinate, similarity, cluster_num, w, 2, e, 100, algorithm, *para)
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr1, u, u0, d1, d2, d, jm, p, fpc, cluster_membership
 
 def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Original"):
     print("[fuzzy c means] - gps")
-    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_coordinate(coordinate, cluster_num, 2, e, 5000, algorithm, *para)
+    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_coordinate(coordinate, cluster_num, 2, e, 100, algorithm, *para)
     cluster_membership = numpy.argmax(u, axis=0)
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
@@ -86,7 +86,7 @@ def _get_distance(level, sequences):
     if level is "Location":
         distance_func = cskfuzzy.cluster.sequence_distance
     elif level is "Cluster":
-        distance_func = 1 - cskfuzzy.cluster.longest_common_sequence
+        distance_func = lambda s1, s2:1 - cskfuzzy.cluster.longest_common_sequence(s1, s2)
     else:
         print("Error, nonexistent clustering level:", type)
         sys.exit()
@@ -105,21 +105,26 @@ def _get_distance(level, sequences):
     print("-- distance max:", numpy.amax(distance), numpy.mean(distance), numpy.std(distance))
     return distance
 
-def sequences_clustering(level, sequences, cluster_num, *para, e = 0.01, algorithm = "Original"):
+def sequences_clustering(level, sequences, cluster_num, *para, e = 0.001, algorithm = "Original"):
     print("[fuzzy c means] Sequence Clustering - level:", level)
     print("--data:")
     distance = _get_distance(level, sequences)
     k = para[0]
-    if algorithm is "2Distance":
-        print("--data 2:")
-        distance2 = _get_distance(level, para[1]) # get distance of semantic sequences
+    if algorithm is "Original":
+        # get init
+        u = _get_init_u(distance, cluster_num, para[0])
+        du, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, init = u)
     else:
-        distance2 = None
-
-    # get init
-    u = _get_init_u(distance, cluster_num, para[0])
-
-    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 5000, algorithm, k, distance2, init = u)
+        # get distance of semantic sequences
+        print("--data 2:")
+        distance2 = _get_distance(level, para[1])
+        # get init
+        u = _get_init_u(distance * distance2, cluster_num, para[0])
+        if algorithm is "2Distance":
+            u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, distance2, init = u) 
+        else:   
+            u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, distance2, para[2], init = u)
+    
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership, distance

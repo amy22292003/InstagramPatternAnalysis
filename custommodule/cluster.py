@@ -94,10 +94,18 @@ def output_topics(topic_word, doc_topic, tag_name, doc_name, file_path_tag = TAG
     f.close()
 
 """mining"""
-def fit_locations_semantic_membership(locations, doc_topic, doc_list, attr = "semantic_mem"):
-    print("[cluster] Fitting the semantic membership of locations...")
-    print("locations #:", len(locations), "\tdoc x topic shape:", doc_topic.shape)
-    for i, doc_id in enumerate(doc_list):
-        if doc_id in locations:
-            setattr(locations[doc_id], attr, numpy.atleast_2d(doc_topic[i,:]))
+def fit_locations_membership(locations, topic_location, id_list, attr = "membership"):
+    print("[cluster] Fitting the membership of locations...")
+    print("locations #:", len(locations), "\ttopic x location shape:", topic_location.shape)
+    for i, key in enumerate(id_list):
+        if key in locations:
+            setattr(locations[key], attr, numpy.atleast_2d(topic_location[:,i]))
+    return locations
+
+def fit_locations_cluster(locations, cluster_membership, id_list, attr = "cluster"):
+    print("[cluster] Fitting the clusters of locations...")
+    print("locations #:", len(locations))
+    for i, key in enumerate(id_list):
+        if key in locations:
+            setattr(locations[key], attr, cluster_membership[i])
     return locations
