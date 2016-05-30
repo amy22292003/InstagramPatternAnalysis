@@ -85,7 +85,6 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         print("-- distance:", distance1.shape, distance1[0:4, 0:8])
         print("-- distance max/mean/std:", numpy.amax(distance1), numpy.mean(distance1), numpy.std(distance1))
         distance = w * distance1 + (1 - w) * distance2
-        print("distance to itself:", distance[0, init[0]], distance[1, init[1]])
         filter_k = lambda row:row >= sorted(row, reverse=True)[k - 1]
         large_k_indices = numpy.apply_along_axis(filter_k, axis=1, arr=distance)
         u = large_k_indices * 1

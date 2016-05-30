@@ -1,6 +1,7 @@
 """
 cmeans.py : Fuzzy C-means clustering algorithm.
 """
+import datetime
 import numpy as np
 import sys
 from scipy.spatial.distance import cdist
@@ -11,17 +12,20 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	k = para[0]
 	data2 = para[1]
 	w = para[2]
+	#print("--u.sum:", u_old.sum(axis=1))
 
 	# Normalizing, then eliminating any potential zero values.
-	u_old /= np.ones((c, 1)).dot(np.atleast_2d(u_old.sum(axis=0)))
-	u_old = np.fmax(u_old, np.finfo(np.float64).eps)
-	um = u_old ** m
+	um = u_old / np.ones((c, 1)).dot(np.atleast_2d(u_old.sum(axis=0)))
+	um = np.fmax(um, np.finfo(np.float64).eps)
+	um = um ** m
 
 	# get distance to each cluster center sequences
 	d1 = []
 	d2 = []
+
 	for c_i in range(c):
-		large_k = [i for i, x in enumerate(um[c_i,:]) if x >= sorted(um[c_i,:], reverse=True)[k-1]]
+		large_k = [i for i, x in enumerate(u_old[c_i,:]) if x >= sorted(u_old[c_i,:], reverse=True)[k - 1]]
+		#print("  large_k:", len(large_k))
 
 		target1 = np.array(data1)[large_k]
 		distance1 = cdistance.get_distance(level, data1, target1)
@@ -30,8 +34,8 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 		target2 = np.array(data2)[large_k]
 		distance2 = cdistance.get_distance(level, data2, target2)
 		d2.append(np.sum(distance2, axis=0) / distance2.shape[0])
-	print("d1.type:", type(d1), numpy.array(d1).shape)
-	print("d2.type:", type(d2), numpy.array(d2).shape)
+	print("d1.type:", type(d1), np.array(d1).shape)
+	print("d2.type:", type(d2), np.array(d2).shape)
 
 	d1 = np.array(d1) / np.std(d1)
 	d2 = np.array(d2) / np.std(d2)
@@ -75,7 +79,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	error_list = []
 	# Main cmeans loop
 	while p < maxiter - 1:
-		print("--", p, "---------------------------->")
+		print("--", p, "----------------------------> ", datetime.datetime.now())
 		u2 = u.copy()
 		[u, Jjm, d] = _cmeans0(data, u2, c, m, level, *para)
 		jm = np.hstack((jm, Jjm))
