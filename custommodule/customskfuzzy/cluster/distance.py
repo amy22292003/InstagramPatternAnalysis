@@ -76,5 +76,5 @@ def get_distance(level, sequences, targets = None):
                 else:
                     distance[i, j] = distance[j, i]
     #print("-- distance:", distance.shape, distance[0:4, 0:6])
-    print("-- [distance] max/min/mean/std:", numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
+    print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
     return distance

@@ -25,7 +25,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 	for c_i in range(c):
 		large_k = [i for i, x in enumerate(u_old[c_i,:]) if x >= sorted(u_old[c_i,:], reverse=True)[k - 1]]
-		#print("  large_k:", len(large_k))
+		print("   ", c_i, "- large k:",  len(large_k), large_k)
 
 		target1 = np.array(data1)[large_k]
 		distance1 = cdistance.get_distance(level, data1, target1)

@@ -79,16 +79,18 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         sequences2 = para[1]
         w = para[2]
         init_s1 = numpy.array(sequences1)[init]
-        init_s2 = numpy.array(sequences2)[init]
         distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1) # target sequence * sequence
+        distance1 = np.array(distance1) / np.std(distance1)
+        print("-- distance1:", distance1.shape, distance1[0:4, 0:8])
+        
+        init_s2 = numpy.array(sequences2)[init]
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2) # target sequence * sequence
-        print("-- distance:", distance1.shape, distance1[0:4, 0:8])
-        print("-- distance max/mean/std:", numpy.amax(distance1), numpy.mean(distance1), numpy.std(distance1))
+        distance2 = np.array(distance2) / np.std(distance2)
+        
         distance = w * distance1 + (1 - w) * distance2
-        filter_k = lambda row:row >= sorted(row, reverse=True)[k - 1]
+        filter_k = lambda row:row <= sorted(row)[k - 1]
         large_k_indices = numpy.apply_along_axis(filter_k, axis=1, arr=distance)
         u = large_k_indices * 1
-    #u /= numpy.ones((cluster_num, 1)).dot(numpy.atleast_2d(u.sum(axis=0))).astype(numpy.float64)
     print("--each cluster initial #:", u.sum(axis=1))
     return u
 
