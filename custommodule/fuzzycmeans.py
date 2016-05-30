@@ -65,66 +65,70 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 """Sequence Clustering"""
-def _get_init_u(distance, cluster_num, k, *para):
-    if para:
-        distance2 = para[0]
-    u = numpy.zeros((cluster_num, distance.shape[0]))
-    init = numpy.random.randint(0, distance.shape[0] - 1, cluster_num)
-    print("[fuzzy c means]- get_init_u> init:", init)
-    for i, center in enumerate(init):
-        top_k = sorted(distance[:, center])[k - 1]
-        is_top_k = [True if x <= top_k else False for x in distance[:, center]]
-        u[i, numpy.array(is_top_k)] = 1
+def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
+    u = numpy.zeros((cluster_num, s_len))
+    init = numpy.random.randint(0, s_len - 1, cluster_num)
+    print("[fuzzy c means]- get_init_u> \n-- init:", init)
+    if distance:
+        for i, center in enumerate(init):
+            top_k = sorted(distance[:, center])[k - 1]
+            is_top_k = [True if x <= top_k else False for x in distance[:, center]]
+            u[i, numpy.array(is_top_k)] = 1
+    else:
+        sequences1 = para[0]
+        sequences2 = para[1]
+        w = para[2]
+        init_s1 = numpy.array(sequences1)[init]
+        init_s2 = numpy.array(sequences2)[init]
+        distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1) # target sequence * sequence
+        distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2) # target sequence * sequence
+        print("-- distance:", distance1.shape, distance1[0:4, 0:8])
+        print("-- distance max/mean/std:", numpy.amax(distance1), numpy.mean(distance1), numpy.std(distance1))
+        distance = w * distance1 + (1 - w) * distance2
+        print("distance to itself:", distance[0, init[0]], distance[1, init[1]])
+        filter_k = lambda row:row >= sorted(row, reverse=True)[k - 1]
+        large_k_indices = numpy.apply_along_axis(filter_k, axis=1, arr=distance)
+        u = large_k_indices * 1
     #u /= numpy.ones((cluster_num, 1)).dot(numpy.atleast_2d(u.sum(axis=0))).astype(numpy.float64)
     print("--each cluster initial #:", u.sum(axis=1))
     return u
 
-def _get_distance(level, sequences):
-    print("-- Get sequences distance >>")
-    # Set distance function of the clustering level (location or cluster)
-    distance_func = None
-    if level is "Location":
-        distance_func = cskfuzzy.cluster.sequence_distance
-    elif level is "Cluster":
-        distance_func = lambda s1, s2:1 - cskfuzzy.cluster.longest_common_sequence(s1, s2)
-    else:
-        print("Error, nonexistent clustering level:", type)
-        sys.exit()
-
-    # get sequence distances
-    distance = numpy.zeros((len(sequences), len(sequences)))
-    for i, s1 in enumerate(sequences):
-        if i % 100 == 0:
-            print("  sequence#", i, "\t", datetime.datetime.now())
-        for j, s2 in enumerate(sequences):
-            if i < j:
-                distance[i, j] = distance_func(s1, s2)
-            else:
-                distance[i, j] = distance[j, i]
-    print("-- distance:", distance[0:4, 0:4])
-    print("-- distance max:", numpy.amax(distance), numpy.mean(distance), numpy.std(distance))
-    return distance
-
 def sequences_clustering(level, sequences, cluster_num, *para, e = 0.001, algorithm = "Original"):
     print("[fuzzy c means] Sequence Clustering - level:", level)
     print("--data:")
-    distance = _get_distance(level, sequences)
+    distance = cskfuzzy.cluster.get_distance(level, sequences)
     k = para[0]
     if algorithm is "Original":
         # get init
-        u = _get_init_u(distance, cluster_num, para[0])
+        u = _get_init_u(level, cluster_num, k, distance.shape[0], distance = distance)
         du, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, init = u)
     else:
         # get distance of semantic sequences
         print("--data 2:")
-        distance2 = _get_distance(level, para[1])
-        # get init
-        u = _get_init_u(distance * distance2, cluster_num, para[0])
+        distance2 = cskfuzzy.cluster.get_distance(level, para[1])
         if algorithm is "2Distance":
+            # get init
+            u = _get_init_u(level, cluster_num, k, distance.shape[0], distance = distance * distance2)
             u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, distance2, init = u) 
-        else:   
+        else:
+            w = para[2]
+            # get init
+            u = _get_init_u(level, cluster_num, k, distance.shape[0], distance = w * distance + (1-w) * distance2)
             u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter(distance, cluster_num, 2, e, 100, algorithm, k, distance2, para[2], init = u)
     
+    print("-- looping time:", p)
+    cluster_membership = numpy.argmax(u, axis=0)
+    return u, u0, d, jm, p, fpc, cluster_membership, distance
+
+def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algorithm = "2WeightedDistance"):
+    print("[fuzzy c means] Sequence Clustering - level:", level)
+    k = para[0]
+    sequences2 = para[1]
+    w = para[2]
+
+    u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
+    du, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 50, algorithm, level, k, sequences2, w, init = u)
+
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership, distance

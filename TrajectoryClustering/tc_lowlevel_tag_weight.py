@@ -21,8 +21,8 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 CLUSTER_NUM = 30
 ERROR = 0.0001
-MAX_KTH = 5
-GPS_WEIGHT = 0.5
+MAX_KTH = 3
+GPS_WEIGHT = 0.9
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
@@ -47,7 +47,7 @@ def main():
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(sequences):
-        if len(s) <= 4 or len(s) >= 8:
+        if len(s) <= 2:
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
@@ -57,7 +57,7 @@ def main():
     print("  remain sequences #:", len(sequences))
 
 
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

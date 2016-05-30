@@ -22,11 +22,11 @@ SPLIT_DAY = 1
 CLUSTER_NUM = 20
 ERROR = 0.0001
 MAX_KTH = 5
-GPS_WEIGHT = 0.7
+GPS_WEIGHT = 0.3
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_hl&tag_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Summary/TC_hl&tag&w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
@@ -58,7 +58,7 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences))
 
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering("Cluster", cluster_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_i("Cluster", cluster_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

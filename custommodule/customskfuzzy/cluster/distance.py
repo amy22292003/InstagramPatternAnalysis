@@ -15,7 +15,7 @@ def _dynamic_programming(s1, s2, i, j):
         add_dij = _dynamic_programming(s1, s2, i - 1, j - 1) + cdist(s1[i], s2[j])
         return min(add_dij, _dynamic_programming(s1, s2, i - 1, j))
 
-def sequence_distance(s1, s2):
+def _sequence_distance(s1, s2):
     if len(s1) >= len(s2):
         return _dynamic_programming(s1, s2, len(s1) - 1, len(s2) - 1) / len(s2)
     else:
@@ -44,7 +44,37 @@ def _lcs(ml, s1, s2, i, j):
         else:
             return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
 
-def longest_common_sequence(s1, s2):
+def _longest_common_sequence(s1, s2):
     ml = _lcs_length(s1, s2)
     #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
     return ml[len(s1), len(s2)] / min(len(s1), len(s2)) #, lcs_set 
+
+def get_distance(level, sequences, targets = None):
+    # Set distance function of the clustering level (location or cluster)
+    if level is "Location":
+        distance_func = _sequence_distance
+    elif level is "Cluster":
+        distance_func = lambda s1, s2:1 - _longest_common_sequence(s1, s2)
+    else:
+        print("Error, nonexistent clustering level:", type)
+        sys.exit()
+
+    # get sequence distances
+    if targets is not None:
+        distance = numpy.zeros((len(targets), len(sequences)))
+        for i, s_t in enumerate(targets):
+            for j, s in enumerate(sequences):
+                distance[i, j] = distance_func(s_t, s)
+    else:
+        distance = numpy.zeros((len(sequences), len(sequences)))
+        for i, s1 in enumerate(sequences):
+            if i % 100 == 0:
+                print("  sequence#", i, "\t", datetime.datetime.now())
+            for j, s2 in enumerate(sequences):
+                if i < j:
+                    distance[i, j] = distance_func(s1, s2)
+                else:
+                    distance[i, j] = distance[j, i]
+    #print("-- distance:", distance.shape, distance[0:4, 0:6])
+    print("-- [distance] max/min/mean/std:", numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
+    return distance

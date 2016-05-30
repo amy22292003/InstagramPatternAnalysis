@@ -126,7 +126,6 @@ def cmeans(distance, c, m, error, maxiter, algorithm, *para, init = None, seed =
 	# Initialize loop parameters
 	jm = np.empty(0)
 	p = 0
-	print("u.shape:", u.shape, u.shape[0] * u.shape[1])
 
 	#select cmeans function
 	if algorithm is "Original":
