@@ -80,12 +80,12 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         w = para[2]
         init_s1 = numpy.array(sequences1)[init]
         distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1) # target sequence * sequence
-        distance1 = np.array(distance1) / np.std(distance1)
+        #distance1 = numpy.array(distance1) / numpy.std(distance1)
         print("-- distance1:", distance1.shape, distance1[0:4, 0:8])
         
         init_s2 = numpy.array(sequences2)[init]
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2) # target sequence * sequence
-        distance2 = np.array(distance2) / np.std(distance2)
+        #distance2 = numpy.array(distance2) / numpy.std(distance2)
         
         distance = w * distance1 + (1 - w) * distance2
         filter_k = lambda row:row <= sorted(row)[k - 1]
