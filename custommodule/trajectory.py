@@ -8,7 +8,7 @@ def split_trajectory(trajectories, split_day = 1):
     for a_trajectory in trajectories:
         if len(a_trajectory) > 0:
             i = 0
-            while len(a_trajectory) > 1 & len(a_trajectory) - 1 > i:
+            while len(a_trajectory) > 1 and len(a_trajectory) - 1 > i:
                 # if the time interval is larger than splitting threshold
                 if a_trajectory[i+1].time - a_trajectory[i].time > split_time:
                     sequences.append(a_trajectory[:i+1]) # add the former sequence to sequences

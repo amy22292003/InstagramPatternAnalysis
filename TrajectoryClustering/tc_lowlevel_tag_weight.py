@@ -26,7 +26,7 @@ GPS_WEIGHT = 0.9
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
