@@ -51,6 +51,11 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	return u, jm, d
 
+def _fp_coeff(u):
+	n = u.shape[1]
+
+	return np.trace(u.dot(u.T)) / float(n)
+
 def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, seed = None):
 	# Setup u0
 	if init is None:

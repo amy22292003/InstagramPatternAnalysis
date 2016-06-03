@@ -129,7 +129,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     w = para[2]
 
     u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
-    du, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 50, algorithm, level, k, sequences2, w, init = u)
+    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)

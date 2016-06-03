@@ -20,7 +20,7 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 """parameters"""
 SPLIT_DAY = 1
 CLUSTER_NUM = 30
-ERROR = 0.0001
+ERROR = 0.0000001
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
