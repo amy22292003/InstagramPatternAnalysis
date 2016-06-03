@@ -2,6 +2,7 @@ import datetime
 import itertools
 import lda
 import numpy
+import random
 import skfuzzy
 import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -92,6 +93,14 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         filter_k = lambda row:row <= sorted(row)[k - 1]
         large_k_indices = numpy.apply_along_axis(filter_k, axis=1, arr=distance)
         u = large_k_indices * 1
+
+        print("--each cluster initial # before random choose:", u.sum(axis=1))
+        for i in range(cluster_num):
+            if sum(u[i, :]) > k:
+                indices = [i for i, x in enumerate(u[i, :]) if x == 1]
+                rand_k = random.sample(indices, k)
+                u[i, :] = 0
+                u[i, :][rand_k] = 1
     print("--each cluster initial #:", u.sum(axis=1))
     return u
 
@@ -134,3 +143,4 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership, distance
+    #return u, init

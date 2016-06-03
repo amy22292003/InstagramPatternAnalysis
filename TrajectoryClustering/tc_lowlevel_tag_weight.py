@@ -58,6 +58,15 @@ def main():
 
 
     u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    """
+    u, init = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    for c_i in range(CLUSTER_NUM):
+        indices = [i for i, x in enumerate(u[c_i, :]) if x == 1]
+        print("  ", c_i, "-#:", len(indices))
+        points_sequences = numpy.array(location_sequences)[indices]
+        color = [0 if x == init[c_i] else 1 for x in indices]
+        cpygmaps.output_patterns_l(points_sequences, color, 2, "./data/Summary/InitSame_" + str(c_i) + ".html")
+    """
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):

@@ -3,6 +3,7 @@ cmeans.py : Fuzzy C-means clustering algorithm.
 """
 import datetime
 import numpy as np
+import random
 import sys
 from scipy.spatial.distance import cdist
 from . import distance as cdistance
@@ -25,7 +26,9 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 	for c_i in range(c):
 		large_k = [i for i, x in enumerate(u_old[c_i,:]) if x >= sorted(u_old[c_i,:], reverse=True)[k - 1]]
-		print("   ", c_i, "- large k:",  len(large_k))
+		print("   ", c_i, "- origin large k:",  len(large_k))
+		if len(large_k) > k:
+			large_k = random.sample(large_k, k)
 
 		target1 = np.array(data1)[large_k]
 		distance1 = cdistance.get_distance(level, data1, target1)
@@ -34,8 +37,6 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 		target2 = np.array(data2)[large_k]
 		distance2 = cdistance.get_distance(level, data2, target2)
 		d2.append(np.sum(distance2, axis=0) / distance2.shape[0])
-	print("d1.type:", type(d1), np.array(d1).shape)
-	print("d2.type:", type(d2), np.array(d2).shape)
 
 	d1 = np.array(d1) / np.std(d1)
 	d2 = np.array(d2) / np.std(d2)
