@@ -142,5 +142,5 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
 
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)
-    return u, u0, d, jm, p, fpc, cluster_membership, distance
+    return u, u0, d, jm, p, fpc, cluster_membership
     #return u, init
