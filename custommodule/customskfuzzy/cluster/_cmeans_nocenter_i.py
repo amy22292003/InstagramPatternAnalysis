@@ -32,14 +32,14 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 		target1 = np.array(data1)[large_k]
 		distance1 = cdistance.get_distance(level, data1, target1)
-		d1.append(np.sum(distance1, axis=0) / distance1.shape[0])
+		d1.append(np.sum(distance1, axis=0) / k)
 
 		target2 = np.array(data2)[large_k]
 		distance2 = cdistance.get_distance(level, data2, target2)
-		d2.append(np.sum(distance2, axis=0) / distance2.shape[0])
+		d2.append(np.sum(distance2, axis=0) / k)
 
-	d1 = np.array(d1) / np.std(d1)
-	d2 = np.array(d2) / np.std(d2)
+	d1 = np.array(d1) / np.amax(d1)
+	d2 = np.array(d2) / np.amax(d2)
 	#print("d2:", d2[0:3, 0:5], " max:", np.amax(d2), " min:", np.amin(d2))
 
 	d = w * d1 + (1 - w) * d2

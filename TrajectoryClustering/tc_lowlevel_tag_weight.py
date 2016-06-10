@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import datetime
+import inspect
 import numpy
 import os
 import sys
 
 PACKAGE_PARENT = '..'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
-sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-sys.path.append(PACKAGE_PARENT)
+FILE_DIR = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+sys.path.insert(0, os.path.normpath(os.path.join(FILE_DIR, PACKAGE_PARENT)))
+sys.path.insert(0, PACKAGE_PARENT)
 
 import Liu.custommodule.cluster as ccluster
 import Liu.custommodule.cpygmaps as cpygmaps
@@ -26,7 +27,7 @@ GPS_WEIGHT = 0.9
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")

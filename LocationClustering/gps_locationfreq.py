@@ -20,7 +20,7 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME = 1448928000 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
+FILTER_TIME = 1451001600 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
 ERROR = 0.01
 MAX_KTH = 30
@@ -37,10 +37,15 @@ def set_location_user_count(locations):
         users = set(a_post.uid for a_post in locations[key].posts)
         setattr(locations[key], "usercount", len(users))
 
-def main():
+def main(*argv):
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
+
+    # set UNIXTIME
+    if len(argv) > 0:
+        global FILTER_TIME
+        FILTER_TIME = argv[0]
     
     # getting data
     locations = clocation.open_locations()
@@ -74,4 +79,4 @@ def main():
     return users, locations
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

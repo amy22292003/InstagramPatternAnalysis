@@ -70,7 +70,7 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
     u = numpy.zeros((cluster_num, s_len))
     init = numpy.random.randint(0, s_len - 1, cluster_num)
     print("[fuzzy c means]- get_init_u> \n-- init:", init)
-    if distance:
+    if distance is not None:
         for i, center in enumerate(init):
             top_k = sorted(distance[:, center])[k - 1]
             is_top_k = [True if x <= top_k else False for x in distance[:, center]]
