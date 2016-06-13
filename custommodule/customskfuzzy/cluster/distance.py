@@ -85,4 +85,5 @@ def get_distance(level, sequences, targets = None):
     #print("-- distance:", distance.shape, distance[0:4, 0:6])
     print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
     print("distance id b4re:", id(distance))
+    print("-- [distance] ", datetime.datetime.now())
     return distance

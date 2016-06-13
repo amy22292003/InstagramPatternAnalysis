@@ -23,15 +23,14 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	um = um ** m
 
 	# get large k indices for each cluster
-	filter_k = lambda row:np.where(row >= sorted(row, reverse=True)[k - 1])
-	large_k = numpy.apply_along_axis(filter_k, axis=1, arr=u_old)
+	filter_k = lambda row:np.where(row >= sorted(row, reverse=True)[k - 1])[0] # get the indices which fit the condition
+	large_k = np.apply_along_axis(filter_k, axis=1, arr=u_old)
 	print("  large k:", large_k)
 
 	large_k_indices = []
 	for i in range(c):
 		if len(large_k[i, :]) > k:
 			rand_k = random.sample(large_k[i, :], k)
-			print("  ", i, "- rand k:", rand_k)
 			large_k_indices.extend(rand_k)
 		else:
 			large_k_indices.extend(large_k[i, :])
@@ -55,7 +54,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	print("  d2 id:", id(d2))
 
 	d = w * d1 + (1 - w) * d2
-	#print("d:", d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
+	print("d:", d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
