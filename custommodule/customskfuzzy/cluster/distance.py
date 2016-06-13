@@ -63,13 +63,13 @@ def get_distance(level, sequences, targets = None):
     else:
         print("Error, nonexistent clustering level:", type)
         sys.exit()
-    print("sequence id:", id(sequences))
-    print("targets id:", id(targets))
+    #print("sequence id:", id(sequences))
+    #print("targets id:", id(targets))
 
     # get sequence distances
     if targets is not None:
         distance = numpy.zeros((len(targets), len(sequences)))
-        print("distance id:", id(distance))
+        #print("distance id:", id(distance))
         for i, s_t in enumerate(targets):
             for j, s in enumerate(sequences):
                 distance[i, j] = distance_func(s_t, s)
@@ -83,8 +83,7 @@ def get_distance(level, sequences, targets = None):
                     distance[i, j] = distance_func(s1, s2)
                 else:
                     distance[i, j] = distance[j, i]
-    #print("-- distance:", distance.shape, distance[0:4, 0:6])
     print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
-    print("distance id b4re:", id(distance))
+    #print("distance id b4re:", id(distance))
     print("-- [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
     return distance

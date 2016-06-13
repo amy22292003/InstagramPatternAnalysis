@@ -36,7 +36,7 @@ def main():
     print("--------------------------------------")
 
     # Getting data
-    users, locations = locationclustering.main(FILTER_TIME)
+    users, locations = locationclustering.main()
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 

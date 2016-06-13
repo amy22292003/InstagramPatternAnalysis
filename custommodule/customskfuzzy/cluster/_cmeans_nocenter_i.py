@@ -29,31 +29,24 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 	large_k_indices = []
 	for i in range(c):
-		indices = np.nonzero(large_k[i, :])[0]
-		print("  ", i, "- ", indices)
+		indices = list(np.nonzero(large_k[i, :])[0])
 		if len(indices) > k:
 			rand_k = random.sample(indices, k)
 			large_k_indices.extend(rand_k)
 		else:
 			large_k_indices.extend(indices)
-	print("  large k indices:", large_k_indices)
+	print("  unique center #:", len(set(large_k_indices)))
 
 	# get distances between targets(c# * k) & data
 	distance1 = _distance(level, data1, large_k_indices)
-	print("  distance1 id:", id(distance1))
 	distance2 = _distance(level, data2, large_k_indices)
-	print("  distance2 id:", id(distance2))
 
 	# calculate data to each cluster's average distance
 	each_cluster = np.zeros((c, c))
 	np.fill_diagonal(each_cluster, 1)
-	print("  each_cluster .shape:", each_cluster.shape)
 	each_cluster = np.repeat(each_cluster, k, axis = 1)
-	print(" each cluster.shape:", each_cluster.shape)
 	d1 = each_cluster.dot(distance1) / k
 	d2 = each_cluster.dot(distance2) / k
-	print("  d1 id:", id(d1))
-	print("  d2 id:", id(d2))
 
 	d = w * d1 + (1 - w) * d2
 	print("d.shape:", d.shape)
