@@ -6,9 +6,8 @@ import custommodule.location as clocation
 import custommodule.tag as ctag
 
 """file path"""
-CLUSTERS = "./data/LocationCluster/LocationCluster.txt"
-TAG_TOPICS = "./data/LocationCluster/TagTopic.txt"
-LOCATION_TOPICS = "./data/LocationCluster/LocationTopic.txt"
+TAG_TOPICS = "./data/LocationTopic/TagTopic.txt"
+LOCATION_TOPICS = "./data/LocationTopic/LocationTopic.txt"
 
 class Cluster():
     def __init__(self, index, items = None):
@@ -19,7 +18,7 @@ class Cluster():
             self.items = set()
 
 """Open files"""
-def open_cluster_list(file_path = CLUSTERS):
+def open_cluster_list(file_path):
     print("Getting clusters...")
     cluster_list = []
     f = open(file_path, "r")

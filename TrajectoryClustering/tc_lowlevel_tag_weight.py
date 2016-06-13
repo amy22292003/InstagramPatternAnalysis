@@ -20,14 +20,15 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
+FILTER_TIME = 1448928000 # 2015/10/01
 CLUSTER_NUM = 30
 ERROR = 0.0000001
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
 """file path"""
-LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_ll&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
+LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
+OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
@@ -35,7 +36,7 @@ def main():
     print("--------------------------------------")
 
     # Getting data
-    users, locations = locationclustering.main()
+    users, locations = locationclustering.main(FILTER_TIME)
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 
@@ -57,6 +58,8 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences))
 
+    print("vector sequence id:", id(vector_sequences))
+    print("semantic_sequences:", id(semantic_sequences))
 
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     """

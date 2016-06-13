@@ -4,9 +4,6 @@ import os
 
 """file path"""
 USER_POSTS_FILE = "./data/UserPosts"
-#BRIEFSUMMARY_FILE = "./data/BriefSummary.txt"
-#USER_POSTS_SUMMARY_FILE = "./data/UserPosts_selLocaInRegion/"
-#SUMMARY_FILE = "./data/Summary_selLocaInRegion.txt"
 
 class APost:
     def __init__(self):

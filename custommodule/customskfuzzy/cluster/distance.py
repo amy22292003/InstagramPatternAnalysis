@@ -31,8 +31,9 @@ def _lcs_length(s1, s2):
                 ml[i, j] = ml[i - 1, j - 1] + 1
             else:
                 ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
-    return ml
+    return ml[len(s1), len(s2)]
 
+"""
 def _lcs(ml, s1, s2, i, j):
     if i == 0 or j == 0:
         return set()
@@ -45,11 +46,12 @@ def _lcs(ml, s1, s2, i, j):
             return _lcs(ml, s1, s2, i - 1, j)
         else:
             return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
+"""
 
 def _longest_common_sequence(s1, s2):
-    ml = _lcs_length(s1, s2)
+    #ml = _lcs_length(s1, s2)
     #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
-    return ml[len(s1), len(s2)] / min(len(s1), len(s2)) #, lcs_set 
+    return _lcs_length(s1, s2) / min(len(s1), len(s2)) #, lcs_set 
 
 def get_distance(level, sequences, targets = None):
     # Set distance function of the clustering level (location or cluster)
@@ -60,10 +62,13 @@ def get_distance(level, sequences, targets = None):
     else:
         print("Error, nonexistent clustering level:", type)
         sys.exit()
+    print("sequence id:", id(sequences))
+    print("targets id:", id(targets))
 
     # get sequence distances
     if targets is not None:
         distance = numpy.zeros((len(targets), len(sequences)))
+        print("distance id:", id(distance))
         for i, s_t in enumerate(targets):
             for j, s in enumerate(sequences):
                 distance[i, j] = distance_func(s_t, s)
@@ -79,4 +84,5 @@ def get_distance(level, sequences, targets = None):
                     distance[i, j] = distance[j, i]
     #print("-- distance:", distance.shape, distance[0:4, 0:6])
     print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
+    print("distance id b4re:", id(distance))
     return distance

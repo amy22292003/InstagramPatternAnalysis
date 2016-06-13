@@ -3,7 +3,7 @@ import re
 import custommodule.post as post
 
 """file path"""
-LOCATIONDETAIL_FILE = "./data/LocationDetail_NY.txt"
+LOCATIONDETAIL_FILE = "./data/LocationDetail_NY_traveler.txt"
 LOCATION_POSTS_FILE = "./data/LocationPosts"
 OUTPUT_LOCATION_DETAIL = "./data/LocationDetail_.txt"
 

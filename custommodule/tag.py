@@ -5,8 +5,6 @@ import custommodule.location as location
 """default file path"""
 LOCATION_TAGS_FOLDER = "./data/LocationTags/"
 LOCATION_TAGS_AFILE = "./data/LocationTags.txt"
-OUTPUT_TAG_COUNT_FILE = "./data/Summary/TagCount.txt"
-OUTPUT_LOCATION_TAGS_AFILE = "./data/LocationTags.txt"
 
 class Tag():
     def __init__(self):

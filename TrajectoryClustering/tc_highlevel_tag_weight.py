@@ -19,14 +19,15 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
+FILTER_TIME = 1443657600 # 2015/10/01
 CLUSTER_NUM = 20
 ERROR = 0.0001
 MAX_KTH = 5
 GPS_WEIGHT = 0.3
 
 """file path"""
-LOCATION_TOPIC = "./data/LocationCluster/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Summary/TC_hl&tag&w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
+LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
+OUTPUT_MAP = "./data/Result/TC_hl&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")

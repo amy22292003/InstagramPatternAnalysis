@@ -27,9 +27,9 @@ MAX_KTH = 30
 
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
-OUTPUT_MAP = "./data/LocationCluster/LocationMapCoor_" + str(CLUSTER_NUM) +\
+OUTPUT_MAP = "./data/Result/LocationMap_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
-OUTPUT_CLUSTER = "./data/LocationCluster/LocationClusterCoor_" + str(CLUSTER_NUM) +\
+OUTPUT_CLUSTER = "./data/Result/LocationCluster_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
 
 def set_location_user_count(locations):
