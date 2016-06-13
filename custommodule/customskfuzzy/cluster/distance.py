@@ -55,6 +55,7 @@ def _longest_common_sequence(s1, s2):
 
 def get_distance(level, sequences, targets = None):
     # Set distance function of the clustering level (location or cluster)
+    start_t = datetime.datetime.now()
     if level is "Location":
         distance_func = _sequence_distance
     elif level is "Cluster":
@@ -85,5 +86,5 @@ def get_distance(level, sequences, targets = None):
     #print("-- distance:", distance.shape, distance[0:4, 0:6])
     print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
     print("distance id b4re:", id(distance))
-    print("-- [distance] ", datetime.datetime.now())
+    print("-- [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
     return distance
