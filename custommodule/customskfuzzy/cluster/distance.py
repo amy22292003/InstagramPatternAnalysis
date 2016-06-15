@@ -1,7 +1,10 @@
 import datetime
 import math
 import numpy
-from scipy.spatial.distance import cdist
+#from scipy.spatial.distance import cdist
+
+def _dist(u, v):
+    return math.sqrt(sum((u - v) ** 2))
 
 def _dynamic_programming(s1, s2):
     ml = numpy.ones([len(s1), len(s2)])
@@ -10,11 +13,11 @@ def _dynamic_programming(s1, s2):
             if i < j:
                 ml[i, j] = float('inf')
             elif i == 0 and j == 0:
-                ml[i, j] = cdist(s1[i], s2[j])
+                ml[i, j] = _dist(s1[i], s2[j])
             elif i > 0 and j == 0:
-                ml[i, j] = min(ml[i - 1, j], cdist(s1[i], s2[j]))
+                ml[i, j] = min(ml[i - 1, j], _dist(s1[i], s2[j]))
             else:
-                ml[i, j] = min(ml[i - 1, j - 1] + cdist(s1[i], s2[j]), ml[i - 1, j])
+                ml[i, j] = min(ml[i - 1, j - 1] + _dist(s1[i], s2[j]), ml[i - 1, j])
     return ml[len(s1) - 1, len(s2) - 1]
 
 def _sequence_distance(s1, s2):
@@ -63,13 +66,10 @@ def get_distance(level, sequences, targets = None):
     else:
         print("Error, nonexistent clustering level:", type)
         sys.exit()
-    #print("sequence id:", id(sequences))
-    #print("targets id:", id(targets))
 
     # get sequence distances
     if targets is not None:
         distance = numpy.zeros((len(targets), len(sequences)))
-        #print("distance id:", id(distance))
         for i, s_t in enumerate(targets):
             for j, s in enumerate(sequences):
                 distance[i, j] = distance_func(s_t, s)
@@ -84,6 +84,5 @@ def get_distance(level, sequences, targets = None):
                 else:
                     distance[i, j] = distance[j, i]
     print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
-    #print("distance id b4re:", id(distance))
     print("-- [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
     return distance

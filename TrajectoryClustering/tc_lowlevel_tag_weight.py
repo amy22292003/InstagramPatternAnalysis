@@ -56,7 +56,7 @@ def main():
     vector_sequences = numpy.delete(numpy.array(vector_sequences), fail_indices)
     semantic_sequences = numpy.delete(numpy.array(semantic_sequences), fail_indices)
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
-    print("  remain sequences #:", len(sequences))
+    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
 
     print("vector sequence id:", id(vector_sequences))
     print("semantic_sequences:", id(semantic_sequences))

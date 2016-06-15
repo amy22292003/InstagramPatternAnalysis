@@ -1,6 +1,7 @@
 """
 cmeans.py : Fuzzy C-means clustering algorithm.
 """
+from collections import deque
 import datetime
 import numpy as np
 import random
@@ -13,10 +14,6 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	k = para[0]
 	data2 = para[1]
 	w = para[2]
-	#print("--u.sum:", u_old.sum(axis=1))
-	print("data 1:", id(data1))
-	print("data 2:", id(data2))
-	print("u old shape:", u_old.shape)
 
 	# Normalizing, then eliminating any potential zero values.
 	um = u_old / np.ones((c, 1)).dot(np.atleast_2d(u_old.sum(axis=0)))
@@ -27,7 +24,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	filter_k = lambda row:row >= sorted(row, reverse=True)[k - 1] # get the indices which fit the condition
 	large_k = np.apply_along_axis(filter_k, axis=1, arr=u_old)
 
-	large_k_indices = []
+	large_k_indices = deque()
 	for i in range(c):
 		indices = list(np.nonzero(large_k[i, :])[0])
 		if len(indices) > k:
@@ -36,6 +33,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 		else:
 			large_k_indices.extend(indices)
 	print("  unique center #:", len(set(large_k_indices)))
+	print("  center:", large_k_indices)
 
 	# get distances between targets(c# * k) & data
 	distance1 = _distance(level, data1, large_k_indices)
@@ -49,8 +47,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	d2 = each_cluster.dot(distance2) / k
 
 	d = w * d1 + (1 - w) * d2
-	print("d.shape:", d.shape)
-	print("d:", d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
+	print("  d:", d.shape, d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -60,11 +57,9 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	return u, jm, d
 
 def _distance(level, data, target_indices):
-	print("  targets #:", len(target_indices))
 	targets = np.array(data)[target_indices]
 	distance = cdistance.get_distance(level, data, targets)
 	distance = distance / np.amax(distance)
-	print("  distance id:", id(distance))
 	return distance
 
 def _fp_coeff(u):
