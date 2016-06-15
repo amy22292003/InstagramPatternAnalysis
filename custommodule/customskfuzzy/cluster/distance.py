@@ -4,7 +4,7 @@ import numpy
 #from scipy.spatial.distance import cdist
 
 def _dist(u, v):
-    return math.sqrt(sum((u - v) ** 2))
+    return math.sqrt(((u - v) ** 2).sum())
 
 def _dynamic_programming(s1, s2):
     ml = numpy.ones([len(s1), len(s2)])
@@ -83,6 +83,6 @@ def get_distance(level, sequences, targets = None):
                     distance[i, j] = distance_func(s1, s2)
                 else:
                     distance[i, j] = distance[j, i]
-    print("-- [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
-    print("-- [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
+    print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
+    print("   [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
     return distance

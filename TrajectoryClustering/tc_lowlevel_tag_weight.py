@@ -58,9 +58,6 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
 
-    print("vector sequence id:", id(vector_sequences))
-    print("semantic_sequences:", id(semantic_sequences))
-
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     """
     u, init = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")

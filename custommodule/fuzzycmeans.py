@@ -138,12 +138,8 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     k = para[0]
     sequences2 = para[1]
     w = para[2]
-    print("vector sequence id:", id(sequences))
-    print("para[1]:", id(para[1]))
-    print("semantic_sequences id:", id(sequences2))
 
     u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
-    print("u id:", id(u))
     u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)

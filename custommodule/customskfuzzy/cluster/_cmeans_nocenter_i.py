@@ -80,13 +80,10 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	u0 = init
 	u = np.fmax(u0, np.finfo(np.float64).eps)
 
-	print("data id:", id(data))
-	print("para[1] id:", id(para[1]))
-
 	# Initialize loop parameters
 	jm = np.empty(0)
 	p = 0
-	print("u.shape:", u.shape, u.shape[0] * u.shape[1])
+	print("--u.shape:", u.shape, u.shape[0] * u.shape[1])
 
 	#select cmeans function
 	if algorithm is "2WeightedDistance":
@@ -98,7 +95,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	error_list = []
 	# Main cmeans loop
 	while p < maxiter - 1:
-		print("--", p, "----------------------------> ", datetime.datetime.now())
+		print("--", p, "-----------------------------------------> ", datetime.datetime.now())
 		u2 = u.copy()
 		[u, Jjm, d] = _cmeans0(data, u2, c, m, level, *para)
 		jm = np.hstack((jm, Jjm))
