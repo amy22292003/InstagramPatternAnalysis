@@ -1,11 +1,14 @@
 import datetime
 import math
 import numpy
+from numba import jit
 #from scipy.spatial.distance import cdist
 
+@jit
 def _dist(u, v):
     return math.sqrt(((u - v) ** 2).sum())
 
+@jit
 def _dynamic_programming(s1, s2):
     ml = numpy.ones([len(s1), len(s2)])
     for i in range(len(s1)):

@@ -11,6 +11,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 import custommodule.customskfuzzy as cskfuzzy
 import custommodule.location as clocation
 
+"""parameters"""
+RAND_SEED_K = 0
+RAND_SEED_INIT = 0
+
 def get_tag_vector(corpus):
     print("[fuzzy c means] getting tag vector...")
     vectorizer = CountVectorizer()
@@ -68,6 +72,7 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
 """Sequence Clustering"""
 def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
     u = numpy.zeros((cluster_num, s_len))
+    numpy.random.seed(RAND_SEED_INIT)
     init = numpy.random.randint(0, s_len - 1, cluster_num)
     print("[fuzzy c means]- get_init_u> \n-- init:", init)
     print("u id:", id(u))
@@ -96,11 +101,13 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         large_k_indices = numpy.apply_along_axis(filter_k, axis=1, arr=distance)
         u = large_k_indices.astype(int)
 
+        random.seed(RAND_SEED_K)
         print("--each cluster initial # before random choose:", u.sum(axis=1))
         for i in range(cluster_num):
             if sum(u[i, :]) > k:
                 indices = [i for i, x in enumerate(u[i, :]) if x == 1]
                 rand_k = random.sample(indices, k)
+                print("  rand:", rand_k)
                 u[i, :] = 0
                 u[i, :][rand_k] = 1
     print("--each cluster initial #:", u.sum(axis=1))
@@ -140,7 +147,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     w = para[2]
 
     u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
-    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
+    u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 50, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)
     cluster_membership = numpy.argmax(u, axis=0)

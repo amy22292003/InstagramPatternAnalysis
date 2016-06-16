@@ -9,6 +9,10 @@ import sys
 from scipy.spatial.distance import cdist
 from . import distance as cdistance
 
+"""parameters"""
+RAND_SEED_INIT = 0
+RAND_SEED_K = 0
+
 def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	# the kth for each cluster
 	k = para[0]
@@ -25,6 +29,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	large_k = np.apply_along_axis(filter_k, axis=1, arr=u_old)
 
 	large_k_indices = deque()
+	random.seed(RAND_SEED_K)
 	for i in range(c):
 		indices = list(np.nonzero(large_k[i, :])[0])
 		if len(indices) > k:
@@ -67,7 +72,7 @@ def _fp_coeff(u):
 
 	return np.trace(u.dot(u.T)) / float(n)
 
-def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, seed = None):
+def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, seed = 0):
 	# Setup u0
 	if init is None:
 		if seed is not None:

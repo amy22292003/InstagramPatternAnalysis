@@ -28,7 +28,7 @@ GPS_WEIGHT = 0.9
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
+OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main():
     print("--------------------------------------")
@@ -36,7 +36,7 @@ def main():
     print("--------------------------------------")
 
     # Getting data
-    users, locations = locationclustering.main()
+    users, locations = locationclustering.main(FILTER_TIME)
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 
