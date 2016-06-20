@@ -20,7 +20,7 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-FILTER_TIME = 1448928000 # 2015/10/01
+FILTER_TIME = 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
 ERROR = 0.0000001
 MAX_KTH = 3
