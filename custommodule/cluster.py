@@ -95,7 +95,7 @@ def output_topics(topic_word, doc_topic, tag_name, doc_name, file_path_tag = TAG
 """mining"""
 def fit_locations_membership(locations, topic_location, id_list, attr = "membership"):
     print("[cluster] Fitting the membership of locations...")
-    print("locations #:", len(locations), "\ttopic x location shape:", topic_location.shape)
+    print("--locations #:", len(locations), "\ttopic x location shape:", topic_location.shape)
     for i, key in enumerate(id_list):
         if key in locations:
             setattr(locations[key], attr, numpy.atleast_2d(topic_location[:,i]))
@@ -103,7 +103,7 @@ def fit_locations_membership(locations, topic_location, id_list, attr = "members
 
 def fit_locations_cluster(locations, cluster_membership, id_list, attr = "cluster"):
     print("[cluster] Fitting the clusters of locations...")
-    print("locations #:", len(locations))
+    print("--locations #:", len(locations))
     for i, key in enumerate(id_list):
         if key in locations:
             setattr(locations[key], attr, cluster_membership[i])

@@ -36,15 +36,15 @@ def main():
     print("--------------------------------------")
 
     # Getting data
-    users, locations = locationclustering.main(FILTER_TIME)
+    users, locations = locationclustering.main()
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 
-    # Getting sequences cluster
+    # Getting sequences of posts & locations
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
-    vector_sequences = ctrajectory.get_vector_sequence(sequences, locations)
-    semantic_sequences = ctrajectory.get_vector_sequence(sequences, locations, "semantic_mem")
-    location_sequences = ctrajectory.convertto_location_sequences(sequences, locations)
+    print("sequences shape:", len(sequences))
+    location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
+    print("location trajectory:", len(location_sequences), type(location_sequences[0]), len(location_sequences[0]), longest_len)
 
     print("Filtering short trajectories...")
     fail_indices = []
@@ -53,12 +53,14 @@ def main():
             fail_indices.append(i)
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
-    vector_sequences = numpy.delete(numpy.array(vector_sequences), fail_indices)
-    semantic_sequences = numpy.delete(numpy.array(semantic_sequences), fail_indices)
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
 
-    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    vector_trajectories = ctrajectory.get_vector_array(location_sequences, longest_len)
+    semantic_trajectories = ctrajectory.get_vector_array(location_sequences, longest_len, "semantic_mem")
+    print(vector_trajectories.shape, semantic_trajectories.shape)
+
+    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     """
     u, init = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     for c_i in range(CLUSTER_NUM):

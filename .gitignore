@@ -1,6 +1,7 @@
 # ignore files
 *.DS_Store
 data/
+Test/
 temp.py
 custommodule/scikit-fuzzy-0.1.3/
 .python-version

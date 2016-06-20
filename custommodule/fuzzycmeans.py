@@ -70,10 +70,10 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 """Sequence Clustering"""
-def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
-    u = numpy.zeros((cluster_num, s_len))
+def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
+    u = numpy.zeros((cluster_num, s_num))
     numpy.random.seed(RAND_SEED_INIT)
-    init = numpy.random.randint(0, s_len - 1, cluster_num)
+    init = numpy.random.randint(0, s_num - 1, cluster_num)
     print("[fuzzy c means]- get_init_u> \n-- init:", init)
     print("u id:", id(u))
     print("init id:", id(init))
@@ -86,12 +86,13 @@ def _get_init_u(level, cluster_num, k, s_len, *para, distance = None):
         sequences1 = para[0]
         sequences2 = para[1]
         w = para[2]
-        init_s1 = numpy.array(sequences1)[init]
-        distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1) # target sequence * sequence
+
+        init_s1 = sequences1[init]
+        distance1 = cskfuzzy.cluster.get_target_distance(level, init_s1, sequences1)
         distance1 = numpy.array(distance1) / numpy.amax(distance1)
         
-        init_s2 = numpy.array(sequences2)[init]
-        distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2) # target sequence * sequence
+        init_s2 = sequences2[init]
+        distance2 = cskfuzzy.cluster.get_target_distance(level, init_s2, sequences2)
         distance2 = numpy.array(distance2) / numpy.amax(distance2)
         print("-- distance1:", distance1.shape, distance1[0:4, 0:8])
         print("-- distance2:", distance2.shape, distance2[0:4, 0:8])
@@ -146,7 +147,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     sequences2 = para[1]
     w = para[2]
 
-    u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
+    u = _get_init_u(level, cluster_num, k, sequences.shape[0], sequences, sequences2, w)
     u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)

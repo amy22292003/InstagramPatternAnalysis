@@ -5,6 +5,9 @@ import numpy as np
 import sys
 from scipy.spatial.distance import cdist
 
+"""parameters"""
+RAND_SEED_INIT = 0
+
 # data1:coordinate; similarity2:tag intersect similarity
 def _cmeans0_ori(data, u_old, c, m, *para):
 	"""
@@ -94,17 +97,16 @@ def _fp_coeff(u):
 
 	return np.trace(u.dot(u.T)) / float(n)
 
-def cmeans(data, c, m, error, maxiter, algorithm, *para):
+def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = 0):
 	"""
 	data2 is for intersect counting
 	"""
-	init = None
-	seed = None
 	# Setup u0
 	if init is None:
 		if seed is not None:
 			np.random.seed(seed=seed)
 		n = data.shape[1]
+		np.random.seed(RAND_SEED_INIT)
 		u0 = np.random.rand(c, n)
 		u0 /= np.ones(
 			(c, 1)).dot(np.atleast_2d(u0.sum(axis=0))).astype(np.float64)

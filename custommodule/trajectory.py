@@ -1,4 +1,5 @@
-# trajectory = list of posts
+# trajectory = 1D array of posts/ locations/ or others
+import numpy
 
 """For posts sequences"""
 def split_trajectory(trajectories, split_day = 1):
@@ -42,7 +43,20 @@ def get_cluster_sequence(trajectories, locations, attr = "cluster"):
 """For location sequences"""
 def convertto_location_sequences(post_sequences, locations):
     location_sequences = []
+    longest_len = 0
     for s in post_sequences:
         location_s = [locations[x.lid] for x in s]
         location_sequences.append(location_s)
-    return location_sequences
+        longest_len = max(longest_len, len(location_s))
+    return location_sequences, longest_len
+
+"""Transform to array"""
+def get_vector_array(trajectories, trajectory_len, attr = "membership"):
+    print("[Trajectory] Getting vector sequences...")
+    attr_dim = getattr(trajectories[0][0], attr).shape[1]
+    # set array = trajectories # * trajectory length * attr's dimension
+    vector_array = numpy.zeros((len(trajectories), trajectory_len, attr_dim))
+    for i, a_sequence in enumerate(trajectories):
+        for j, a_location in enumerate(a_sequence):
+            vector_array[i, j, :] = getattr(a_location, attr)
+    return vector_array
