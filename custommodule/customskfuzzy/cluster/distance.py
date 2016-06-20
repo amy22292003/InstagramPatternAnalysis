@@ -5,10 +5,6 @@ from numba import jit
 #from scipy.spatial.distance import cdist
 
 @jit
-def _dist(u, v):
-    return math.sqrt(((u - v) ** 2).sum())
-
-@jit
 def _dynamic_programming(s1, s2):
     ml = numpy.ones([len(s1), len(s2)])
     for i in range(len(s1)):
@@ -16,18 +12,18 @@ def _dynamic_programming(s1, s2):
             if i < j:
                 ml[i, j] = float('inf')
             elif i == 0 and j == 0:
-                ml[i, j] = _dist(s1[i], s2[j])
+                ml[i, j] = math.sqrt(((s1[i] - s2[j]) ** 2).sum())
             elif i > 0 and j == 0:
-                ml[i, j] = min(ml[i - 1, j], _dist(s1[i], s2[j]))
+                ml[i, j] = min(ml[i - 1, j], math.sqrt(((s1[i] - s2[j]) ** 2).sum()))
             else:
-                ml[i, j] = min(ml[i - 1, j - 1] + _dist(s1[i], s2[j]), ml[i - 1, j])
+                ml[i, j] = min(ml[i - 1, j - 1] + math.sqrt(((s1[i] - s2[j]) ** 2).sum()), ml[i - 1, j])
     return ml[len(s1) - 1, len(s2) - 1]
 
 def _sequence_distance(s1, s2):
     if len(s1) >= len(s2):
-        return _dynamic_programming(s1, s2) / len(s2)
+        return _dynamic_programming(s1, s2) / len(s1)
     else:
-        return _dynamic_programming(s2, s1) / len(s1)
+        return _dynamic_programming(s2, s1) / len(s2)
 
 def _lcs_length(s1, s2):
     ml = numpy.zeros([len(s1) + 1, len(s2) + 1])
