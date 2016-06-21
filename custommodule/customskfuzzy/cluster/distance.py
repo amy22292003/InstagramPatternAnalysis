@@ -7,73 +7,31 @@ from numba import jit
 @jit
 def _dist(u, v):
     dist = 0
-    for k in range(u.shape[0]):
-        dist += (u[k] - v[k]) ** 2
+    for k in range(u.shape[1]):
+        dist += (u[0, k] - v[0, k]) ** 2
     return math.sqrt(dist) #math.sqrt(((u - v) * (u - v)).sum())
 
 @jit
 def _dynamic_programming(s1, s2):
-    ml = numpy.ones([s1.shape[0], s2.shape[0]])
-    for i in range(s1.shape[0]):
-        for j in range(s2.shape[0]):
-            if i < j:
+    ml = numpy.ones((len(s1), len(s2)))
+    for i in range(len(s1)):
+        for j in range(len(s2)):
+            if i > j:
                 ml[i, j] = float('inf')
             elif i == 0 and j == 0:
-                ml[i, j] = _dist(s1[i,:], s2[j,:]) #math.sqrt(((s1[i] - s2[j]) * (s1[i] - s2[j])).sum())
-            elif i > 0 and j == 0:
-                ml[i, j] = min(ml[i - 1, j], _dist(s1[i,:], s2[j,:]))
+                ml[i, j] = _dist(s1[i], s2[j]) #math.sqrt(((s1[i] - s2[j]) * (s1[i] - s2[j])).sum())
+            elif i == 0 and j > 0:
+                ml[i, j] = min(ml[i, j - 1], _dist(s1[i], s2[j]))
             else:
-                ml[i, j] = min(ml[i - 1, j - 1] + _dist(s1[i,:], s2[j,:]), ml[i - 1, j])
+                ml[i, j] = min(ml[i - 1, j - 1] + _dist(s1[i], s2[j]), ml[i, j - 1])
     return ml[len(s1) - 1, len(s2) - 1]
 
+@jit
 def _sequence_distance(s1, s2):
     if len(s1) > len(s2):
         return _dynamic_programming(s2, s1) / len(s1)
     else:
         return _dynamic_programming(s1, s2) / len(s2)
-
-@jit
-def _sequence_distance_target(targets, sequences):
-    distance = numpy.zeros((targets.shape[0], sequences.shape[0]))
-    for i in range(targets.shape[0]):
-        for j in range(sequences.shape[0]):
-            # Get target i & sequence j length
-            len_i = numpy.where(targets[i,:,:].sum(axis=1) == 0)[0]
-            len_j = numpy.where(sequences[j,:,:].sum(axis=1) == 0)[0]
-            if len(len_i) == 0:
-                len_i = targets.shape[1]
-            else:
-                len_i = len_i[0] + 1
-            if len(len_j) == 0:
-                len_j = sequences.shape[1]
-            else:
-                len_j = len_j[0] + 1
-
-            ml = numpy.ones((min(len_i, len_j), max(len_i, len_j)))
-            for x_s in range(min(len_i, len_j)):
-                for x_l in range(max(len_i, len_j)):
-                    if x_s > x_l:
-                        ml[x_s, x_l] = float('inf')
-                    else:
-                        if len_i <= len_j:
-                            ii = x_s
-                            jj = x_l
-                        else:
-                            ii = x_l
-                            jj = x_s
-                        dist = 0
-                        for k in range(targets.shape[2]):
-                            dist += (targets[i,ii,k] - sequences[j,jj,k]) ** 2
-                        dist = math.sqrt(dist)
-
-                        if x_s == 0 and x_l == 0:
-                            ml[x_s, x_l] = dist
-                        elif x_s == 0 and x_l > 0:
-                            ml[x_s, x_l] = min(ml[x_s, x_l - 1], dist)
-                        else:
-                            ml[x_s, x_l] = min(ml[x_s - 1, x_l - 1] + dist, ml[x_s, x_l - 1])
-            distance[i, j] = ml[x_s, x_l] / max(len_i, len_j)
-    return distance
 
 def _lcs_length(s1, s2):
     ml = numpy.zeros([len(s1) + 1, len(s2) + 1])
@@ -84,6 +42,11 @@ def _lcs_length(s1, s2):
             else:
                 ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
     return ml[len(s1), len(s2)]
+
+def _longest_common_sequence(s1, s2):
+    #ml = _lcs_length(s1, s2)
+    #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
+    return _lcs_length(s1, s2) / min(len(s1), len(s2)) #, lcs_set
 
 """
 def _lcs(ml, s1, s2, i, j):
@@ -99,12 +62,55 @@ def _lcs(ml, s1, s2, i, j):
         else:
             return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
 """
+"""
+@jit
+def _sequence_distance_target(targets, sequences):
+    distance = numpy.zeros((len(targets), len(sequences)))
+    for i in range(len(targets)):
+        for j in range(len(sequences)):
+            # Get target i & sequence j length
+            
+            #len_i = numpy.where(targets[i,:,:].sum(axis=1) == 0)[0]
+            #len_j = numpy.where(sequences[j,:,:].sum(axis=1) == 0)[0]
+            #if len(len_i) == 0:
+            #    len_i = targets.shape[1]
+            #else:
+            #    len_i = len_i[0] + 1
+            #if len(len_j) == 0:
+            #    len_j = sequences.shape[1]
+            #else:
+            #    len_j = len_j[0] + 1
+            
+            len_i = len(targets[i])
+            len_j = len(sequences[j])
+            ml = numpy.ones((min(len_i, len_j), max(len_i, len_j)))
+            for x_s in range(min(len_i, len_j)):
+                for x_l in range(max(len_i, len_j)):
+                    if x_s > x_l:
+                        ml[x_s, x_l] = float('inf')
+                    else:
+                        if len_i <= len_j:
+                            ii = x_s
+                            jj = x_l
+                        else:
+                            ii = x_l
+                            jj = x_s
+                        dist = 0
+                        for k in range(targets[i][ii].shape[1]):
+                            dist += (targets[i][ii][0,k] - sequences[j][jj][0,k]) ** 2
+                        dist = math.sqrt(dist)
 
-def _longest_common_sequence(s1, s2):
-    #ml = _lcs_length(s1, s2)
-    #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
-    return _lcs_length(s1, s2) / min(len(s1), len(s2)) #, lcs_set
+                        if x_s == 0 and x_l == 0:
+                            ml[x_s, x_l] = dist
+                        elif x_s == 0 and x_l > 0:
+                            ml[x_s, x_l] = min(ml[x_s, x_l - 1], dist)
+                        else:
+                            ml[x_s, x_l] = min(ml[x_s - 1, x_l - 1] + dist, ml[x_s, x_l - 1])
+            distance[i, j] = ml[x_s, x_l] / max(len_i, len_j)
+    return distance
+"""
 
+"""
 def get_target_distance(level, targets, sequences):
     # Set distance function of the clustering level (location or cluster)
     start_t = datetime.datetime.now()
@@ -118,8 +124,8 @@ def get_target_distance(level, targets, sequences):
     distance = distance_func(targets, sequences)
     print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
     print("   [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
-    print(distance)
     return distance
+"""
 
 def get_distance(level, sequences, targets = None):
     # Set distance function of the clustering level (location or cluster)
@@ -134,11 +140,10 @@ def get_distance(level, sequences, targets = None):
 
     # get sequence distances
     if targets is not None:
-        print(targets.shape, sequences.shape)
-        distance = numpy.zeros((targets.shape[0], sequences.shape[0]))
-        for i in range(targets.shape[0]):
-            for j in range(sequences.shape[0]):
-                distance[i,j] = distance_func(targets[i,:,:], sequences[j,:,:])
+        distance = numpy.zeros((len(targets), len(sequences)))
+        for i in range(len(targets)):
+            for j in range(len(sequences)):
+                distance[i,j] = distance_func(targets[i], sequences[j])
     else:
         distance = numpy.zeros((len(sequences), len(sequences)))
         for i, s1 in enumerate(sequences):

@@ -42,10 +42,7 @@ def main():
 
     # Getting sequences of posts & locations
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
-    print("sequences shape:", len(sequences))
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
-    print("location trajectory:", len(location_sequences), type(location_sequences[0]), len(location_sequences[0]), longest_len)
-
     print("Filtering short trajectories...")
     fail_indices = []
     for i, s in enumerate(sequences):
@@ -56,9 +53,8 @@ def main():
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
     print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
 
-    vector_trajectories = ctrajectory.get_vector_array(location_sequences, longest_len)
-    semantic_trajectories = ctrajectory.get_vector_array(location_sequences, longest_len, "semantic_mem")
-    print(vector_trajectories.shape, semantic_trajectories.shape)
+    vector_trajectories = ctrajectory.get_vector_sequence(location_sequences)
+    semantic_trajectories = ctrajectory.get_vector_sequence(location_sequences, "semantic_mem")
 
     u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     """

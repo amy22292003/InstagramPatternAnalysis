@@ -21,22 +21,22 @@ def split_trajectory(trajectories, split_day = 1):
     print("  output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
     return sequences
 
-def get_vector_sequence(trajectories, locations, attr = "membership"):
+def get_vector_sequence(trajectories, attr = "membership"):
     print("[Trajectory] Getting vector sequences...")
     vector_sequences = []
     for a_sequence in trajectories:
         #a_vector_sequence = [locations[a_post.lid].membership for a_post in a_sequence]
-        a_vector_sequence = [getattr(locations[a_post.lid], attr) for a_post in a_sequence]
+        a_vector_sequence = [getattr(a_location, attr) for a_location in a_sequence]
         vector_sequences.append(a_vector_sequence)
     return vector_sequences
 
-def get_cluster_sequence(trajectories, locations, attr = "cluster"):
+def get_cluster_sequence(trajectories, attr = "cluster"):
     cluster_sequences = []
     for a_sequence in trajectories:
         cluster_sequence = []
-        for a_post in a_sequence:
-            if len(cluster_sequence) == 0 or cluster_sequence[-1] != getattr(locations[a_post.lid], attr):
-                cluster_sequence.append(getattr(locations[a_post.lid], attr))
+        for a_location in a_sequence:
+            if len(cluster_sequence) == 0 or cluster_sequence[-1] != getattr(a_location, attr):
+                cluster_sequence.append(getattr(a_location, attr))
         cluster_sequences.append(cluster_sequence)
     return cluster_sequences
 

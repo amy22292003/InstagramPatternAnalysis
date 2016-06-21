@@ -63,7 +63,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 def _distance(level, data, target_indices):
 	targets = np.array(data)[target_indices]
-	distance = cdistance.get_target_distance(level, targets, data)
+	distance = cdistance.get_distance(level, data, targets)
 	distance = distance / np.amax(distance)
 	return distance
 
