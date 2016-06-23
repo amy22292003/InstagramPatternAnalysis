@@ -57,7 +57,7 @@ def main():
     cluster_trajectories = ctrajectory.get_cluster_sequence(location_sequences)
     semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
 
-    u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
