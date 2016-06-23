@@ -37,7 +37,6 @@ def main():
     # Getting data
     users, locations = locationclustering.main()
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
-    locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
     semantic_cluster = numpy.argmax(doc_topic, axis = 1)
     locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")
 
@@ -56,7 +55,7 @@ def main():
     print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
 
     cluster_trajectories = ctrajectory.get_cluster_sequence(location_sequences)
-    semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_mem")
+    semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
 
     u, u0, d, jm, p, fpc, membership, distance = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
