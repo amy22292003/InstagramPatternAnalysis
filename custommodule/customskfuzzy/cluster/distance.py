@@ -33,6 +33,7 @@ def _sequence_distance(s1, s2):
     else:
         return _dynamic_programming(s1, s2) / len(s2)
 
+@jit
 def _lcs_length(s1, s2):
     ml = numpy.zeros([len(s1) + 1, len(s2) + 1])
     for i in range(1, len(s1) + 1):
@@ -43,6 +44,7 @@ def _lcs_length(s1, s2):
                 ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
     return ml[len(s1), len(s2)]
 
+@jit
 def _longest_common_sequence(s1, s2):
     #ml = _lcs_length(s1, s2)
     #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
