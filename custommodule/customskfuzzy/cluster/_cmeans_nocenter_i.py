@@ -59,7 +59,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 
 	u = d ** (- 2. / (m - 1))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
-	return u, jm, d
+	return u, jm, d, large_k_indices
 
 def _distance(level, data, target_indices):
 	targets = np.array(data)[target_indices]
@@ -88,7 +88,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	# Initialize loop parameters
 	jm = np.empty(0)
 	p = 0
-	print("--u.shape:", u.shape, u.shape[0] * u.shape[1])
+	print("--u.shape:", u.shape, ", elements:", u.shape[0] * u.shape[1])
 
 	#select cmeans function
 	if algorithm is "2WeightedDistance":
@@ -102,7 +102,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	while p < maxiter - 1:
 		print("--", p, "-----------------------------------------> ", datetime.datetime.now())
 		u2 = u.copy()
-		[u, Jjm, d] = _cmeans0(data, u2, c, m, level, *para)
+		[u, Jjm, d, center] = _cmeans0(data, u2, c, m, level, *para)
 		jm = np.hstack((jm, Jjm))
 		p += 1
 		error_list.append(np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]))
@@ -110,13 +110,12 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 		# Stopping rule
 		if np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]) < error:
 			break
+	print("-------------------------------")
 	print("  error:", error_list)
-	print("  error avg:", sum(error_list) / len(error_list))
-
-	print("--End> u.sum:", u.sum(axis=0)[0:6], u.sum(axis=1))
-	print("  Fin u>>\n", u[:,0],u[:,1], u[:,2], "\n  u avg:", np.sum(u) / (u.shape[0] * u.shape[1]), "\nu std:", np.std(u))
+	print("  error avg:", sum(error_list) / len(error_list), ", max/min:", max(error_list), min(error_list))
+	print("  Fin u>>\n", u[:,0:2], "\n  u avg:", np.sum(u) / (u.shape[0] * u.shape[1]), "\n  u std:", np.std(u))
 	# Final calculations
 	error = np.linalg.norm(u - u2)
 	fpc = _fp_coeff(u)
 
-	return u, u0, d, jm, p, fpc
+	return u, u0, d, jm, p, fpc, center

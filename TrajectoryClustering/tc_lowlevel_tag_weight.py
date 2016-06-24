@@ -56,7 +56,7 @@ def main():
     vector_trajectories = ctrajectory.get_vector_sequence(location_sequences)
     semantic_trajectories = ctrajectory.get_vector_sequence(location_sequences, "semantic_mem")
 
-    u, u0, d, jm, p, fpc, membership = cfuzzy.sequences_clustering_i("Location", vector_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
+    u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Location", vector_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
     """
     u, init = cfuzzy.sequences_clustering_i("Location", vector_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
@@ -89,6 +89,7 @@ def main():
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
+    return locations, u, center
 
 if __name__ == '__main__':
     main()
