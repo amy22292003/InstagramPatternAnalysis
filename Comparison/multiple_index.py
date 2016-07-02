@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import inspect
+import numpy
 import os
 import sys
 
@@ -20,8 +21,8 @@ CLUSTER_RESULT = "./data/Index_cluster#"
 CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
-FILTER_TIME_S = 1447545600 
-FILTER_TIME_E = 1448928000
+FILTER_TIME_S = 1448323200 #2015/11/24 
+FILTER_TIME_E = 1448928000 #2015/12/1
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -38,13 +39,14 @@ def main(*argv):
 
     cluster.extend([100, 150])
     #cluster = [100,200]
-    
-    for cluster_num in cluster:
+
+    rsc_n = numpy.zeros((len(cluster), 2))
+    for i, cluster_num in enumerate(cluster):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
         
         if cluster_num == 15:
             f = open(CLUSTER_RESULT, "w")
-            f.write("#\tNPE\tNPC\tXB\n")
+            f.write("#\tNPE\tNPC\tXB\tBSC\tRSC\n")
         else:
             f = open(CLUSTER_RESULT, "a")
         print("#- ", cluster_num, "------------")
@@ -66,13 +68,21 @@ def main(*argv):
         print("BSC--\t\t", bsc)
         f.write(str(bsc) + "\t")
 
-        rsc, comp, sep = cindex.rsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
-        print("RSC--\t\t", rsc, "\t(", comp, ",", sep, ")")
-        f.write(str(xb) + "(" + str(comp) + "," + str(sep) + ")" + "\t")
+        sep, comp = cindex.rsc_c("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
+        #print("RSC--\t\t", rsc, "\t(", comp, ",", sep, ")")
+        #f.write(str(xb) + "(" + str(comp) + "," + str(sep) + ")" + "\t")
+        rsc_n[i, 0] = sep
+        rsc_n[i, 1] = comp
 
         f.write("\n")
         f.close()
 
+    rsc = cindex.rsc(rsc_n[:,0], rsc_n[:,1])
+    f = open(CLUSTER_RESULT, "a")
+    f.write("----RSC--------->\n")
+    for i, cluster_num in enumerate(cluster):
+        f.write("#- " + str(cluster_num) + "\t" + rsc[i] + "\n")
+    f.close()
 
     print("Test ", argv[0], " ---output--->", CLUSTER_RESULT)
     print("--------------------------------------")
