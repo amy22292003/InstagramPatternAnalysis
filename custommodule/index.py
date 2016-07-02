@@ -1,4 +1,5 @@
 from collections import deque
+from numba import jit
 import numpy as np
 import math
 import random
@@ -30,6 +31,7 @@ def _total_separation(d):
     print("separa:", separation)
     return separation.sum()
 
+@jit
 def _center(level, u, k, seed=RAND_SEED_K):
     # get large k indices for each cluster
     filter_k = lambda row:row >= sorted(row, reverse=True)[k - 1] # get the indices which fit the condition
@@ -95,6 +97,7 @@ def _comp(level, u, k, w, data1, data2, center):
     d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
     return ((u ** 2) * (d ** 2)).sum()
 
+@jit
 def _sep(u):
     sep = 0
     for p in range(u.shape[0] - 1):
@@ -142,9 +145,6 @@ def rsc(level, u, k, w, data1, data2):
     comp = _comp(level, u, k, w, data1, data2, center)
     sep = _sep(u)
     return sep + comp, sep, comp
-
-
-
 
 """
 def fhv(level, u, k, w, data1, data2):
