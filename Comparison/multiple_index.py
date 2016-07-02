@@ -41,10 +41,10 @@ def main(*argv):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT)
         
         if cluster_num == 15:
-            f = open("./data/Multiple_index.txt", "w")
+            f = open(CLUSTER_RESULT, "w")
             f.write("#\tNPE\tNPC\tXB\n")
         else:
-            f = open("./data/Multiple_index.txt", "a")
+            f = open(CLUSTER_RESULT, "a")
         print("#- ", cluster_num, "------------")
         f.write("#- " + str(cluster_num) + "\t")
 
