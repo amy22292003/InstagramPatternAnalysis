@@ -19,7 +19,8 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-FILTER_TIME = 1448928000 # 2015/12/01
+FILTER_TIME_S = 1448928000 
+FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
 ERROR = 0.0001
 MAX_KTH = 3
@@ -34,16 +35,20 @@ def main(*argv):
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
     # set parameters
+    global CLUSTER_NUM
+    global MAX_KTH
+    global GPS_WEIGHT
+    global FILTER_TIME_S
+    global FILTER_TIME_E
     if len(argv) > 0:
-        global CLUSTER_NUM
-        global MAX_KTH
-        global GPS_WEIGHT
         CLUSTER_NUM = argv[0]
         MAX_KTH = argv[1]
         GPS_WEIGHT = argv[2]
+        FILTER_TIME_S = argv[3]
+        FILTER_TIME_E = argv[4]
 
     # Getting data
-    users, locations = locationclustering.main()
+    users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     semantic_cluster = numpy.argmax(doc_topic, axis = 1)
     locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")

@@ -20,7 +20,9 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME = 1451001600 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
+#1447545600 2015/11/15 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
+FILTER_TIME_S = 1448928000 
+FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 30
@@ -42,11 +44,12 @@ def main(*argv):
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
-    print("argv:", argv)
     # set UNIXTIME
+    global FILTER_TIME_S
+    global FILTER_TIME_E
     if len(argv) > 0:
-        global FILTER_TIME
-        FILTER_TIME = argv[0]
+        FILTER_TIME_S = argv[0]
+        FILTER_TIME_E = argv[1]
     
     # getting data
     locations = clocation.open_locations()
@@ -54,7 +57,7 @@ def main(*argv):
 
     print("Sampling users posts...")
     for key, a_user in users.items():
-        posts = [x for x in a_user.posts if (x.time > FILTER_TIME) and (x.time < 1451606400)]
+        posts = [x for x in a_user.posts if (x.time > FILTER_TIME_S) and (x.time < FILTER_TIME_E)]
         users[key].posts = posts
     locations = clocation.fit_users_to_location(locations, users, "uid")
     set_location_user_count(locations)

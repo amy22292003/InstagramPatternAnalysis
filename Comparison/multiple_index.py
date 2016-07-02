@@ -20,6 +20,8 @@ CLUSTER_RESULT = "./data/Index_cluster#"
 CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
+FILTER_TIME_S = 1447545600 
+FILTER_TIME_E = 1448928000
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -32,13 +34,13 @@ def main(*argv):
         CLUSTER_RESULT = CLUSTER_RESULT + "_T" + argv[0]
     CLUSTER_RESULT = CLUSTER_RESULT + ".txt"
 
-    cluster = list(range(15, 55, 5))
+    cluster = list(range(15, 65, 5))
 
-    cluster.extend([100, 200])
+    cluster.extend([100, 150])
     #cluster = [100,200]
     
     for cluster_num in cluster:
-        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT)
+        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
         
         if cluster_num == 15:
             f = open(CLUSTER_RESULT, "w")
@@ -71,14 +73,6 @@ def main(*argv):
         f.write("\n")
         f.close()
 
-    # Set c#
-    """
-    f = open("./data/t.txt", "w")
-    for cluster_num in range(20,60,10):
-        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT)
-        pcaes = cindex.pcaes("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
-        f.write("PCAES\t" + str(pcaes) + "\n")
-    """
 
     print("Test ", argv[0], " ---output--->", CLUSTER_RESULT)
     print("--------------------------------------")
