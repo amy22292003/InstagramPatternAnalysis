@@ -35,7 +35,7 @@ def main(*argv):
         CLUSTER_RESULT = CLUSTER_RESULT + "_T" + argv[0]
     CLUSTER_RESULT = CLUSTER_RESULT + ".txt"
 
-    cluster = list(range(15, 65, 5))
+    cluster = list(range(10, 65, 5))
 
     cluster.extend([100, 150])
     #cluster = [100,200]
@@ -44,7 +44,7 @@ def main(*argv):
     for i, cluster_num in enumerate(cluster):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclustering.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
         
-        if cluster_num == 15:
+        if i == 0:
             f = open(CLUSTER_RESULT, "w")
             f.write("#\tNPE\tNPC\tXB\tBSC\tRSC\n")
         else:
