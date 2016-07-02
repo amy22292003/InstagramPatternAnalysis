@@ -37,8 +37,7 @@ def main(*argv):
 
     cluster = list(range(10, 65, 5))
 
-    cluster.extend([100, 150])
-    #cluster = [100,200]
+    #cluster.extend([100, 150])
 
     rsc_n = numpy.zeros((len(cluster), 2))
     for i, cluster_num in enumerate(cluster):
@@ -81,7 +80,7 @@ def main(*argv):
     f = open(CLUSTER_RESULT, "a")
     f.write("----RSC--------->\n")
     for i, cluster_num in enumerate(cluster):
-        f.write("#- " + str(cluster_num) + "\t" + rsc[i] + "\n")
+        f.write("#- " + str(cluster_num) + "\t" + str(rsc[i]) + "\n")
     f.close()
 
     print("Test ", argv[0], " ---output--->", CLUSTER_RESULT)
