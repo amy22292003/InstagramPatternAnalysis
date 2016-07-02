@@ -12,17 +12,25 @@ sys.path.append(PACKAGE_PARENT)
 import Liu.custommodule.index as cindex
 import Liu.TrajectoryClustering.tc_highlevel_tag_weight as trajectoryclustering
 
+"""file path"""
+CLUSTER_RESULT = "./data/Index_cluster#"
+
+
 """parameters"""
 CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
-def main():
+def main(*argv):
     start_time = datetime.datetime.now()
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
-
+    
+    global CLUSTER_RESULT
+    if len(argv) > 0:
+        CLUSTER_RESULT = CLUSTER_RESULT + "_T" + argv[0]
+    CLUSTER_RESULT = CLUSTER_RESULT + ".txt"
 
     cluster = list(range(15, 55, 5))
 
@@ -40,8 +48,6 @@ def main():
         print("#- ", cluster_num, "------------")
         f.write("#- " + str(cluster_num) + "\t")
 
-
-
         npe = cindex.npe(u)
         print("NPE--\t\t", npe)
         f.write(str(npe) + "\t")
@@ -58,7 +64,7 @@ def main():
         print("BSC--\t\t", bsc)
         f.write(str(bsc) + "\t")
 
-        rsc, comp, sep = rsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
+        rsc, comp, sep = cindex.rsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
         print("RSC--\t\t", rsc, "\t(", comp, ",", sep, ")")
         f.write(str(xb) + "(" + str(comp) + "," + str(sep) + ")" + "\t")
 
@@ -74,14 +80,10 @@ def main():
         f.write("PCAES\t" + str(pcaes) + "\n")
     """
 
-
-
-
-
-
+    print("Test ", argv[0], " ---output--->", CLUSTER_RESULT)
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
     print("--------------------------------------")
 
 if __name__ == '__main__':
-    main()
+    main(*sys.argv[1:])
