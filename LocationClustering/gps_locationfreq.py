@@ -22,14 +22,14 @@ import Liu.custommodule.user as cuser
 """parameters"""
 FILTER_TIME = 1451001600 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
-ERROR = 0.01
+ERROR = 0.000001
 MAX_KTH = 30
 
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
-OUTPUT_MAP = "./data/Result/LocationMap_" + str(CLUSTER_NUM) +\
+OUTPUT_MAP = "./data/Result/LocationMap'_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
-OUTPUT_CLUSTER = "./data/Result/LocationCluster_" + str(CLUSTER_NUM) +\
+OUTPUT_CLUSTER = "./data/Result/LocationCluster'_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
 
 def set_location_user_count(locations):
@@ -42,6 +42,7 @@ def main(*argv):
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
+    print("argv:", argv)
     # set UNIXTIME
     if len(argv) > 0:
         global FILTER_TIME
@@ -66,13 +67,13 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, u, locations.keys())
     locations = ccluster.fit_locations_cluster(locations, cluster_membership, locations.keys())
 
-    """
+    
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         cluster_membership, CLUSTER_NUM, OUTPUT_MAP)
 
     ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
-    """
+    
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
@@ -81,4 +82,4 @@ def main(*argv):
     return users, locations
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main(*sys.argv[1:])

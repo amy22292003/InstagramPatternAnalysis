@@ -44,32 +44,63 @@ def _center(level, u, k, seed=RAND_SEED_K):
             large_k_indices.extend(rand_k)
         else:
             large_k_indices.extend(indices)
-    print("-- unique center #:", len(set(large_k_indices)))
-    print("-- center:", large_k_indices)
+    #print("-- unique center #:", len(set(large_k_indices)))
+    #print("-- center:", large_k_indices)
     return large_k_indices
 
 def _cluster_dist(level, c, k, w, data1, data2, center):
-    print("[index] Getting cluster distances")
+    #print("[index] Getting cluster distances")
     d1 = _distance(level, c, k, data1, center)
     d2 = _distance(level, c, k, data2, center)
     d = w * d1 + (1 - w) * d2
-    print("d:", d.shape, d[0:3, 0:3])
+    #print("d:", d.shape, d[0:3, 0:3])
     return d
 
 def _distance(level, c, k, data, center):
     center_data = np.array(data)[center]
     distance = cskfuzzy.cluster.distance.get_distance(level, center_data)
-    distance = distance / np.amax(distance)
+    #distance = distance / np.amax(distance)
 
     each_cluster = np.zeros((c, c))
     np.fill_diagonal(each_cluster, 1)
     each_cluster = np.repeat(each_cluster, k, axis = 1)
     d = each_cluster.dot(distance)
     d = d.dot(each_cluster.transpose()) / (k * k)
-    print("d1-2:", d.shape, "\n", d[0:5,0:5])
+    #print("d1-2:", d.shape, "\n", d[0:5,0:5])
     np.fill_diagonal(d, 0)
     print(d[0:5,0:5])
     return d
+
+def _distance_c_x(level, c, k, data, center):
+    center_data = np.array(data)[center]
+    distance = cskfuzzy.cluster.distance.get_distance(level, data, center_data)
+    #distance = distance / np.amax(distance)
+    each_cluster = np.zeros((c, c))
+    np.fill_diagonal(each_cluster, 1)
+    each_cluster = np.repeat(each_cluster, k, axis = 1)
+    d = each_cluster.dot(distance) / k
+    return d
+
+def _dist_c_x(level, c, k, w, data1, data2, center):
+    d1 = _distance_c_x(level, c, k, data1, center)
+    d2 = _distance_c_x(level, c, k, data1, center)
+    d = w * d1 + (1 - w) * d2
+    return d
+
+def _j(level, u, k, w, data1, data2, center):
+    d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
+    return ((u ** 2) * (d ** 2)).sum()
+
+def _comp(level, u, k, w, data1, data2, center):
+    d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
+    return ((u ** 2) * (d ** 2)).sum()
+
+def _sep(u):
+    sep = 0
+    for p in range(u.shape[0] - 1):
+        for q in range(p + 1, u.shape[0]):
+            sep += (u[[p,q],:].min(axis=0) * (- (u * np.log(u)).sum(axis=0))).sum()
+    return sep * 2 / (u.shape[0] * (u.shape[0] - 1))
 
 def pcaes(level, u, k, w, data1, data2):
     print("[Index] PCAES -->")
@@ -81,4 +112,44 @@ def pcaes(level, u, k, w, data1, data2):
     result = compactness - separation
     print("-- compactness:", compactness, ", separation:", separation)
     print("-- PCAES:", result)
-    return pcaes
+    return pcaes 
+
+def npe(u):
+    return (- (u * np.log(u)).sum()) / (u.shape[1] - u.shape[0])
+
+def npc(u):
+    return ((u.shape[0] / u.shape[1]) * ((u ** 2) - 1).sum()) / (u.shape[0] - 1)
+
+def xb(level, u, k, w, data1, data2):
+    center = _center(level, u, k)
+    j = _j(level, u, k, w, data1, data2, center) 
+    cd = _cluster_dist(level, u.shape[0], k, w, data1, data2, center)
+    cd[cd == 0] = float('inf')
+    xb = (j / u.shape[1]) / np.amin(cd ** 2)
+    return xb, j / u.shape[1], np.amin(cd ** 2)
+
+def bsc(level, u, k, w, data1, data2):
+    center = _center(level, u, k)
+    d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
+    up = ((u ** 2) * (d ** 2)).sum(axis=1)
+    cd = _cluster_dist(level, u.shape[0], k, w, data1, data2, center)
+    down = u.sum(axis=1) * (cd ** 2).sum(axis=1)
+    bsc = (up / down).sum()
+    return bsc
+
+def rsc(level, u, k, w, data1, data2):
+    center = _center(level, u, k)
+    comp = _comp(level, u, k, w, data1, data2, center)
+    sep = _sep(u)
+    return sep + comp, sep, comp
+
+
+
+
+"""
+def fhv(level, u, k, w, data1, data2):
+    center = _center(level, u, k)
+    d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
+    f = (((u ** 2) * (d * d.transpose())).sum(axis=1) / (u ** 2).sum(axis=1))
+    np.linalg.det(f) 
+"""

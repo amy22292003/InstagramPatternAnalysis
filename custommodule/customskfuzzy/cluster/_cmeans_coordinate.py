@@ -83,7 +83,7 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	u_ori = d ** (- 2. / (m - 1))
 	u_ori /= np.ones((c, 1)).dot(np.atleast_2d(u_ori.sum(axis=0)))
 	#print("  - u_ori:", u_ori[0:5,0:3])
-	u = d ** (- 2. / (m - 1)) / cluster_frequency.dot(np.ones((1, d.shape[1])))
+	u = d ** (- 2. / (m - 1)) * cluster_frequency.dot(np.ones((1, d.shape[1])))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	#print("  - d:", d[0:5, 0:3], "\n  - u:", u[0:5, 0:3])
 	return cntr, u, jm, d
@@ -127,6 +127,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = 0):
 		print("Error, nonexistent fuzzy c means algorithm:", algorithm)
 		sys.exit()
 
+	error_list = []
 	# Main cmeans loop
 	while p < maxiter - 1:
 		if p % 100 == 0:
@@ -135,11 +136,12 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = 0):
 		[cntr, u, Jjm, d] = _cmeans0(data, u2, c, m, *para)
 		jm = np.hstack((jm, Jjm))
 		p += 1
+		error_list.append(np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]))
 
 		# Stopping rule
 		if np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]) < error:
 			break
-
+	print("  error:", error_list)
 	print(">>> p=", p)
 	print("  Final u.sum:", u.sum(axis=0), "\n", u.sum(axis=1))
 	print("  Final u:>>\n", u[:,0:2], "\n  u std:", np.std(u))
