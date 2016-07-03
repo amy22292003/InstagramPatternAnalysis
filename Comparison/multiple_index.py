@@ -72,14 +72,13 @@ def decide_cluster(level, cluster):
     for i, cluster_num in enumerate(cluster):
         if level == 'H':
             location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Cluster", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
+            sep, comp = output_index_it("Cluster", i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
         elif level == 'L':
             location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
+            sep, comp = output_index_it("Location", i, i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
         else:
             print("[ERROR] no such level")
             return 1
-        sep, comp = output_index_it(i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
         rsc_n[i, 0] = sep
         rsc_n[i, 1] = comp
     output_rsc(rsc_n, cluster, CLUSTER_RESULT)
@@ -90,14 +89,13 @@ def decide_k(level, k_range):
     for i, k in enumerate(k_range):
         if level == 'H':
             location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Cluster", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
+            sep, comp = output_index_it("Cluster", i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
         elif level == 'L':
             location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
+            sep, comp = output_index_it("Location", i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
         else:
             print("[ERROR] no such level")
             return 1
-        sep, comp = output_index_it(i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
         rsc_n[i, 0] = sep
         rsc_n[i, 1] = comp
     output_rsc(rsc_n, k_range, K_RESULT)
