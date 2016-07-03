@@ -48,7 +48,7 @@ def _lcs_length(s1, s2):
 def _longest_common_sequence(s1, s2):
     #ml = _lcs_length(s1, s2)
     #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
-    return _lcs_length(s1, s2) / min(len(s1), len(s2)) #, lcs_set
+    return _lcs_length(s1, s2) / max(len(s1), len(s2)) #, lcs_set
 
 """
 def _lcs(ml, s1, s2, i, j):

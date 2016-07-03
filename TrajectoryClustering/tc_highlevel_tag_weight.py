@@ -22,7 +22,7 @@ SPLIT_DAY = 1
 FILTER_TIME_S = 1448928000 
 FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
-ERROR = 0.0001
+ERROR = 0.000001
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
@@ -71,7 +71,7 @@ def main(*argv):
     semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
-
+    
     """
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
@@ -91,6 +91,7 @@ def main(*argv):
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
     """
+    
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
     print("--------------------------------------")

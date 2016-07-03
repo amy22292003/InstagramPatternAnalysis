@@ -106,7 +106,8 @@ def main(*argv):
     elif argv[0] == 'k':
         global K_RESULT
         K_RESULT = K_RESULT + "_T" + argv[1] + ".txt"
-        k_range = list(range(1, 10))
+        k_range = list(range(1, 6))
+        k_range.extend(list(range(10, 30, 5)))
         decide_k(k_range)
 
     elif argv[0] == 'w':

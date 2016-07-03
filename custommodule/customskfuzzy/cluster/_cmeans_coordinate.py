@@ -80,8 +80,8 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 
 	jm = (um * d ** 2).sum()
 
-	u_ori = d ** (- 2. / (m - 1))
-	u_ori /= np.ones((c, 1)).dot(np.atleast_2d(u_ori.sum(axis=0)))
+	#u_ori = d ** (- 2. / (m - 1))
+	#u_ori /= np.ones((c, 1)).dot(np.atleast_2d(u_ori.sum(axis=0)))
 	#print("  - u_ori:", u_ori[0:5,0:3])
 	u = d ** (- 2. / (m - 1)) * cluster_frequency.dot(np.ones((1, d.shape[1])))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))

@@ -13,7 +13,7 @@ import custommodule.location as clocation
 
 """parameters"""
 RAND_SEED_K = 0
-RAND_SEED_INIT = 0
+RAND_SEED_INIT = 2
 
 def get_tag_vector(corpus):
     print("[fuzzy c means] getting tag vector...")
@@ -86,10 +86,17 @@ def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
         w = para[2]
 
         init_s1 = numpy.array(sequences1)[init]
+        init_s2 = numpy.array(sequences2)[init]
+        cluster_dist1 = cskfuzzy.cluster.get_distance(level, init_s1)
+        cluster_dist2 = cskfuzzy.cluster.get_distance(level, init_s2)
+        cluster_dist = w * cluster_dist1 + (1 - w) * cluster_dist2
+        print(" cluster dist:", cluster_dist)
+
+        
         distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1)
         distance1 = numpy.array(distance1) / numpy.amax(distance1)
         
-        init_s2 = numpy.array(sequences2)[init]
+        
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2)
         distance2 = numpy.array(distance2) / numpy.amax(distance2)
         #print("-- distance1:", distance1.shape, distance1[0:4, 0:5])
@@ -143,7 +150,6 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     k = para[0]
     sequences2 = para[1]
     w = para[2]
-    print("!k:", k)
 
     u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
     u, u0, d, jm, p, fpc, center = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)

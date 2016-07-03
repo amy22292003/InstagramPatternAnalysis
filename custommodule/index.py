@@ -44,8 +44,8 @@ def _center(level, u, k, seed=RAND_SEED_K):
             large_k_indices.extend(rand_k)
         else:
             large_k_indices.extend(indices)
-    #print("-- unique center #:", len(set(large_k_indices)))
-    #print("-- center:", large_k_indices)
+    print("-- !unique center #:", len(set(large_k_indices)))
+    print("-- center:", large_k_indices)
     return large_k_indices
 
 def _cluster_dist(level, c, k, w, data1, data2, center):
@@ -60,6 +60,8 @@ def _distance(level, c, k, data, center):
     center_data = np.array(data)[center]
     distance = cskfuzzy.cluster.distance.get_distance(level, center_data)
     #distance = distance / np.amax(distance)
+    #print("center distance(", c, k, "):", distance.shape)
+    #print(" distance:", distance)
 
     each_cluster = np.zeros((c, c))
     np.fill_diagonal(each_cluster, 1)
@@ -67,6 +69,7 @@ def _distance(level, c, k, data, center):
     d = each_cluster.dot(distance)
     d = d.dot(each_cluster.transpose()) / (k * k)
     #print("d1-2:", d.shape, "\n", d[0:5,0:5])
+    #print(" cluster:", d)
     np.fill_diagonal(d, 0)
     #print(d[0:5,0:5])
     return d
@@ -83,7 +86,7 @@ def _distance_c_x(level, c, k, data, center):
 
 def _dist_c_x(level, c, k, w, data1, data2, center):
     d1 = _distance_c_x(level, c, k, data1, center)
-    d2 = _distance_c_x(level, c, k, data1, center)
+    d2 = _distance_c_x(level, c, k, data2, center)
     d = w * d1 + (1 - w) * d2
     return d
 
