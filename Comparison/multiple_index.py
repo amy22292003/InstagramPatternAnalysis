@@ -15,7 +15,7 @@ import Liu.TrajectoryClustering.tc_highlevel_tag_weight as trajectoryclustering
 
 """file path"""
 CLUSTER_RESULT = "./data/Evaluate/Index_cluster#"
-K_RESULT = "./data/Evaluate/Index_d"
+K_RESULT = "./data/Evaluate/Index_k"
 W_RESULT = "./data/Evaluate/Index_w"
 
 """parameters"""
@@ -46,9 +46,11 @@ def output_index_it(i, para, cluster_trajectories, semantic_trajectories, u, fil
     print("XB--\t\t", xb, "\t(", up, ",", down, ")")
     f.write(str(xb) + "(" + str(up) + "," + str(down) + ")" + "\t")
 
+    """
     bsc = cindex.bsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
     print("BSC--\t\t", bsc)
     f.write(str(bsc) + "\t")
+    """
 
     sep, comp = cindex.rsc_c("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
     f.write("\n")
@@ -101,13 +103,14 @@ def main(*argv):
         global CLUSTER_RESULT
         CLUSTER_RESULT = CLUSTER_RESULT + "_T" + argv[1] + ".txt"
         cluster = list(range(10, 65, 5))
+        cluster.extend([100, 150])
         decide_cluster(cluster)
 
     elif argv[0] == 'k':
         global K_RESULT
         K_RESULT = K_RESULT + "_T" + argv[1] + ".txt"
-        k_range = list(range(1, 6))
-        k_range.extend(list(range(10, 30, 5)))
+        k_range = list(range(1, 10))
+        k_range.extend(list(range(10, 25, 5)))
         decide_k(k_range)
 
     elif argv[0] == 'w':

@@ -87,15 +87,12 @@ def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
 
         init_s1 = numpy.array(sequences1)[init]
         init_s2 = numpy.array(sequences2)[init]
-        cluster_dist1 = cskfuzzy.cluster.get_distance(level, init_s1)
-        cluster_dist2 = cskfuzzy.cluster.get_distance(level, init_s2)
-        cluster_dist = w * cluster_dist1 + (1 - w) * cluster_dist2
-        print(" cluster dist:", cluster_dist)
-
+        #cluster_dist1 = cskfuzzy.cluster.get_distance(level, init_s1)
+        #cluster_dist2 = cskfuzzy.cluster.get_distance(level, init_s2)
+        #cluster_dist = w * cluster_dist1 + (1 - w) * cluster_dist2
         
         distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1)
         distance1 = numpy.array(distance1) / numpy.amax(distance1)
-        
         
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2)
         distance2 = numpy.array(distance2) / numpy.amax(distance2)
