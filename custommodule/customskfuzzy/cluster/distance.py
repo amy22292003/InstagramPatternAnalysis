@@ -48,7 +48,7 @@ def _lcs_length(s1, s2):
 def _longest_common_sequence(s1, s2):
     #ml = _lcs_length(s1, s2)
     #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
-    return _lcs_length(s1, s2) / max(len(s1), len(s2)) #, lcs_set
+    return 1 - _lcs_length(s1, s2) / max(len(s1), len(s2)) #, lcs_set
 
 """
 def _lcs(ml, s1, s2, i, j):
@@ -135,7 +135,7 @@ def get_distance(level, sequences, targets = None):
     if level is "Location":
         distance_func = _sequence_distance
     elif level is "Cluster":
-        distance_func = lambda s1, s2:1 - _longest_common_sequence(s1, s2)
+        distance_func = _longest_common_sequence
     else:
         print("Error, nonexistent clustering level:", level)
         sys.exit()
