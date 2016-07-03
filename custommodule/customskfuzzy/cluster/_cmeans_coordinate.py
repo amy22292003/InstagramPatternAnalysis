@@ -143,8 +143,8 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = 0):
 			break
 	print("  error:", error_list)
 	print(">>> p=", p)
-	print("  Final u.sum:", u.sum(axis=0), "\n", u.sum(axis=1))
-	print("  Final u:>>\n", u[:,0:2], "\n  u std:", np.std(u))
+	#print("  Final u.sum:", u.sum(axis=0), "\n", u.sum(axis=1))
+	#print("  Final u:>>\n", u[:,0:2], "\n  u std:", np.std(u))
 	# Final calculations
 	error = np.linalg.norm(u - u2)
 	fpc = _fp_coeff(u)

@@ -68,7 +68,7 @@ def _distance(level, c, k, data, center):
     d = d.dot(each_cluster.transpose()) / (k * k)
     #print("d1-2:", d.shape, "\n", d[0:5,0:5])
     np.fill_diagonal(d, 0)
-    print(d[0:5,0:5])
+    #print(d[0:5,0:5])
     return d
 
 def _distance_c_x(level, c, k, data, center):

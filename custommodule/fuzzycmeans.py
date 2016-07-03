@@ -92,8 +92,8 @@ def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
         init_s2 = numpy.array(sequences2)[init]
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2)
         distance2 = numpy.array(distance2) / numpy.amax(distance2)
-        print("-- distance1:", distance1.shape, distance1[0:4, 0:5])
-        print("-- distance2:", distance2.shape, distance2[0:4, 0:5])
+        #print("-- distance1:", distance1.shape, distance1[0:4, 0:5])
+        #print("-- distance2:", distance2.shape, distance2[0:4, 0:5])
         
         distance = w * distance1 + (1 - w) * distance2
         filter_k = lambda row:row <= sorted(row)[k - 1]
@@ -143,6 +143,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     k = para[0]
     sequences2 = para[1]
     w = para[2]
+    print("!k:", k)
 
     u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
     u, u0, d, jm, p, fpc, center = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)

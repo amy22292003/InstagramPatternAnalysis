@@ -52,7 +52,7 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	d2 = each_cluster.dot(distance2) / k
 
 	d = w * d1 + (1 - w) * d2
-	print("  d:", d.shape, d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
+	#print("  d:", d.shape, d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
