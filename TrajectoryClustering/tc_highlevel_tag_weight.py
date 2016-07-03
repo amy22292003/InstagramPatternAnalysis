@@ -24,7 +24,7 @@ FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0.9
+GPS_WEIGHT = 0.6
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"

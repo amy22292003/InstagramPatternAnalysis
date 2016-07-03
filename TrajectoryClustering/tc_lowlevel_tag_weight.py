@@ -30,13 +30,27 @@ GPS_WEIGHT = 0.9
 LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
 OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
-def main():
+def main(*argv):
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
 
+    # set parameters
+    global CLUSTER_NUM
+    global MAX_KTH
+    global GPS_WEIGHT
+    global FILTER_TIME_S
+    global FILTER_TIME_E
+    if len(argv) > 0:
+        CLUSTER_NUM = argv[0]
+        MAX_KTH = argv[1]
+        GPS_WEIGHT = argv[2]
+        FILTER_TIME_S = argv[3]
+        FILTER_TIME_E = argv[4]
+
+    
     # Getting data
-    users, locations = locationclustering.main()
+    users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 
@@ -68,6 +82,7 @@ def main():
         cpygmaps.output_patterns_l(points_sequences, color, 2, "./data/Summary/InitSame_" + str(c_i) + ".html")
     """
 
+    """
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
@@ -85,11 +100,12 @@ def main():
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
+    """
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
-    return locations, u, center
+    return location_sequences, vector_trajectories, semantic_trajectories, u
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
