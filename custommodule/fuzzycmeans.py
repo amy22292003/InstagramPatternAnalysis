@@ -13,7 +13,7 @@ import custommodule.location as clocation
 
 """parameters"""
 RAND_SEED_K = 0
-RAND_SEED_INIT = 2
+RAND_SEED_INIT = 1
 CLUSTER_DIST_THRESHOLD = 0.75
 
 def get_tag_vector(corpus):

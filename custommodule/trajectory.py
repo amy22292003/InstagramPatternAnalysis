@@ -1,4 +1,5 @@
 # trajectory = 1D array of posts/ locations/ or others
+import datetime
 import numpy
 
 """For posts sequences"""
@@ -18,6 +19,18 @@ def split_trajectory(trajectories, split_day = 1):
                 else:
                     i += 1
             sequences.append(a_trajectory)
+    print("  output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
+    return sequences
+
+def split_trajectory_byday(trajectories):
+    print("[Trajectory] Splitting trajectories by day, input #=", len(trajectories))
+    day_init = 1446336000 # 2015/11/01
+    a_day = 86400
+    sequences = []
+    for a_trajectory in trajectories:
+        trajectory_day = [datetime.datetime.fromtimestamp(int(x.time)).strftime('%Y-%m-%d') for x in a_trajectory]
+        start_indicies = [i + 1 for i, x in enumerate(trajectory_day[1:]) if trajectory_day[i] != trajectory_day[i + 1]]
+        sequences.extend([a_trajectory[i:j] for i, j in zip([0] + start_indicies, start_indicies + [None])])
     print("  output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
     return sequences
 

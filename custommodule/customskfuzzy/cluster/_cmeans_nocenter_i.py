@@ -111,6 +111,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 			break
 	print("-------------------------------")
 	print("  error:", error_list)
+	print("  >>> p=", p)
 	print("  error avg:", sum(error_list) / len(error_list), ", max/min:", max(error_list), min(error_list))
 	print("  Fin u>>\n", u[:,0:2], "\n  u avg:", np.sum(u) / (u.shape[0] * u.shape[1]), "\n  u std:", np.std(u))
 	# Final calculations

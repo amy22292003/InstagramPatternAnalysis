@@ -119,9 +119,10 @@ def npc(u):
 
 def xb(level, u, k, w, data1, data2):
     center = _center(level, u, k)
-    j = _j(level, u, k, w, data1, data2, center) 
+    j = _j(level, u, k, w, data1, data2, center)
     cd = _cluster_dist(level, u.shape[0], k, w, data1, data2, center)
     cd[cd == 0] = float('inf')
+    print("   cd max/min/mean/std:", cd.shape, np.amax(cd), np.amin(cd), np.mean(cd), np.std(cd))
     xb = (j / u.shape[1]) / np.amin(cd ** 2)
     return xb, j / u.shape[1], np.amin(cd ** 2)
 

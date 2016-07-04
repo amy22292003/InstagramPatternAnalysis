@@ -22,7 +22,7 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 FILTER_TIME = 1448928000 # 2015/12/01
 CLUSTER_NUM = 30
-ERROR = 0.0001
+ERROR = 0.000001
 MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
@@ -56,6 +56,7 @@ def main(*argv):
 
     # Getting sequences of posts & locations
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
+    #sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
     print("Filtering short trajectories...")
     fail_indices = []
@@ -108,4 +109,4 @@ def main(*argv):
     return location_sequences, vector_trajectories, semantic_trajectories, u
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main(*sys.argv[1:])

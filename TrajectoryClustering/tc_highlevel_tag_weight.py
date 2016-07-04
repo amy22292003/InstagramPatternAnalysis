@@ -24,7 +24,7 @@ FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0.6
+GPS_WEIGHT = 0.7
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
@@ -34,6 +34,7 @@ def main(*argv):
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
+
     # set parameters
     global CLUSTER_NUM
     global MAX_KTH
@@ -55,6 +56,7 @@ def main(*argv):
 
     # Getting sequences cluster
     sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
+    #sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
 
     print("Filtering short trajectories...")
@@ -72,7 +74,7 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     
-    """
+
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
@@ -90,11 +92,11 @@ def main(*argv):
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
-    """
+
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
     return location_sequences, cluster_trajectories, semantic_trajectories, u
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main(*sys.argv[1:])
