@@ -86,7 +86,7 @@ def _dist_c_x(level, c, k, w, data1, data2, center):
 
 def _j(level, u, k, w, data1, data2, center):
     d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
-    return ((u ** 2) * (d ** 2)).sum()
+    return (u * (d ** 2)).sum()
 
 def _comp(level, u, k, w, data1, data2, center):
     d = _dist_c_x(level, u.shape[0], k, w, data1, data2, center)
