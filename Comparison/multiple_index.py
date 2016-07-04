@@ -75,7 +75,7 @@ def decide_cluster(level, cluster):
             sep, comp = output_index_it("Cluster", i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
         elif level == 'L':
             location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
+            sep, comp = output_index_it("Location", i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
         else:
             print("[ERROR] no such level")
             return 1
