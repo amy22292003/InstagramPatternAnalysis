@@ -13,7 +13,7 @@ import custommodule.location as clocation
 
 """parameters"""
 RAND_SEED_K = 0
-RAND_SEED_INIT = 0
+RAND_SEED_INIT = 2
 CLUSTER_DIST_THRESHOLD = 0.75
 
 def get_tag_vector(corpus):
@@ -91,7 +91,7 @@ def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
         distance2 = cskfuzzy.cluster.get_distance(level, sequences2, np.array(sequences2)[init])
         distance[0,:] = w * distance1 + (1 - w) * distance2
         
-        random.seed(RAND_SEED_K)
+        random.seed(RAND_SEED_INIT)
         # get far away cluster initial
         for c in range(1, cluster_num):
             far_cluster = list(np.where((distance[0:c, :] >= CLUSTER_DIST_THRESHOLD).all(axis=0))[0])

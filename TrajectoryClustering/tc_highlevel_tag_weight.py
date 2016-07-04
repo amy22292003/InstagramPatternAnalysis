@@ -72,6 +72,7 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
     
+    """
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
@@ -89,7 +90,7 @@ def main(*argv):
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
-    
+    """
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))
     print("--------------------------------------")

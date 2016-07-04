@@ -20,9 +20,9 @@ K_RESULT = "./data/Evaluate/Index_k"
 W_RESULT = "./data/Evaluate/Index_w"
 
 """parameters"""
-CLUSTER_NUM = 30
+CLUSTER_NUM = 35
 MAX_KTH = 3
-GPS_WEIGHT = 0.9
+GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448323200 #2015/11/24 
 FILTER_TIME_E = 1448928000 #2015/12/1
 
@@ -127,21 +127,21 @@ def main(*argv):
     
     if argv[1] == 'c':
         global CLUSTER_RESULT
-        CLUSTER_RESULT = CLUSTER_RESULT + "-" + argv[0] + "_T" + argv[2] + ".txt"
+        CLUSTER_RESULT = CLUSTER_RESULT + "-" + argv[0] + "k"+ str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
         cluster = list(range(10, 65, 5))
         #cluster.extend([100, 150])
         decide_cluster(argv[0], cluster)
 
     elif argv[1] == 'k':
         global K_RESULT
-        K_RESULT = K_RESULT + "-" + argv[0] + "_T" + argv[2] + ".txt"
+        K_RESULT = K_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
         k_range = list(range(1, 10))
         k_range.extend(list(range(10, 20, 5)))
         decide_k(argv[0], k_range)
 
     elif argv[1] == 'w':
         global W_RESULT
-        W_RESULT = W_RESULT + "-" + argv[0] + "_T" + argv[2] + ".txt"
+        W_RESULT = W_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "_T" + argv[2] + ".txt"
         w_range = [x / 10 for x in range(10, 0, -1)]
         decide_w(argv[0], w_range)
 
