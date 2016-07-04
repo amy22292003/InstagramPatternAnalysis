@@ -49,17 +49,16 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	um = u_old ** m
 
 	# calculating u_c
-	u_c = u_old / u_old.sum(axis=1)[:,None]
+	#u_c = u_old / u_old.sum(axis=1)[:,None]
 
 	# remain the belonging rate >= the k-th max location of each cluster in um_c
 	filter_k = lambda row:row < sorted(row, reverse=True)[k-1]
-	fail_indices = np.apply_along_axis(filter_k, axis=1, arr=u_c)
+	fail_indices = np.apply_along_axis(filter_k, axis=1, arr=u_old)
 	um[fail_indices] = 0
 
 	# cluster freqeuncy
 	true_indices = np.invert(fail_indices)
 	cluster_frequency = true_indices.dot(np.atleast_2d(location_frequency).T)
-	#print("  - cluster_frequency:", cluster_frequency.T)
 
 	# Calculate cluster centers
 	# data1:2861,2; um:30,2861
@@ -80,9 +79,6 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 
 	jm = (um * d ** 2).sum()
 
-	#u_ori = d ** (- 2. / (m - 1))
-	#u_ori /= np.ones((c, 1)).dot(np.atleast_2d(u_ori.sum(axis=0)))
-	#print("  - u_ori:", u_ori[0:5,0:3])
 	u = d ** (- 2. / (m - 1)) * cluster_frequency.dot(np.ones((1, d.shape[1])))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	#print("  - d:", d[0:5, 0:3], "\n  - u:", u[0:5, 0:3])
@@ -91,22 +87,19 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 def _distance(data, centers):
 	return cdist(data, centers).T
 
-
 def _fp_coeff(u):
 	n = u.shape[1]
 
 	return np.trace(u.dot(u.T)) / float(n)
 
-def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = 0):
+def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = RAND_SEED_INIT):
 	"""
 	data2 is for intersect counting
 	"""
 	# Setup u0
 	if init is None:
-		if seed is not None:
-			np.random.seed(seed=seed)
+		np.random.seed(seed=seed)
 		n = data.shape[1]
-		np.random.seed(RAND_SEED_INIT)
 		u0 = np.random.rand(c, n)
 		u0 /= np.ones(
 			(c, 1)).dot(np.atleast_2d(u0.sum(axis=0))).astype(np.float64)

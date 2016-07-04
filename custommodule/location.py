@@ -1,3 +1,4 @@
+import collections
 import os
 import re
 import custommodule.post as post
@@ -54,7 +55,7 @@ class Location:
         if res.group("usercount"):
             self.usercount = res.group("usercount")
 
-class LocationDict(dict):
+class LocationDict(collections.OrderedDict):
     def __init__(self, *args, **kwargs):
         for arg in args:
             self.setdefault(arg.lid, Location(arg.lid, arg.lname))

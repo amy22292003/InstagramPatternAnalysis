@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import collections
 import io
 import os
 import requests
@@ -39,7 +40,7 @@ class AUser:
         else:
             return self.posts
             
-class UserDict(dict):
+class UserDict(collections.OrderedDict):
     # UserDict(posts)
     def __init__(self, *args, **kwargs):
         for arg in args:

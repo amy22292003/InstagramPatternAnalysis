@@ -72,11 +72,10 @@ def _fp_coeff(u):
 
 	return np.trace(u.dot(u.T)) / float(n)
 
-def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, seed = 0):
+def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, seed = RAND_SEED_INIT):
 	# Setup u0
 	if init is None:
-		if seed is not None:
-			np.random.seed(seed=seed)
+		np.random.seed(seed=seed)
 		n = len(data)
 		u0 = np.random.rand(c, n)
 		u0 /= np.ones(
