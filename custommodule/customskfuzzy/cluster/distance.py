@@ -20,24 +20,35 @@ def _similarity(u, v):
         similarity += u[0, k] * v[0, k]
         u_norm += u[0, k] ** 2
         v_norm += v[0, k] ** 2
-    return similarity / math.sqrt(u_norm) * math.sqrt(v_norm)
+    return similarity / (math.sqrt(u_norm) * math.sqrt(v_norm))
 
 @jit
-def _dynamic_programming(s1, s2):
-    ml = numpy.zeros((len(s1) + 1, len(s2) + 1))
+def _dynamic_programming(s1, s2, len_s1, len_s2):
+    ml = numpy.zeros((len_s1 + 1, len_s2 + 1))
     #ml[1:, :] = float('inf')
-    for i in range(1, len(s1) + 1):
-        for j in range(i, len(s2) + 1):
+    for i in range(1, len_s1 + 1):
+        for j in range(i, len_s2 + 1):
             #ml[i, j] = max(ml[i - 1, j - 1] + _dist(s1[i - 1], s2[j - 1]), ml[i, j - 1])
-            ml[i, j] = max(ml[i - 1, j - 1] + _similarity(s1[i - 1], s2[j - 1]), ml[i, j - 1])
-    return ml[len(s1), len(s2)]
+            #ml[i, j] = max(ml[i - 1, j - 1] + _similarity(s1[i - 1], s2[j - 1]), ml[i, j - 1])
+            similarity = 0
+            u_norm = 0
+            v_norm = 0
+            for k in range(s1.shape[1]):
+                similarity += s1[i - 1, k] * s2[j - 1, k]
+                u_norm += s1[i - 1, k] ** 2
+                v_norm += s2[j - 1, k] ** 2
+            ml[i, j] = max(ml[i - 1, j - 1] + similarity / (math.sqrt(u_norm) * math.sqrt(v_norm)), ml[i, j - 1])
+    return ml[len_s1, len_s2]
 
 @jit
 def _sequence_distance(s1, s2):
-    if len(s1) > len(s2):
-        return 1 - _dynamic_programming(s2, s1) / len(s1)
+    #if len(s1) > len(s2):
+    len_s1 = len(s1) - numpy.isnan(numpy.array(s1)[:,0]).sum()
+    len_s2 = len(s2) - numpy.isnan(numpy.array(s2)[:,0]).sum()
+    if len_s1 > len_s2:
+        return 1 - _dynamic_programming(s2, s1, len_s2, len_s1) / len_s1
     else:
-        return 1 - _dynamic_programming(s1, s2) / len(s2)
+        return 1 - _dynamic_programming(s1, s2, len_s1, len_s2) / len_s2
 
 @jit
 def _lcs_length(s1, s2):
@@ -154,12 +165,12 @@ def get_distance(level, sequences, targets = None):
                 distance[i,j] = distance_func(targets[i], sequences[j])
     else:
         distance = numpy.zeros((len(sequences), len(sequences)))
-        for i, s1 in enumerate(sequences):
+        for i in range(len(sequences)):
             if i % 100 == 0:
                 print("  sequence#", i, "\t", datetime.datetime.now())
-            for j, s2 in enumerate(sequences):
+            for j in range(len(sequences)):
                 if i < j:
-                    distance[i, j] = distance_func(s1, s2)
+                    distance[i, j] = distance_func(sequences[i], sequences[j])
                 else:
                     distance[i, j] = distance[j, i]
     print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))

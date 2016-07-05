@@ -28,9 +28,9 @@ GPS_WEIGHT = 0.7
 
 """file path"""
 LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
-OUTPUT_MAP = "./data/Result/TC_hl&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "e" + str(ERROR)
 
 def main(*argv):
+    start_time = datetime.datetime.now()
     print("--------------------------------------")
     print("STARTTIME:", (datetime.datetime.now()))
     print("--------------------------------------")
@@ -47,6 +47,8 @@ def main(*argv):
         GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
+
+    OUTPUT_MAP = "./data/Result/TC_hl&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
 
     # Getting data
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
@@ -94,7 +96,7 @@ def main(*argv):
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
 
     print("--------------------------------------")
-    print("ENDTIME:", (datetime.datetime.now()))
+    print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
     print("--------------------------------------")
     return location_sequences, cluster_trajectories, semantic_trajectories, u
 

@@ -69,6 +69,7 @@ def get_vector_array(trajectories, trajectory_len, attr = "membership"):
     attr_dim = getattr(trajectories[0][0], attr).shape[1]
     # set array = trajectories # * trajectory length * attr's dimension
     vector_array = numpy.zeros((len(trajectories), trajectory_len, attr_dim))
+    vector_array[:,:,:] = float('nan')
     for i, a_sequence in enumerate(trajectories):
         for j, a_location in enumerate(a_sequence):
             vector_array[i, j, :] = getattr(a_location, attr)
