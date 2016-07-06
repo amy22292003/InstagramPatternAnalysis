@@ -20,8 +20,8 @@ K_RESULT = "./data/Evaluate/Index_k"
 W_RESULT = "./data/Evaluate/Index_w"
 
 """parameters"""
-CLUSTER_NUM = 35
-MAX_KTH = 3
+CLUSTER_NUM = 50
+MAX_KTH = 5
 GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448323200 #2015/11/24 
 FILTER_TIME_E = 1448928000 #2015/12/1

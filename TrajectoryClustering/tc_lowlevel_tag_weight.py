@@ -58,8 +58,8 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
 
     # Getting sequences of posts & locations
-    sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
-    #sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
+    #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
+    sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
     print("Filtering short trajectories...")
     fail_indices = []
@@ -108,7 +108,6 @@ def main(*argv):
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
             cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
     """
-
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
     print("--------------------------------------")

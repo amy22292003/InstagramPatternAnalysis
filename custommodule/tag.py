@@ -55,6 +55,16 @@ def get_corpus(tags_list):
     print("-- corpus doc #:", len(corpus))
     return corpus
 
+def get_location_posts_corpus(locations):
+    print("[tag] getting corpus from posts of locations")
+    corpus = []
+    for key in locations.keys():
+        doc_str = " ".join(x for a_post in locations[key].posts for x in a_post.tags)
+        corpus.append(doc_str)
+    print("-- corpus doc #:", len(corpus))
+    return corpus
+
+
 """
 def open_location_tags_afile(file_path = None):
     location_list = []

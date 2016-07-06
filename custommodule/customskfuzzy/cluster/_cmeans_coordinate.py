@@ -59,6 +59,7 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	# cluster freqeuncy
 	true_indices = np.invert(fail_indices)
 	cluster_frequency = true_indices.dot(np.atleast_2d(location_frequency).T)
+	cluster_frequency = cluster_frequency / np.amax(cluster_frequency)
 
 	# Calculate cluster centers
 	# data1:2861,2; um:30,2861
