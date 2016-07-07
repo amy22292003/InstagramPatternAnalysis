@@ -153,6 +153,7 @@ def main(*argv):
     #k_range.extend(list(range(10, 25, 5)))
     w_range = [x / 10 for x in range(10, 0, -1)]
 
+    """
     file = RESULT + "_seed" + argv[1] + ".txt"
     f = open(file, "w")
     f.write("#\tNPE\tNPC\tXB\n")
@@ -160,21 +161,21 @@ def main(*argv):
 
     if argv[0] == 'L':
         for c in cluster:
-            f = open(file, "a")
             for k in k_range:
+                f = open(file, "a")
                 for w in w_range:
                     location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
                     output("Location", c, k, w, cluster_trajectories, semantic_trajectories, u, f)
-            f.close()
+                f.close()
 
     if argv[0] == 'H':
         for c in cluster:
-            f = open(file, "a")
             for k in k_range:
                 w = float('nan')
                 ocation_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(c, k, float('nan'), FILTER_TIME_S, FILTER_TIME_E)
+                f = open(file, "a")
                 output("Cluster", c, k, w, cluster_trajectories, semantic_trajectories, u, f)
-            f.close()
+                f.close()
 
     """
     if argv[1] == 'c':
@@ -198,7 +199,7 @@ def main(*argv):
 
     else:
         print("[ERROR] wrong command!!!! :", argv)
-    """
+    #"""
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
