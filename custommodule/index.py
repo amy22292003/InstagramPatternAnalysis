@@ -48,9 +48,10 @@ def _center(level, u, k, seed=RAND_SEED_K):
     print("[Index] center:", large_k_indices)
     return large_k_indices
 
-def _dist_c_c(level, c, k, data, center):
-    center_data = np.array(data)[center]
-    distance = cskfuzzy.cluster.distance.get_distance(level, center_data)
+def _distance_c_c(level, c, k, w, data1, data2, center):
+    center_data1 = np.array(data1)[center]
+    center_data2 = np.array(data2)[center]
+    distance = cskfuzzy.cluster.get_distance(level, w, data1, data2, center_data1, center_data2)
     #distance = distance / np.amax(distance)
 
     each_cluster = np.zeros((c, c))
@@ -61,27 +62,16 @@ def _dist_c_c(level, c, k, data, center):
     np.fill_diagonal(d, 0)
     return d
 
-def _distance_c_c(level, c, k, w, data1, data2, center):
-    #print("[index] Getting cluster distances")
-    d1 = _dist_c_c(level, c, k, data1, center)
-    d2 = _dist_c_c(level, c, k, data2, center)
-    d = w * d1 + (1 - w) * d2
-    return d
-
-def _dist_c_x(level, c, k, data, center):
-    center_data = np.array(data)[center]
-    distance = cskfuzzy.cluster.distance.get_distance(level, data, center_data)
+def _distance_c_x(level, c, k, w, data1, data2, center):
+    center_data1 = np.array(data1)[center]
+    center_data2 = np.array(data2)[center]
+    distance = cskfuzzy.cluster.distance.get_distance(level, w, data1, data2, center_data1, center_data2)
     #distance = distance / np.amax(distance)
+
     each_cluster = np.zeros((c, c))
     np.fill_diagonal(each_cluster, 1)
     each_cluster = np.repeat(each_cluster, k, axis = 1)
     d = each_cluster.dot(distance) / k
-    return d
-
-def _distance_c_x(level, c, k, w, data1, data2, center):
-    d1 = _dist_c_x(level, c, k, data1, center)
-    d2 = _dist_c_x(level, c, k, data2, center)
-    d = w * d1 + (1 - w) * d2
     return d
 
 def _j(level, u, k, w, data1, data2, center):
