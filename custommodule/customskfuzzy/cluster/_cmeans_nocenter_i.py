@@ -41,18 +41,14 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	print("  center:", large_k_indices)
 
 	# get distances between targets(c# * k) & data
-	distance1 = _distance(level, data1, large_k_indices)
-	distance2 = _distance(level, data2, large_k_indices)
+	distance = _distance(level, w, data1, data2, large_k_indices)
 
 	# calculate data to each cluster's average distance
 	each_cluster = np.zeros((c, c))
 	np.fill_diagonal(each_cluster, 1)
 	each_cluster = np.repeat(each_cluster, k, axis = 1)
-	d1 = each_cluster.dot(distance1) / k
-	d2 = each_cluster.dot(distance2) / k
-
-	d = w * d1 + (1 - w) * d2
-	#print("  d:", d.shape, d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
+	d = each_cluster.dot(distance) / k
+	print("  d:", d.shape, d[0:3, 0:5], " max:", np.amax(d), " min:", np.amin(d))
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -61,9 +57,10 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	return u, jm, d, large_k_indices
 
-def _distance(level, data, target_indices):
-	targets = np.array(data)[target_indices]
-	distance = cdistance.get_distance(level, data, targets)
+def _distance(level, w, data1, data2, target_indices):
+	targets1 = np.array(data1)[target_indices]
+	targets2 = np.array(data2)[target_indices]
+	distance = cdistance.get_distance(level, w, data1, data2, targets1, targets2)
 	#distance = distance / np.amax(distance)
 	return distance
 

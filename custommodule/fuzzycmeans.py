@@ -71,61 +71,42 @@ def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Origi
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 """Sequence Clustering"""
-def _get_init_u(level, cluster_num, k, s_num, *para, distance = None):
-    u = np.zeros((cluster_num, s_num))
+def _get_init_u(level, cluster_num, sequences1, sequences2, k, w):
+    distance = np.ones((cluster_num, len(sequences1)))
+
     np.random.seed(RAND_SEED_INIT)
-    if distance is not None:
-        init = np.random.randint(0, s_num - 1, cluster_num)
-        print("[fuzzy c means]- get_init_u> \n-- init:", init)
-        for i, center in enumerate(init):
-            top_k = sorted(distance[:, center])[k - 1]
-            is_top_k = [True if x <= top_k else False for x in distance[:, center]]
-            u[i, np.array(is_top_k)] = 1
-    else:
-        sequences1 = para[0]
-        sequences2 = para[1]
-        w = para[2]
-        distance = np.ones((cluster_num, s_num))
-        init = np.random.randint(0, s_num - 1, 1)
-        distance1 = cskfuzzy.cluster.get_distance(level, sequences1, np.array(sequences1)[init])
-        distance2 = cskfuzzy.cluster.get_distance(level, sequences2, np.array(sequences2)[init])
-        distance[0,:] = w * distance1 + (1 - w) * distance2
-        
-        random.seed(RAND_SEED_INIT)
-        # get far away cluster initial
-        for c in range(1, cluster_num):
-            far_cluster = list(np.where((distance[0:c, :] >= CLUSTER_DIST_THRESHOLD).all(axis=0))[0])
-            if len(far_cluster) == 0:
-                far_cluster = [np.argmax(distance[0:c, :].sum(axis=0))]
-            add_init = random.sample(far_cluster, 1)
-            distance1 = cskfuzzy.cluster.get_distance(level, sequences1, np.array(sequences1)[add_init])
-            distance2 = cskfuzzy.cluster.get_distance(level, sequences2, np.array(sequences2)[add_init])
-            add_distance = w * distance1 + (1 - w) * distance2
-            distance[c,:] = add_distance
-            init = np.append(init, add_init)
-        print("[fuzzy c means]- get_init_u> \n-- init:", init)
-        
-        #distance1 = cskfuzzy.cluster.get_distance(level, sequences1, init_s1)
-        #distance1 = np.array(distance1) / np.amax(distance1)
-        #distance2 = cskfuzzy.cluster.get_distance(level, sequences2, init_s2)
-        #distance2 = np.array(distance2) / np.amax(distance2)
-        #distance = w * distance1 + (1 - w) * distance2
+    init = np.random.randint(0, len(sequences1) - 1, 1)
+    distance[0,:] = cskfuzzy.cluster.get_distance(level, w, sequences1, sequences2, np.array(sequences1)[init], np.array(sequences2)[init])   
+    
+    random.seed(RAND_SEED_INIT)
+    # get far away cluster initial
+    for c in range(1, cluster_num):
+        far_cluster = list(np.where((distance[0:c, :] >= CLUSTER_DIST_THRESHOLD).all(axis=0))[0])
+        if len(far_cluster) == 0:
+            far_cluster = [np.argmax(distance[0:c, :].sum(axis=0))]
+        add_init = random.sample(far_cluster, 1)
+        distance[c,:] = cskfuzzy.cluster.get_distance(level, w, sequences1, sequences2, np.array(sequences1)[add_init], np.array(sequences2)[add_init])   
+        init = np.append(init, add_init)
+    print("[fuzzy c means]- get_init_u> \n-- init:", init)
 
-        filter_k = lambda row:row <= sorted(row)[k - 1]
-        large_k_indices = np.apply_along_axis(filter_k, axis=1, arr=distance)
-        u = large_k_indices.astype(int)
+    # get enough k sequences for each cluster
+    #u = np.zeros((cluster_num, len(sequences1)))
+    filter_k = lambda row:row <= sorted(row)[k - 1]
+    large_k_indices = np.apply_along_axis(filter_k, axis=1, arr=distance)
+    u = large_k_indices.astype(int)
 
-        random.seed(RAND_SEED_K)
-        print("--each cluster initial # before random choose:", u.sum(axis=1))
-        for i in range(cluster_num):
-            if sum(u[i, :]) > k:
-                indices = [i for i, x in enumerate(u[i, :]) if x == 1]
-                rand_k = random.sample(indices, k)
-                u[i, :] = 0
-                u[i, :][rand_k] = 1
+    random.seed(RAND_SEED_K)
+    print("--each cluster initial # before random choose:", u.sum(axis=1))
+    for i in range(cluster_num):
+        if sum(u[i, :]) > k:
+            indices = [i for i, x in enumerate(u[i, :]) if x == 1]
+            rand_k = random.sample(indices, k)
+            u[i, :] = 0
+            u[i, :][rand_k] = 1
     print("--each cluster initial #:", u.sum(axis=1))
     return u
 
+"""
 def sequences_clustering(level, sequences, cluster_num, *para, e = 0.001, algorithm = "Original"):
     print("[fuzzy c means] Sequence Clustering - level:", level)
     print("--data:")
@@ -152,6 +133,7 @@ def sequences_clustering(level, sequences, cluster_num, *para, e = 0.001, algori
     print("-- looping time:", p)
     cluster_membership = np.argmax(u, axis=0)
     return u, u0, d, jm, p, fpc, cluster_membership, distance
+"""
 
 def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algorithm = "2WeightedDistance"):
     print("[fuzzy c means] Sequence Clustering - level:", level)
@@ -159,7 +141,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     sequences2 = para[1]
     w = para[2]
 
-    u = _get_init_u(level, cluster_num, k, len(sequences), sequences, sequences2, w)
+    u = _get_init_u(level, cluster_num, sequences, sequences2, k, w)
     u, u0, d, jm, p, fpc, center = cskfuzzy.cluster.cmeans_nocenter_i(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)

@@ -22,13 +22,14 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 FILTER_TIME_S = 1448928000 
 FILTER_TIME_E = 1451606400
-CLUSTER_NUM = 35
+CLUSTER_NUM = 50
 ERROR = 0.000001
-MAX_KTH = 3
-GPS_WEIGHT = 0.7
+MAX_KTH = 5
+GPS_WEIGHT = 0
 
 """file path"""
-LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
+LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
+#"./data/LocationTopic/LocationTopic_c30.txt"
 
 def main(*argv):
     start_time = datetime.datetime.now()

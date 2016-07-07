@@ -57,7 +57,7 @@ def main(*argv):
     locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")
 
     # Getting sequences cluster
-    sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
+    #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
 
