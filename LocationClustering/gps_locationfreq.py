@@ -21,11 +21,11 @@ import Liu.custommodule.user as cuser
 
 """parameters"""
 #1447545600 2015/11/15 1448323200 #2015/11/24 #1451001600 #2015/12/25 #1443657600 # 2015/10/01 1448928000 # 2015/12/01
-FILTER_TIME_S = 1448928000 
-FILTER_TIME_E = 1451606400
+FILTER_TIME_S = 1448928000 #2015/11/15 #1448928000 
+FILTER_TIME_E = 1451606400 #2015/12/1 #1451606400
 CLUSTER_NUM = 30
 ERROR = 0.000001
-MAX_KTH = 30
+MAX_KTH = 20
 
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
@@ -56,9 +56,14 @@ def main(*argv):
     users = cuser.open_users_posts_afile(USER_POSTS_FILE)
 
     print("Sampling users posts...")
+    removes = []
     for key, a_user in users.items():
         posts = [x for x in a_user.posts if (x.time > FILTER_TIME_S) and (x.time < FILTER_TIME_E)]
         users[key].posts = posts
+        if len(posts) == 0:
+            removes.append(key)
+    for key in removes:
+        del users[key]
     locations = clocation.fit_users_to_location(locations, users, "uid")
     set_location_user_count(locations)
 
@@ -70,13 +75,13 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, u, locations.keys())
     locations = ccluster.fit_locations_cluster(locations, cluster_membership, locations.keys())
 
-    """
+    
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         cluster_membership, CLUSTER_NUM, OUTPUT_MAP)
 
     ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
-    """
+    
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

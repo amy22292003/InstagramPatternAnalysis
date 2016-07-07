@@ -51,7 +51,7 @@ def main(*argv):
         FILTER_TIME_E = argv[4]
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV2w_c30.txt.txt"
     else:
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c30.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
 
     OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
     
@@ -72,7 +72,7 @@ def main(*argv):
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
-    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
+    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences), numpy.std([len(x) for x in sequences]))
 
     #vector_trajectories = ctrajectory.get_vector_sequence(location_sequences)
     #semantic_trajectories = ctrajectory.get_vector_sequence(location_sequences, "semantic_mem")
