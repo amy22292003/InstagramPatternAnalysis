@@ -16,16 +16,16 @@ import Liu.custommodule.tag as ctag
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME_S = 1448323200 #2015/11/24 #1448928000 
-FILTER_TIME_E = 1448928000 #2015/12/1 #1451606400
+FILTER_TIME_S = 1447545600 #1448323200 #2015/11/24 #1448928000 #2015/12/01
+FILTER_TIME_E = 1448928000 #1448928000 #2015/12/1 #1451606400 #2016/01/01
 TOPIC_NUM = 30
 
 
 """file path"""
 USER_TAGS_FILE = "./data/LocationTags"
 USER_POSTS_FILE = "./data/TravelerPosts"
-OUTPUT_TAG_TOPIC = "./data/LocationTopic/TagTopic_1w_c" + str(TOPIC_NUM) + ".txt"
-OUTPUT_LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1w_c" + str(TOPIC_NUM) + ".txt"
+OUTPUT_TAG_TOPIC = "./data/LocationTopic/TagTopic_NOV2w_c" + str(TOPIC_NUM) + ".txt"
+OUTPUT_LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV2w_c" + str(TOPIC_NUM) + ".txt"
 
 
 def main():

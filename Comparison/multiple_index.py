@@ -23,7 +23,7 @@ W_RESULT = "./data/Evaluate/Index_w"
 CLUSTER_NUM = 50
 MAX_KTH = 5
 GPS_WEIGHT = 0.8
-FILTER_TIME_S = 1448323200 #2015/11/24 
+FILTER_TIME_S = 1447545600 #2015/11/15
 FILTER_TIME_E = 1448928000 #2015/12/1
 
 def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories, u, file):

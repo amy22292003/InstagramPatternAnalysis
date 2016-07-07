@@ -49,9 +49,9 @@ def main(*argv):
         GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1w_c30.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV2w_c30.txt.txt"
     else:
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c30.txt"
 
     OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
     
