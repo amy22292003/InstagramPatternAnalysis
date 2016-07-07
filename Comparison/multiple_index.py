@@ -128,7 +128,7 @@ def main(*argv):
     if argv[1] == 'c':
         global CLUSTER_RESULT
         CLUSTER_RESULT = CLUSTER_RESULT + "-" + argv[0] + "k"+ str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
-        cluster = list(range(10, 65, 5))
+        cluster = list(range(15, 85, 5))
         #cluster.extend([100, 150])
         decide_cluster(argv[0], cluster)
 
@@ -136,7 +136,7 @@ def main(*argv):
         global K_RESULT
         K_RESULT = K_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
         k_range = list(range(1, 10))
-        k_range.extend(list(range(10, 20, 5)))
+        k_range.extend(list(range(10, 25, 5)))
         decide_k(argv[0], k_range)
 
     elif argv[1] == 'w':

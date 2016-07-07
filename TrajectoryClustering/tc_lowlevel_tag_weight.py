@@ -28,7 +28,7 @@ MAX_KTH = 5
 GPS_WEIGHT = 0
 
 """file path"""
-LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
+
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def main(*argv):
@@ -49,9 +49,11 @@ def main(*argv):
         GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1w_c30.txt"
+    else:
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
 
     OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
-
     
     # Getting data
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)

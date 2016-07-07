@@ -27,11 +27,17 @@ def split_trajectory_byday(trajectories):
     day_init = 1446336000 # 2015/11/01
     a_day = 86400
     sequences = []
+    f = open("./data/t.txt", "w")
     for a_trajectory in trajectories:
         trajectory_day = [datetime.datetime.fromtimestamp(int(x.time)).strftime('%Y-%m-%d') for x in a_trajectory]
+        f.write("len-" + str(len(trajectory_day)) + "\t")
+        for x in trajectory_day:
+            f.write(x + " , ")
+        f.write("\n")
         start_indicies = [i + 1 for i, x in enumerate(trajectory_day[1:]) if trajectory_day[i] != trajectory_day[i + 1]]
         sequences.extend([a_trajectory[i:j] for i, j in zip([0] + start_indicies, start_indicies + [None])])
     print("  output sequences #=", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
+    f.close()
     return sequences
 
 def get_vector_sequence(trajectories, attr = "membership"):
@@ -45,11 +51,11 @@ def get_vector_sequence(trajectories, attr = "membership"):
 
 def get_cluster_sequence(trajectories, attr = "cluster"):
     cluster_sequences = []
-    for a_sequence in trajectories:
-        cluster_sequence = []
-        for a_location in a_sequence:
-            if len(cluster_sequence) == 0 or cluster_sequence[-1] != getattr(a_location, attr):
-                cluster_sequence.append(getattr(a_location, attr))
+    for i in range(len(trajectories)):
+        cluster_sequence = [getattr(trajectories[i][0], attr)]
+        for j in range(1, len(trajectories[i])):
+            if trajectories[i][j].lid != trajectories[i][j - 1].lid:
+                cluster_sequence.append(getattr(trajectories[i][j], attr))
         cluster_sequences.append(cluster_sequence)
     return cluster_sequences
 
@@ -67,10 +73,11 @@ def convertto_location_sequences(post_sequences, locations):
 def get_vector_array(trajectories, trajectory_len, attr = "membership"):
     print("[Trajectory] Getting vector sequences...")
     attr_dim = getattr(trajectories[0][0], attr).shape[1]
+
     # set array = trajectories # * trajectory length * attr's dimension
     vector_array = numpy.zeros((len(trajectories), trajectory_len, attr_dim))
     vector_array[:,:,:] = float('nan')
-    for i, a_sequence in enumerate(trajectories):
-        for j, a_location in enumerate(a_sequence):
-            vector_array[i, j, :] = getattr(a_location, attr)
+    for i in range(len(trajectories)):
+        for j in range(len(trajectories[i])):
+            vector_array[i, j, :] = getattr(trajectories[i][j], attr)
     return vector_array

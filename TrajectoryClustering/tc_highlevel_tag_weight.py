@@ -24,10 +24,11 @@ FILTER_TIME_E = 1451606400
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0.7
+GPS_WEIGHT = 0.5
 
 """file path"""
-LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_c30.txt"
+
+#"./data/LocationTopic/LocationTopic_c30.txt"
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -47,6 +48,9 @@ def main(*argv):
         GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1w_c30.txt"
+    else:
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c30.txt"
 
     OUTPUT_MAP = "./data/Result/TC_hl&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
 

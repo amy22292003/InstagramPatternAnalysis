@@ -46,7 +46,7 @@ def _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v):
     return ml[len_u, len_v]
 
 @jit
-def _sequence_distance(w, u_1, u_2, v_1, v_2):
+def _sequence_distance(u_1, u_2, v_1, v_2, w):
     #if len(s1) > len(s2):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1[:,0]).sum())
@@ -65,6 +65,17 @@ def _lcs_length(w, u_1, u_2, v_1, v_2):
             else:
                 ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
     return ml[len(s1), len(s2)]
+
+@jit
+def _edit_distance(u_1, u_2, v_1, v_2, *args):
+    ml = numpy.zeros([len(u_1) + 1, len(v_1) + 1])
+    ml[0, :] = range(len(v_1) + 1)
+    ml[:, 0] = range(len(u_1) + 1)
+    for i in range(1, len(u_1) + 1):
+        for j in range(1, len(v_1) + 1):
+            dij = 2 - ((u_1[i - 1] == v_1[j - 1]) + (u_2[i - 1] == v_2[j - 1]))
+            ml[i, j] = min(ml[i - 1, j] + 1, ml[i, j - 1] + 1, ml[i - 1, j - 1] + dij)
+    return ml[len(u_1), len(v_1)] / (len(u_1) + len(v_1))
 
 @jit
 def _longest_common_sequence(w, u_1, u_2, v_1, v_2):
@@ -110,7 +121,8 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
     if level is "Location":
         distance_func = _sequence_distance
     elif level is "Cluster":
-        distance_func = _longest_common_sequence
+        #distance_func = _longest_common_sequence
+        distance_func = _edit_distance
     else:
         print("Error, nonexistent clustering level:", level)
         sys.exit()
@@ -120,7 +132,7 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
         distance = numpy.zeros((len(targets_1), len(sequences_1)))
         for i in range(len(targets_1)):
             for j in range(len(sequences_1)):
-                distance[i, j] = distance_func(w, targets_1[i], targets_2[i], sequences_1[j], sequences_2[j])
+                distance[i, j] = distance_func(targets_1[i], targets_2[i], sequences_1[j], sequences_2[j], w)
     else:
         distance = numpy.zeros((len(sequences_1), len(sequences_1)))
         for i in range(len(sequences_1)):
@@ -128,7 +140,7 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
                 print("  sequence#", i, "\t", datetime.datetime.now())
             for j in range(len(sequences_1)):
                 if i < j:
-                    distance[i, j] = distance_func(w, sequences_1[i], sequences_2[i], sequences_1[j], sequences_2[j])
+                    distance[i, j] = distance_func(sequences_1[i], sequences_2[i], sequences_1[j], sequences_2[j], w)
                 else:
                     distance[i, j] = distance[j, i]
     print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
