@@ -21,7 +21,7 @@ W_RESULT = "./data/Evaluate/Index_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 30
+CLUSTER_NUM = 40
 MAX_KTH = 3
 GPS_WEIGHT = float('nan')
 FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
@@ -48,13 +48,13 @@ def output(level, c, k, w, cluster_trajectories, semantic_trajectories, u, f):
 
     f.write("\n")
 
-def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories, u, file):
+def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories, u, k, w, file):
     if i == 0:
         f = open(file, "w")
         f.write("#\tNPE\tNPC\tXB\tBSC\tRSC\n")
     else:
         f = open(file, "a")
-    print("#- ", para, "------------")
+    print("#- ", para, "------------ u.shpae:", u.shape)
     f.write("#- " + str(para) + "\t")
 
     npe = cindex.npe(u)
@@ -65,7 +65,7 @@ def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories,
     print("NPC--\t\t", npc)
     f.write(str(npc) + "\t")
 
-    xb, up, down = cindex.xb(level, u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
+    xb, up, down = cindex.xb(level, u, k, w, cluster_trajectories, semantic_trajectories)
     print("XB--\t\t", xb, "\t(", up, ",", down, ")")
     f.write(str(xb) + "(" + str(up) + "," + str(down) + ")" + "\t")
 
@@ -93,17 +93,17 @@ def output_rsc(rsc_n, para_range, file):
 def decide_cluster(level, cluster):
     for i, cluster_num in enumerate(cluster):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-        output_index_it(level, i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
+        output_index_it(level, i, cluster_num, cluster_trajectories, semantic_trajectories, u, MAX_KTH, GPS_WEIGHT, CLUSTER_RESULT)
 
 def decide_k(level, k_range):
     for i, k in enumerate(k_range):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-        output_index_it(level, i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
+        output_index_it(level, i, k, cluster_trajectories, semantic_trajectories, u, k, GPS_WEIGHT, K_RESULT)
 
 def decide_w(level, w_range):
     for i, w in enumerate(w_range):
         location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, MAX_KTH, w, FILTER_TIME_S, FILTER_TIME_E)
-        output_index_it(level, i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
+        output_index_it(level, i, w, cluster_trajectories, semantic_trajectories, u, MAX_KTH, w, W_RESULT)
 
 def main(*argv):
     start_time = datetime.datetime.now()

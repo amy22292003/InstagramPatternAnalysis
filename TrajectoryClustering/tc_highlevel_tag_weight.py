@@ -59,6 +59,7 @@ def main(*argv):
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     semantic_cluster = numpy.argmax(doc_topic, axis = 1)
     locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")
+    print("  users # :", len(users))
 
     # Getting sequences cluster
     #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
@@ -73,7 +74,7 @@ def main(*argv):
     print("  will delete #:", len(fail_indices))
     sequences = numpy.delete(numpy.array(sequences), fail_indices)
     location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
-    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences))
+    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences), numpy.std([len(x) for x in sequences]))
 
     cluster_trajectories = ctrajectory.get_cluster_sequence(location_sequences)
     semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
