@@ -48,7 +48,7 @@ def main(*argv):
         GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV2w_c35.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV1w_c35.txt"
     else:
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
 

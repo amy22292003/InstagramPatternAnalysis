@@ -24,7 +24,7 @@ RESULT = "./data/Evaluate/Index"
 CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = float('nan')
-FILTER_TIME_S = 1447545600 #2015/11/15
+FILTER_TIME_S = 1448323200 #2015/11/24 #1447545600 #2015/11/15
 FILTER_TIME_E = 1448928000 #2015/12/1
 
 def output(level, c, k, w, cluster_trajectories, semantic_trajectories, u, f):
@@ -73,13 +73,13 @@ def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories,
     bsc = cindex.bsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
     print("BSC--\t\t", bsc)
     f.write(str(bsc) + "\t")
-    """
 
     sep, comp = cindex.rsc_c(level, u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
     f.write("\n")
     f.close()
 
     return sep, comp
+    """
 
 def output_rsc(rsc_n, para_range, file):
     rsc = cindex.rsc(rsc_n[:,0], rsc_n[:,1])
@@ -90,55 +90,19 @@ def output_rsc(rsc_n, para_range, file):
     f.close()
 
 def decide_cluster(level, cluster):
-    rsc_n = numpy.zeros((len(cluster), 2))
     for i, cluster_num in enumerate(cluster):
-        if level == 'H':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Cluster", i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
-        elif level == 'L':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
-        else:
-            print("[ERROR] no such level")
-            return 1
-        rsc_n[i, 0] = sep
-        rsc_n[i, 1] = comp
-    output_rsc(rsc_n, cluster, CLUSTER_RESULT)
-    return 0
+        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
+        output_index_it(level, i, cluster_num, cluster_trajectories, semantic_trajectories, u, CLUSTER_RESULT)
 
 def decide_k(level, k_range):
-    rsc_n = numpy.zeros((len(k_range), 2))
     for i, k in enumerate(k_range):
-        if level == 'H':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Cluster", i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
-        elif level == 'L':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
-        else:
-            print("[ERROR] no such level")
-            return 1
-        rsc_n[i, 0] = sep
-        rsc_n[i, 1] = comp
-    output_rsc(rsc_n, k_range, K_RESULT)
-    return 0
+        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, k, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
+        output_index_it(level, i, k, cluster_trajectories, semantic_trajectories, u, K_RESULT)
 
 def decide_w(level, w_range):
-    rsc_n = numpy.zeros((len(w_range), 2))
     for i, w in enumerate(w_range):
-        if level == 'H':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, MAX_KTH, w, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Cluster", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
-        elif level == 'L':
-            location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringl.main(CLUSTER_NUM, MAX_KTH, w, FILTER_TIME_S, FILTER_TIME_E)
-            sep, comp = output_index_it("Location", i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
-        else:
-            print("[ERROR] no such level")
-            return 1
-        rsc_n[i, 0] = sep
-        rsc_n[i, 1] = comp
-    output_rsc(rsc_n, w_range, W_RESULT)
-    return 0
+        location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(CLUSTER_NUM, MAX_KTH, w, FILTER_TIME_S, FILTER_TIME_E)
+        output_index_it(level, i, w, cluster_trajectories, semantic_trajectories, u, W_RESULT)
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -178,28 +142,28 @@ def main(*argv):
                 f.close()
 
     """
+
+    if argv[0] == 'L':
+        level = "Location"
+    elif argv[0] == 'H':
+        level = "Cluster"
+
     if argv[1] == 'c':
         global CLUSTER_RESULT
         CLUSTER_RESULT = CLUSTER_RESULT + "-" + argv[0] + "k"+ str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
-
-        #cluster.extend([100, 150])
-        decide_cluster(argv[0], cluster)
+        decide_cluster(level, cluster)
 
     elif argv[1] == 'k':
         global K_RESULT
         K_RESULT = K_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
-        
-        decide_k(argv[0], k_range)
+        decide_k(level, k_range)
 
     elif argv[1] == 'w':
         global W_RESULT
         W_RESULT = W_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "_T" + argv[2] + ".txt"
-        
-        decide_w(argv[0], w_range)
+        decide_w(level, w_range)
 
-    else:
-        print("[ERROR] wrong command!!!! :", argv)
-    #"""
+
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
