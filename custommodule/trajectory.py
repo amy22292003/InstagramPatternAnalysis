@@ -25,7 +25,7 @@ def split_trajectory(trajectories, split_day = 1):
 
 def split_trajectory_byday(trajectories):
     print("[Trajectory] Splitting trajectories by day, input #=", len(trajectories))
-    time_zone = pytz.timezone('America/New_York')
+    time_zone = timezone('America/New_York')
     sequences = []
     f = open("./data/t.txt", "w")
     for a_trajectory in trajectories:
