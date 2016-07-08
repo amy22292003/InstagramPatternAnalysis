@@ -93,8 +93,8 @@ def main(*argv):
 
     # the test set
     cluster = list(range(15, 65, 5))
-    k_range = list(range(1, 6))
-    k_range.extend(list(range(7, 12, 2)))
+    k_range = list(range(1, 11))
+    #k_range.extend(list(range(7, 12, 2)))
     #k_range.extend(list(range(10, 25, 5)))
     w_range = [x / 10 for x in range(10, 0, -1)]
 
