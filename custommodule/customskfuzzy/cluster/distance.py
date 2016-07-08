@@ -26,7 +26,7 @@ def _similarity(u, v):
 """
 
 # pay attention to precision errors of float
-
+@jit
 def _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v):
     ml = numpy.zeros((len_u + 1, len_v + 1))
     for i in range(1, len_u + 1):
@@ -45,7 +45,7 @@ def _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v):
             ml[i, j] = round(max(ml[i - 1, j - 1] + sim, ml[i, j - 1]), 12)
     return ml[len_u, len_v]
 
-
+@jit
 def _sequence_distance(u_1, u_2, v_1, v_2, w):
     #if len(s1) > len(s2):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())

@@ -21,9 +21,9 @@ W_RESULT = "./data/Evaluate/Index_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 30
+CLUSTER_NUM = 40
 MAX_KTH = 3
-GPS_WEIGHT = float('nan')
+GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
 FILTER_TIME_E = 1448942400 #2015/12/01 @ UTC-4
 
