@@ -69,14 +69,15 @@ def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories,
     print("XB--\t\t", xb, "\t(", up, ",", down, ")")
     f.write(str(xb) + "(" + str(up) + "," + str(down) + ")" + "\t")
 
+    f.write("\n")
+    f.close()
+
     """
     bsc = cindex.bsc("Cluster", u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
     print("BSC--\t\t", bsc)
     f.write(str(bsc) + "\t")
 
     sep, comp = cindex.rsc_c(level, u, MAX_KTH, GPS_WEIGHT, cluster_trajectories, semantic_trajectories)
-    f.write("\n")
-    f.close()
 
     return sep, comp
     """
