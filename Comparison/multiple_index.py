@@ -24,8 +24,8 @@ RESULT = "./data/Evaluate/Index"
 CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = float('nan')
-FILTER_TIME_S = 1448323200 #2015/11/24 #1447545600 #2015/11/15
-FILTER_TIME_E = 1448928000 #2015/12/1
+FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
+FILTER_TIME_E = 1448942400 #2015/12/01 @ UTC-4
 
 def output(level, c, k, w, cluster_trajectories, semantic_trajectories, u, f):
     print("[Index] - (c,k,w)= ", c, ",", k, ",", w)

@@ -1,6 +1,7 @@
 # trajectory = 1D array of posts/ locations/ or others
 import datetime
 import numpy
+from pytz import timezone
 
 """For posts sequences"""
 def split_trajectory(trajectories, split_day = 1):
@@ -24,12 +25,11 @@ def split_trajectory(trajectories, split_day = 1):
 
 def split_trajectory_byday(trajectories):
     print("[Trajectory] Splitting trajectories by day, input #=", len(trajectories))
-    day_init = 1446336000 # 2015/11/01
-    a_day = 86400
+    time_zone = pytz.timezone('America/New_York')
     sequences = []
     f = open("./data/t.txt", "w")
     for a_trajectory in trajectories:
-        trajectory_day = [datetime.datetime.fromtimestamp(int(x.time)).strftime('%Y-%m-%d') for x in a_trajectory]
+        trajectory_day = [datetime.datetime.fromtimestamp(int(x.time), tz=time_zone).strftime('%Y-%m-%d') for x in a_trajectory]
         f.write("len-" + str(len(trajectory_day)) + "\t")
         for x in trajectory_day:
             f.write(x + " , ")

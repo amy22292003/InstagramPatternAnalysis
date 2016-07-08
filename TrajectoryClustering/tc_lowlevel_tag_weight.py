@@ -20,8 +20,8 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-FILTER_TIME_S = 1448928000 
-FILTER_TIME_E = 1451606400
+FILTER_TIME_S = 1448942400 #2015/12/01 @ UTC-4
+FILTER_TIME_E = 1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 50
 ERROR = 0.000001
 MAX_KTH = 5
@@ -51,7 +51,7 @@ def main(*argv):
         FILTER_TIME_E = argv[4]
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV1w_c35.txt"
     else:
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_1m_c35.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
 
     OUTPUT_MAP = "./data/Result/TC_ll&tag&w_1m_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
     
@@ -59,6 +59,7 @@ def main(*argv):
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
     location_id, doc_topic = ccluster.open_doc_topic(LOCATION_TOPIC)
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
+    print("  users # :", len(users))
 
     # Getting sequences of posts & locations
     #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
