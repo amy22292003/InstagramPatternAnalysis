@@ -88,6 +88,7 @@ def main(*argv):
     global FILTER_TIME_S
     global FILTER_TIME_E
     global OUTPUT_MAP
+    global OUTPUT_PATTERN
     if len(argv) > 0:
         CLUSTER_NUM = argv[0]
         MAX_KTH = argv[1]
@@ -99,6 +100,7 @@ def main(*argv):
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
 
     OUTPUT_MAP = OUTPUT_MAP + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
+    OUTPUT_PATTERN = OUTPUT_PATTERN + str(CLUSTER_NUM) + "k" + str(MAX_KTH)
     
     # Getting data
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
@@ -118,10 +120,11 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Location", spatial_array, CLUSTER_NUM, MAX_KTH, semantic_array, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
+    """
     ouput_pattern(sequences, location_sequences, u, membership)
     output_each_pattern(sequences, location_sequences, u, membership, 10)
-    ouput_pattern(sequences, location_sequences, u, membership)
-
+    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    """
     
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)

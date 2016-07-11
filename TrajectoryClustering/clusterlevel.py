@@ -29,7 +29,8 @@ GPS_WEIGHT = float('nan')
 
 
 """file path"""
-OUTPUT_MAP = "./data/Result/Highlevel_DEC_c"
+OUTPUT_MAP = "./data/Result/Highlevelmap_DEC_c"
+OUTPUT_PATTERN = "./data/Result/Highlevel_DEC"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def output_each_pattern(sequences, location_sequences, u, membership, k = None):
@@ -84,21 +85,21 @@ def main(*argv):
     # set parameters
     global CLUSTER_NUM
     global MAX_KTH
-    global GPS_WEIGHT
     global FILTER_TIME_S
     global FILTER_TIME_E
     global OUTPUT_MAP
+    global OUTPUT_PATTERN
     if len(argv) > 0:
         CLUSTER_NUM = argv[0]
         MAX_KTH = argv[1]
-        GPS_WEIGHT = argv[2]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV1w_c35.txt"
     else:
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
 
-    OUTPUT_MAP = OUTPUT_MAP + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
+    OUTPUT_MAP = OUTPUT_MAP + str(CLUSTER_NUM) + "k" + str(MAX_KTH)
+    OUTPUT_PATTERN = OUTPUT_PATTERN + str(CLUSTER_NUM) + "k" + str(MAX_KTH)
 
     # Getting data
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
@@ -118,10 +119,11 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", spatial_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
+    """
     ouput_pattern(sequences, location_sequences, u, membership)
     output_each_pattern(sequences, location_sequences, u, membership, 10)
-    ouput_pattern(sequences, location_sequences, u, membership)
-    
+    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    """
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)

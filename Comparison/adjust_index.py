@@ -22,7 +22,7 @@ W_RESULT = "./data/Evaluate/Index_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 40
+CLUSTER_NUM = 50
 MAX_KTH = 3
 GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
@@ -126,7 +126,7 @@ def main(*argv):
         level = "Cluster"
         tc = FCM_C.main
 
-    
+
     file = RESULT + "_" + argv[0] + "_seed" + argv[1] + ".txt"
     f = open(file, "w")
     f.write("#\tNPE\tNPC\tXB\n")
@@ -134,9 +134,12 @@ def main(*argv):
     for c in cluster:
         for k in k_range:
             f = open(file, "a")
-            for w in w_range:
+            if level == "Location":
+                for w in w_range:
+                    location_sequences, cluster_trajectories, semantic_trajectories, u = tc(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
+                    output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)                
+            else:
                 location_sequences, cluster_trajectories, semantic_trajectories, u = tc(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
-                output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)                
             f.close()    
 
     """
