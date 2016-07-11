@@ -51,11 +51,9 @@ def _sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1[:,0]).sum())
     if len_u > len_v:
-        d = 1 - _dynamic_programming(w, v_1, v_2, u_1, u_2, len_v, len_u) / float(len_u)
-        return d
+        return 1 - _dynamic_programming(w, v_1, v_2, u_1, u_2, len_v, len_u) / float(len_u)
     else:
-        d = 1 - _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v) / float(len_v)
-        return d
+        return 1 - _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v) / float(len_v)
 
 @jit
 def _lcs_length(w, u_1, u_2, v_1, v_2):
@@ -85,8 +83,7 @@ def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     #len_v = len(v_1) - int(numpy.isnan(v_1).sum())
     len_u = len(u_1)
     len_v = len(v_1)
-    d = _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
-    return d
+    return _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
 
 
 """
@@ -138,7 +135,8 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
         distance = numpy.zeros((len(targets_1), len(sequences_1)))
         for i in range(len(targets_1)):
             for j in range(len(sequences_1)):
-                distance[i, j] = distance_func(targets_1[i], targets_2[i], sequences_1[j], sequences_2[j], w)
+                d = distance_func(targets_1[i], targets_2[i], sequences_1[j], sequences_2[j], w)
+                distance[i, j] = d
     else:
         distance = numpy.zeros((len(sequences_1), len(sequences_1)))
         for i in range(len(sequences_1)):
@@ -146,7 +144,8 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
                 print("  sequence#", i, "\t", datetime.datetime.now())
             for j in range(len(sequences_1)):
                 if i < j:
-                    distance[i, j] = distance_func(sequences_1[i], sequences_2[i], sequences_1[j], sequences_2[j], w)
+                    d = distance_func(sequences_1[i], sequences_2[i], sequences_1[j], sequences_2[j], w)
+                    distance[i, j] = d
                 else:
                     distance[i, j] = distance[j, i]
     print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))

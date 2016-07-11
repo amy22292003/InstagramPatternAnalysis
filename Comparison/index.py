@@ -111,9 +111,10 @@ def main(*argv):
 
     # the test set
     cluster = list(range(15, 65, 5))
+    cluster.extend([80, 100])
     #cluster = [40, 50, 70]
-    k_range = list(range(1, 11))
-    k_range = k_range.extend([20, 30])
+    k_range = list(range(1, 9))
+    k_range.extend([20, 30])
     
     #k_range.extend(list(range(10, 25, 5)))
     w_range = [x / 10 for x in range(10, 0, -1)]
