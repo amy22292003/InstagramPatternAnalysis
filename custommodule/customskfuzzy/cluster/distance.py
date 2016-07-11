@@ -51,9 +51,11 @@ def _sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1[:,0]).sum())
     if len_u > len_v:
-        return 1 - _dynamic_programming(w, v_1, v_2, u_1, u_2, len_v, len_u) / float(len_u)
+        d = 1 - _dynamic_programming(w, v_1, v_2, u_1, u_2, len_v, len_u) / float(len_u)
+        return d
     else:
-        return 1 - _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v) / float(len_v)
+        d = 1 - _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v) / float(len_v)
+        return d
 
 @jit
 def _lcs_length(w, u_1, u_2, v_1, v_2):
@@ -83,7 +85,8 @@ def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     #len_v = len(v_1) - int(numpy.isnan(v_1).sum())
     len_u = len(u_1)
     len_v = len(v_1)
-    return _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
+    d = _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
+    return d
 
 
 """
