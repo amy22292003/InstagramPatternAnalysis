@@ -3,6 +3,7 @@ import datetime
 import inspect
 import numpy
 import os
+import re
 import sys
 
 PACKAGE_PARENT = '..'
@@ -11,8 +12,8 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 sys.path.append(PACKAGE_PARENT)
 
 import Liu.custommodule.index as cindex
-import Liu.TrajectoryClustering.tc_highlevel_tag_weight as trajectoryclustering_h
-import Liu.TrajectoryClustering.tc_lowlevel_tag_weight as trajectoryclustering_l
+import Liu.TrajectoryClustering.locationlevel as FCM_T
+import Liu.TrajectoryClustering.clusterlevel as FCM_C
 
 """file path"""
 CLUSTER_RESULT = "./data/Evaluate/Index_cluster#"
@@ -21,8 +22,8 @@ W_RESULT = "./data/Evaluate/Index_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 45
-MAX_KTH = 20
+CLUSTER_NUM = 40
+MAX_KTH = 5
 GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
 FILTER_TIME_E = 1448942400 #2015/12/01 @ UTC-4
@@ -111,18 +112,18 @@ def main(*argv):
     # the test set
     cluster = list(range(15, 65, 5))
     #cluster = [40, 50, 70]
-    #k_range = list(range(1, 11))
-    k_range = [20, 30, 40]
+    k_range = list(range(1, 11))
+    k_range = k_range.extend([20, 30])
     
     #k_range.extend(list(range(10, 25, 5)))
     w_range = [x / 10 for x in range(10, 0, -1)]
 
     if argv[0] == 'L':
         level = "Location"
-        tc = trajectoryclustering_l.main
+        tc = FCM_T.main
     elif argv[0] == 'H':
         level = "Cluster"
-        tc = trajectoryclustering_h.main
+        tc = FCM_C.main
 
     """
     file = RESULT + "_seed" + argv[1] + ".txt"

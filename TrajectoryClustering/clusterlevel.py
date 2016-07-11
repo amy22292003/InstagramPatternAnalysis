@@ -114,7 +114,7 @@ def main(*argv):
     sequences = ctrajectory.remove_short(sequences)
 
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
-    removes, spatial_sequences, semantic_sequences = ctrajectory.get_cluster_sequence(location_sequences, "cluster", "semantic_cluster")
+    removes, spatial_sequences, semantic_sequences = ctrajectory.get_cluster_sequences(location_sequences, "cluster", "semantic_cluster")
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", spatial_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
