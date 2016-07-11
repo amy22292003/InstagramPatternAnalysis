@@ -67,21 +67,24 @@ def _lcs_length(w, u_1, u_2, v_1, v_2):
     return ml[len(s1), len(s2)]
 
 @jit
-def _edit_distance(u_1, u_2, v_1, v_2, *args):
-    ml = numpy.zeros([len(u_1) + 1, len(v_1) + 1])
-    ml[0, :] = range(len(v_1) + 1)
-    ml[:, 0] = range(len(u_1) + 1)
-    for i in range(1, len(u_1) + 1):
-        for j in range(1, len(v_1) + 1):
+def _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v):
+    ml = numpy.zeros((len_u + 1, len_v + 1))
+    ml[0, :] = list(numpy.array(range(len_v + 1)) ** 2)
+    ml[:, 0] = list(numpy.array(range(len_u + 1)) ** 2)
+    for i in range(1, len_u + 1):
+        for j in range(1, len_v + 1):
             dij = 2 - ((u_1[i - 1] == v_1[j - 1]) + (u_2[i - 1] == v_2[j - 1]))
-            ml[i, j] = min(ml[i - 1, j] + 1, ml[i, j - 1] + 1, ml[i - 1, j - 1] + dij)
-    return ml[len(u_1), len(v_1)] / (len(u_1) + len(v_1))
+            ml[i, j] = min(ml[i - 1, j] + 2, ml[i, j - 1] + 2, ml[i - 1, j - 1] + dij)
+    return ml[len_u, len_v]
 
 @jit
-def _longest_common_sequence(w, u_1, u_2, v_1, v_2):
-    #ml = _lcs_length(s1, s2)
-    #lcs_set = _lcs(ml, s1, s2, len(s1), len(s2))
-    return 1 - _lcs_length(s1, s2) / max(len(s1), len(s2)) #, lcs_set
+def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
+    #len_u = len(u_1) - int(numpy.isnan(u_1).sum())
+    #len_v = len(v_1) - int(numpy.isnan(v_1).sum())
+    len_u = len(u_1)
+    len_v = len(v_1)
+    return _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
+
 
 """
 def _lcs(ml, s1, s2, i, j):
@@ -122,7 +125,7 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
         distance_func = _sequence_distance
     elif level is "Cluster":
         #distance_func = _longest_common_sequence
-        distance_func = _edit_distance
+        distance_func = _cluster_sequence_distance
     else:
         print("Error, nonexistent clustering level:", level)
         sys.exit()

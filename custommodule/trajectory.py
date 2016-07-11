@@ -52,6 +52,7 @@ def remove_short(trajectories, threshold = 2):
     print("  avg, std=", sum([len(x) for x in trajectories]) / len(trajectories), numpy.std([len(x) for x in trajectories]))
     return trajectories
 
+"""
 def get_vector_sequence(trajectories, attr = "membership"):
     print("[Trajectory] Getting vector sequences...")
     vector_sequences = []
@@ -70,6 +71,29 @@ def get_cluster_sequence(trajectories, attr = "cluster"):
                 cluster_sequence.append(getattr(trajectories[i][j], attr))
         cluster_sequences.append(cluster_sequence)
     return cluster_sequences
+"""
+
+def get_cluster_sequence(trajectories, attr, attr2 = None):
+    print("[Trajectory] Getting cluster sequences...")
+    # set array = trajectories # * trajectory length * attr's dimension
+    attr_sequences = []
+    attr2_sequences = []
+    removes = []
+    for i in range(len(trajectories)):
+        a_sequence = [getattr(x, attr) for x in trajectories[i]]
+        if attr2:
+            a_sequence2 = [getattr(x, attr2) for x in trajectories[i]]
+            remove = [j for j in range(1, len(trajectories[i])) if a_sequence[j] == a_sequence[j - 1] and a_sequence2[j] == a_sequence2[j - 1]]
+        else:
+            remove = [j for j in range(1, len(trajectories[i])) if a_sequence[j] == a_sequence[j - 1]]
+        removes.append(remove)
+        a_sequence = numpy.delete(numpy.array(a_sequence), remove)
+        attr_sequences.append(a_sequence)
+        if attr2:
+            a_sequence2 = numpy.delete(numpy.array(a_sequence2), remove)
+            attr2_sequences.append(a_sequence2)
+    print("  avg, std=", sum([len(x) for x in attr_sequences]) / len(attr_sequences), numpy.std([len(x) for x in attr_sequences]))
+    return removes,  attr_sequences, attr2_sequences
 
 """For location sequences"""
 def convertto_location_sequences(post_sequences, locations):
@@ -91,19 +115,6 @@ def get_vector_array(trajectories, trajectory_len, attr = "membership"):
     vector_array[:,:,:] = float('nan')
     for i in range(len(trajectories)):
         for j in range(len(trajectories[i])):
-            vector_array[i, j, :] = getattr(trajectories[i][j], attr)
-    return vector_array
-
-def get_cluster_array(trajectories, trajectory_len, attr="membership"):
-    print("[Trajectory] Getting cluster sequences...")
-    attr_dim = getattr(trajectories[0][0], attr).shape[1]
-
-    # set array = trajectories # * trajectory length * attr's dimension
-    cluster_array = numpy.zeros((len(trajectories), trajectory_len, attr_dim))
-    cluster_array[:,:,:] = float('nan')
-    for i in range(len(trajectories)):
-        for j in range(len(trajectories[i])):
-            #if
             vector_array[i, j, :] = getattr(trajectories[i][j], attr)
     return vector_array
 
