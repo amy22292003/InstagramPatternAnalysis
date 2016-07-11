@@ -68,19 +68,23 @@ def _lcs_length(w, u_1, u_2, v_1, v_2):
 @jit
 def _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v):
     ml = numpy.zeros((len_u + 1, len_v + 1))
-    ml[0, :] = list(numpy.array(range(len_v + 1)) ** 2)
-    ml[:, 0] = list(numpy.array(range(len_u + 1)) ** 2)
+    for i in range(len_v + 1):
+        ml[0, i] = i * 2
+    for i in range(len_u + 1):
+        ml[i, 0] = i * 2
     for i in range(1, len_u + 1):
         for j in range(1, len_v + 1):
-            dij = 2 - ((u_1[i - 1] == v_1[j - 1]) + (u_2[i - 1] == v_2[j - 1]))
+            #dij = 2 - ((u_1[i - 1] == v_1[j - 1]) + (u_2[i - 1] == v_2[j - 1]))
+            dij = min(1, abs(u_1[i - 1] - v_1[j - 1])) + min(1, abs(u_2[i - 1] - v_2[j - 1]))
             ml[i, j] = min(ml[i - 1, j] + 2, ml[i, j - 1] + 2, ml[i - 1, j - 1] + dij)
     return ml[len_u, len_v]
 
+
 def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
-    #len_u = len(u_1) - int(numpy.isnan(u_1).sum())
-    #len_v = len(v_1) - int(numpy.isnan(v_1).sum())
-    len_u = len(u_1)
-    len_v = len(v_1)
+    len_u = len(u_1) - int(numpy.isnan(u_1).sum())
+    len_v = len(v_1) - int(numpy.isnan(v_1).sum())
+    #len_u = len(u_1)
+    #len_v = len(v_1)
     d = _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
     return d
 

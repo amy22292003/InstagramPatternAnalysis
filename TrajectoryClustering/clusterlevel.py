@@ -22,15 +22,15 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 FILTER_TIME_S = 1446350400 #1448942400 #2015/12/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
-CLUSTER_NUM = 30
+CLUSTER_NUM = 35
 ERROR = 0.000001
 MAX_KTH = 6
 GPS_WEIGHT = float('nan')
 
 
 """file path"""
-OUTPUT_MAP = "./data/Result/Highlevelmap_DEC_c"
-OUTPUT_PATTERN = "./data/Result/Highlevel_DEC"
+OUTPUT_MAP = "./data/Result/Highlevelmap_NOVDEC_c"
+OUTPUT_PATTERN = "./data/Result/Highlevel_NOVDEC"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def output_each_pattern(sequences, location_sequences, u, membership, k = None):
@@ -115,7 +115,7 @@ def main(*argv):
     sequences = ctrajectory.remove_short(sequences)
 
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
-    removes, spatial_sequences, semantic_sequences = ctrajectory.get_cluster_sequences(location_sequences, "cluster", "semantic_cluster")
+    spatial_sequences, semantic_sequences = ctrajectory.get_cluster_array(location_sequences, longest_len, "cluster", "semantic_cluster")
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", spatial_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 

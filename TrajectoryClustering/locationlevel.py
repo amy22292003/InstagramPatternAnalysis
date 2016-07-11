@@ -23,10 +23,10 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 FILTER_TIME_S = 1446350400 #1448942400 #2015/12/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
-CLUSTER_NUM = 50
+CLUSTER_NUM = 60
 ERROR = 0.000001
-MAX_KTH = 5
-GPS_WEIGHT = 0.7
+MAX_KTH = 3
+GPS_WEIGHT = 0.9
 
 """file path"""
 OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_c"

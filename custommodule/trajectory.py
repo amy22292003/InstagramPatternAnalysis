@@ -60,7 +60,7 @@ def get_cluster_sequences(trajectories, attr, attr2 = None):
     removes = []
     for i in range(len(trajectories)):
         a_sequence = [getattr(x, attr) for x in trajectories[i]]
-        if attr2:
+        if attr2 is not None:
             a_sequence2 = [getattr(x, attr2) for x in trajectories[i]]
             remove = [j for j in range(1, len(trajectories[i])) if a_sequence[j] == a_sequence[j - 1] and a_sequence2[j] == a_sequence2[j - 1]]
         else:
@@ -82,6 +82,7 @@ def convertto_location_sequences(post_sequences, locations):
         location_s = [locations[x.lid] for x in s]
         location_sequences.append(location_s)
         longest_len = max(longest_len, len(location_s))
+    print("  max length=", longest_len)
     return location_sequences, longest_len
 
 """Transform to array"""
@@ -96,6 +97,35 @@ def get_vector_array(trajectories, trajectory_len, attr = "membership"):
         for j in range(len(trajectories[i])):
             vector_array[i, j, :] = getattr(trajectories[i][j], attr)
     return vector_array
+
+def get_cluster_array(trajectories, trajectory_len, attr = "cluster", attr2 = None):
+    print("[Trajectory] Getting cluster sequences..., attr:", attr)
+
+    # set array = trajectories # * trajectory length * attr's dimension
+    vector_array = numpy.empty((len(trajectories), trajectory_len))
+    vector_array[:,:] = float('nan')
+    vector_array2 = numpy.empty((len(trajectories), trajectory_len))
+    vector_array2[:,:] = float('nan')
+    for i in range(len(trajectories)):
+        fore_cluster = -1
+        fore_cluster2 = -1
+        cur = 0
+        for j in range(len(trajectories[i])):
+            this_cluster = getattr(trajectories[i][j], attr)
+            if attr2:
+                this_cluster2 = getattr(trajectories[i][j], attr2)
+            else:
+                this_cluster2 = -1
+            if this_cluster != fore_cluster or this_cluster2 != fore_cluster2:
+                vector_array[i, cur] = this_cluster
+                fore_cluster = this_cluster
+                if attr2:
+                    vector_array2[i, cur] = this_cluster2
+                    fore_cluster2 = this_cluster2
+                cur += 1
+    len_list = [len(x) - (numpy.isnan(x)).sum() for x in vector_array]
+    print("  avg, std, max=", sum(len_list) / vector_array.shape[0], numpy.std(len_list), max(len_list))
+    return vector_array, vector_array2
 
 """Output"""
 def output_clusters(post_sequences, membership, u, file_path):
