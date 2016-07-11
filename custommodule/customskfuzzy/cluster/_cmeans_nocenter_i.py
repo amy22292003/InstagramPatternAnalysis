@@ -110,7 +110,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, level, *para, init = None, see
 	print("  error:", error_list)
 	print("  >>> p=", p)
 	print("  error avg:", sum(error_list) / len(error_list), ", max/min:", max(error_list), min(error_list))
-	print("  Fin u>>\n", u[:,0:2], "\n  u avg:", np.sum(u) / (u.shape[0] * u.shape[1]), "\n  u std:", np.std(u))
+	print("  Fin u>>\n", u[:,0:2], "\n  u avg:", np.sum(u) / (u.shape[0] * u.shape[1]), "\t  u std:", np.std(u), "  max,min:", np.amax(u), np.amin(0))
 	# Final calculations
 	error = np.linalg.norm(u - u2)
 	fpc = _fp_coeff(u)

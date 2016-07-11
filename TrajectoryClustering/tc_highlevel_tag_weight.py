@@ -23,11 +23,12 @@ FILTER_TIME_S = 1448942400 #2015/12/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 30
 ERROR = 0.000001
-MAX_KTH = 3
-GPS_WEIGHT = 0.5
+MAX_KTH = 6
+GPS_WEIGHT = float('nan')
+
 
 """file path"""
-
+OUTPUT_MAP = "./data/Result/Highlevel_DEC_c"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def main(*argv):
@@ -42,6 +43,7 @@ def main(*argv):
     global GPS_WEIGHT
     global FILTER_TIME_S
     global FILTER_TIME_E
+    global OUTPUT_MAP
     if len(argv) > 0:
         CLUSTER_NUM = argv[0]
         MAX_KTH = argv[1]
@@ -52,7 +54,7 @@ def main(*argv):
     else:
         LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
 
-    OUTPUT_MAP = "./data/Result/TC_hl&tag&w_1w_c" + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
+    OUTPUT_MAP = OUTPUT_MAP + str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "w" + str(GPS_WEIGHT)
 
     # Getting data
     users, locations = locationclustering.main(FILTER_TIME_S, FILTER_TIME_E)
@@ -64,42 +66,42 @@ def main(*argv):
     # Getting sequences cluster
     #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
+    sequences = ctrajectory.remove_adjacent_location(sequences)
+    sequences = ctrajectory.remove_short(trajectories)
+
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
-
-    print("Filtering short trajectories...")
-    fail_indices = []
-    for i, s in enumerate(sequences):
-        if len(s) <= 2:
-            fail_indices.append(i)
-    print("  will delete #:", len(fail_indices))
-    sequences = numpy.delete(numpy.array(sequences), fail_indices)
-    location_sequences = numpy.delete(numpy.array(location_sequences), fail_indices)
-    print("  remain sequences #:", len(sequences), " ,average length=", sum([len(x) for x in sequences]) / len(sequences), numpy.std([len(x) for x in sequences]))
-
-    cluster_trajectories = ctrajectory.get_cluster_sequence(location_sequences)
-    semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
+    #cluster_trajectories = ctrajectory.get_cluster_sequence(location_sequences)
+    #semantic_trajectories = ctrajectory.get_cluster_sequence(location_sequences, "semantic_cluster")
+    vector_array = ctrajectory.get_vector_array(location_sequences, longest_len)
+    semantic_array = ctrajectory.get_vector_array(location_sequences, longest_len, "semantic_mem")
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", cluster_trajectories, CLUSTER_NUM, MAX_KTH, semantic_trajectories, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
-    
-    """
+
+
+    u_threshold = 0.2
+    print("u_threshold:", u_threshold)
     print("Start Outputting...")
     for c in range(CLUSTER_NUM):
         this_cluster_indices = [i for i, x in enumerate(membership) if x == c]
         print(c, " >> this cluster #:", len(this_cluster_indices))
         if len(this_cluster_indices) is not 0:
             top_10_u = sorted(u[c, this_cluster_indices], reverse=True)
+            """
             if len(top_10_u) >= MAX_KTH:
                 top_10_u = top_10_u[MAX_KTH - 1]
             else:
                 top_10_u = top_10_u[-1]
-            top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= top_10_u]
+            """
+            top_10_indices = [i for i, x in enumerate(u[c, this_cluster_indices]) if x >= u_threshold]
             #top_10_indices = sorted(range(len(u[c, this_cluster_indices])), key=lambda x: u[c, this_cluster_indices][x], reverse=True)[0:10]
             print("  top_10:", top_10_u, ">", top_10_indices)
             print(u[c, this_cluster_indices][top_10_indices])
             points_sequences = numpy.array(location_sequences)[this_cluster_indices][top_10_indices]
             color = sorted(range(len(points_sequences)), key=lambda x: top_10_indices[x])
-            cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
-    """
+            if len(color) > 0:
+                cpygmaps.output_patterns_l(points_sequences, color, len(points_sequences), OUTPUT_MAP + "_" + str(c) + ".html")
+    
+
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
     print("--------------------------------------")

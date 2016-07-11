@@ -21,11 +21,29 @@ W_RESULT = "./data/Evaluate/Index_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 40
-MAX_KTH = 3
+CLUSTER_NUM = 45
+MAX_KTH = 20
 GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
 FILTER_TIME_E = 1448942400 #2015/12/01 @ UTC-4
+
+def output(level, cluster_trajectories, semantic_trajectories, u, k, w, f):
+    print("(", u.shape[0], ",", k, ",", w, ")---------------")
+    f.write(str(u.shape[0]) + " , " + str(k) + " , " + str(w) + "\t")
+
+    npe = cindex.npe(u)
+    print("NPE--\t\t", npe)
+    f.write(str(npe) + "\t")
+
+    npc = cindex.npc(u)
+    print("NPC--\t\t", npc)
+    f.write(str(npc) + "\t")
+
+    xb, up, down = cindex.xb(level, u, k, w, cluster_trajectories, semantic_trajectories)
+    print("XB--\t\t", xb, "\t(", up, ",", down, ")")
+    f.write(str(xb) + "(" + str(up) + "," + str(down) + ")" + "\n")
+
+
 
 def output_index_it(level, i, para, cluster_trajectories, semantic_trajectories, u, k, w, file):
     if i == 0:
@@ -70,7 +88,6 @@ def output_rsc(rsc_n, para_range, file):
     f.close()
 
 def decide_cluster(level, tc, cluster):
-
     for i, cluster_num in enumerate(cluster):
         location_sequences, cluster_trajectories, semantic_trajectories, u = tc(cluster_num, MAX_KTH, GPS_WEIGHT, FILTER_TIME_S, FILTER_TIME_E)
         output_index_it(level, i, cluster_num, cluster_trajectories, semantic_trajectories, u, MAX_KTH, GPS_WEIGHT, CLUSTER_RESULT)
@@ -93,36 +110,12 @@ def main(*argv):
 
     # the test set
     cluster = list(range(15, 65, 5))
-    k_range = list(range(1, 11))
-    #k_range.extend(list(range(7, 12, 2)))
+    #cluster = [40, 50, 70]
+    #k_range = list(range(1, 11))
+    k_range = [20, 30, 40]
+    
     #k_range.extend(list(range(10, 25, 5)))
     w_range = [x / 10 for x in range(10, 0, -1)]
-
-    """
-    file = RESULT + "_seed" + argv[1] + ".txt"
-    f = open(file, "w")
-    f.write("#\tNPE\tNPC\tXB\n")
-    f.close()
-
-    if argv[0] == 'L':
-        for c in cluster:
-            for k in k_range:
-                f = open(file, "a")
-                for w in w_range:
-                    location_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
-                    output("Location", c, k, w, cluster_trajectories, semantic_trajectories, u, f)
-                f.close()
-
-    if argv[0] == 'H':
-        for c in cluster:
-            for k in k_range:
-                w = float('nan')
-                ocation_sequences, cluster_trajectories, semantic_trajectories, u = trajectoryclusteringh.main(c, k, float('nan'), FILTER_TIME_S, FILTER_TIME_E)
-                f = open(file, "a")
-                output("Cluster", c, k, w, cluster_trajectories, semantic_trajectories, u, f)
-                f.close()
-
-    """
 
     if argv[0] == 'L':
         level = "Location"
@@ -130,6 +123,21 @@ def main(*argv):
     elif argv[0] == 'H':
         level = "Cluster"
         tc = trajectoryclustering_h.main
+
+    """
+    file = RESULT + "_seed" + argv[1] + ".txt"
+    f = open(file, "w")
+    f.write("#\tNPE\tNPC\tXB\n")
+    f.close()
+    for c in cluster:
+        for k in k_range:
+            f = open(file, "a")
+            for w in w_range:
+                location_sequences, cluster_trajectories, semantic_trajectories, u = tc(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
+                output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)                
+            f.close()    
+
+    """
 
     if argv[1] == 'c':
         global CLUSTER_RESULT
@@ -145,7 +153,7 @@ def main(*argv):
         global W_RESULT
         W_RESULT = W_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "_T" + argv[2] + ".txt"
         decide_w(level, tc, w_range)
-
+    #"""
 
 
     print("--------------------------------------")

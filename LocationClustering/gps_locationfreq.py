@@ -28,7 +28,7 @@ MAX_KTH = 30
 
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
-OUTPUT_MAP = "./data/Result/LocationMap'_" + str(CLUSTER_NUM) +\
+OUTPUT_MAP = "./data/Result/LocationMap_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
 OUTPUT_CLUSTER = "./data/Result/LocationCluster_" + str(CLUSTER_NUM) +\
     "k" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
@@ -74,13 +74,13 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, u, locations.keys())
     locations = ccluster.fit_locations_cluster(locations, cluster_membership, locations.keys())
 
-    
+    """
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         cluster_membership, CLUSTER_NUM, OUTPUT_MAP)
 
     ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
-    
+    """
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

@@ -79,34 +79,21 @@ def _get_color(num):
     return color
 
 def output_clusters(point_all, cluster_membership, c, file_path):
-    print("[cpygmaps] Outputing clusters' points on the map...")
+    print("[cpygmaps] Outputing clusters' points on the map, file:", file_path)
     mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
     color = _get_color(c)
     for i, a_point in enumerate(point_all):
         mymap.addpoint(a_point[0], a_point[1], color[cluster_membership[i]], a_point[2])
     mymap.draw(file_path) 
 
-def output_patterns_l(trajectories, cluster_membership, c, file_path):
-    print("[cpygmaps] Outputing patterns...")
+# a point content: lat, lng, content
+def output_patterns(trajectories, cluster_membership, c, file_path):
+    print("[cpygmaps] Outputing patterns, file:", file_path)
     mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
     color = _get_color(c)
     for i, s in enumerate(trajectories):
-        path = [(float(a_point.lat), float(a_point.lng)) for a_point in s]
+        path = [(float(a_point[0]), float(a_point[1])) for a_point in s]
         for j, a_point in enumerate(s):
-            mymap.addpoint(float(a_point.lat), float(a_point.lng), color[cluster_membership[i]], str(cluster_membership[i]) + ">" + str(j) + ":" + a_point.lname)
-        #mymap.addpoint(float(s[0].lat), float(s[0].lng), color[cluster_membership[i]], "[S]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
-        #mymap.addpoint(float(s[len(s)-1].lat), float(s[len(s)-1].lng), color[cluster_membership[i]], "[E]" + str(cluster_membership[i]) + ">>" + str(len(s)) + "-" + s[0].lname)
+            mymap.addpoint(float(a_point[0]), float(a_point[1]), color[cluster_membership[i]], a_point[2])
         mymap.addpath(path, color[cluster_membership[i]])
     mymap.draw(file_path)
-
-"""
-def output_patterns(patterns, cluster_cntr, cluster_membership, file_path):
-    mymap = Googlemap(MAP_LAT, MAP_LNG, 13)
-    color = _get_color(len(cluster_cntr))
-    for i, a_point in enumerate(cluster_cntr):
-        mymap.addpoint(a_point[0], a_point[1], color[i], cluster_membership[i])
-    for a_pattern in patterns:
-        path = [cluster_cntr[cluster_membership.index(x)] for x in a_pattern]
-        mymap.addpath(path, color[cluster_membership.index(a_pattern[0])])
-    mymap.draw(file_path)
-"""
