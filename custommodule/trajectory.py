@@ -52,27 +52,6 @@ def remove_short(trajectories, threshold = 2):
     print("  avg, std=", sum([len(x) for x in trajectories]) / len(trajectories), numpy.std([len(x) for x in trajectories]))
     return trajectories
 
-"""
-def get_vector_sequence(trajectories, attr = "membership"):
-    print("[Trajectory] Getting vector sequences...")
-    vector_sequences = []
-    for a_sequence in trajectories:
-        #a_vector_sequence = [locations[a_post.lid].membership for a_post in a_sequence]
-        a_vector_sequence = [getattr(a_location, attr) for a_location in a_sequence]
-        vector_sequences.append(a_vector_sequence)
-    return vector_sequences
-
-def get_cluster_sequence(trajectories, attr = "cluster"):
-    cluster_sequences = []
-    for i in range(len(trajectories)):
-        cluster_sequence = [getattr(trajectories[i][0], attr)]
-        for j in range(1, len(trajectories[i])):
-            if trajectories[i][j].lid != trajectories[i][j - 1].lid:
-                cluster_sequence.append(getattr(trajectories[i][j], attr))
-        cluster_sequences.append(cluster_sequence)
-    return cluster_sequences
-"""
-
 def get_cluster_sequence(trajectories, attr, attr2 = None):
     print("[Trajectory] Getting cluster sequences...")
     # set array = trajectories # * trajectory length * attr's dimension
