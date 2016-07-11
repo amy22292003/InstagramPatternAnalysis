@@ -126,8 +126,8 @@ def main(*argv):
         level = "Cluster"
         tc = FCM_C.main
 
-    """
-    file = RESULT + "_seed" + argv[1] + ".txt"
+    
+    file = RESULT + "_" + argv[0] + "_seed" + argv[1] + ".txt"
     f = open(file, "w")
     f.write("#\tNPE\tNPC\tXB\n")
     f.close()
@@ -155,7 +155,7 @@ def main(*argv):
         global W_RESULT
         W_RESULT = W_RESULT + "-" + argv[0] + "c"+ str(CLUSTER_NUM) + "k" + str(MAX_KTH) + "_T" + argv[2] + ".txt"
         decide_w(level, tc, w_range)
-    #"""
+    """
 
 
     print("--------------------------------------")
