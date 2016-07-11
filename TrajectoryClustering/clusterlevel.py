@@ -20,8 +20,8 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-FILTER_TIME_S = 1448942400 #2015/12/01 @ UTC-4
-FILTER_TIME_E = 1451620800 #2016/01/01 @ UTC-4
+FILTER_TIME_S = 1446350400 #1448942400 #2015/12/01 @ UTC-4
+FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 6
@@ -94,9 +94,9 @@ def main(*argv):
         MAX_KTH = argv[1]
         FILTER_TIME_S = argv[3]
         FILTER_TIME_E = argv[4]
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOV1w_c35.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_OCT_c35.txt"
     else:
-        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_DEC_c35.txt"
+        LOCATION_TOPIC = "./data/LocationTopic/LocationTopic_NOVDEC_c35.txt"
 
     OUTPUT_MAP = OUTPUT_MAP + str(CLUSTER_NUM) + "k" + str(MAX_KTH)
     OUTPUT_PATTERN = OUTPUT_PATTERN + str(CLUSTER_NUM) + "k" + str(MAX_KTH)
@@ -121,7 +121,7 @@ def main(*argv):
 
     """
     ouput_pattern(sequences, location_sequences, u, membership)
-    output_each_pattern(sequences, location_sequences, u, membership, 10)
+    output_each_pattern(sequences, location_sequences, u, membership, 5)
     ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     """
 

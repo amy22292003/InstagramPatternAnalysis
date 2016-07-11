@@ -16,17 +16,17 @@ import Liu.TrajectoryClustering.locationlevel as FCM_T
 import Liu.TrajectoryClustering.clusterlevel as FCM_C
 
 """file path"""
-CLUSTER_RESULT = "./data/Evaluate/Index_cluster#"
-K_RESULT = "./data/Evaluate/Index_k"
-W_RESULT = "./data/Evaluate/Index_w"
+CLUSTER_RESULT = "./data/Evaluate/Index_2w_cluster#"
+K_RESULT = "./data/Evaluate/Index_2w_k"
+W_RESULT = "./data/Evaluate/Index_2w_w"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 50
+CLUSTER_NUM = 30
 MAX_KTH = 3
 GPS_WEIGHT = 0.7
-FILTER_TIME_S = 1448337600 #2015/11/24 @ UTC-4 
-FILTER_TIME_E = 1448942400 #2015/12/01 @ UTC-4
+FILTER_TIME_S = 1443672000 #2015/10/01 @ UTC-4 
+FILTER_TIME_E = 1446350400 #2015/11/01 @ UTC-4
 
 def output(level, cluster_trajectories, semantic_trajectories, u, k, w, f):
     print("(", u.shape[0], ",", k, ",", w, ")---------------")
@@ -110,14 +110,14 @@ def main(*argv):
     print("--------------------------------------")
 
     # the test set
-    cluster = list(range(15, 65, 5))
+    cluster = list(range(25, 75, 5))
     cluster.extend([80, 100])
     #cluster = [40, 50, 70]
-    k_range = list(range(1, 9))
-    k_range.extend([20, 30])
+    k_range = list(range(1, 7))
+    k_range.extend([8, 10, 20])
     
     #k_range.extend(list(range(10, 25, 5)))
-    w_range = [x / 10 for x in range(10, 0, -1)]
+    w_range = [x / 10 for x in range(10, 4, -1)]
 
     if argv[0] == 'L':
         level = "Location"
@@ -126,7 +126,7 @@ def main(*argv):
         level = "Cluster"
         tc = FCM_C.main
 
-
+    
     file = RESULT + "_" + argv[0] + "_seed" + argv[1] + ".txt"
     f = open(file, "w")
     f.write("#\tNPE\tNPC\tXB\n")
@@ -137,13 +137,15 @@ def main(*argv):
             if level == "Location":
                 for w in w_range:
                     location_sequences, cluster_trajectories, semantic_trajectories, u = tc(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
-                    output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)                
+                    output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)
             else:
+                w = float('nan')
                 location_sequences, cluster_trajectories, semantic_trajectories, u = tc(c, k, w, FILTER_TIME_S, FILTER_TIME_E)
+                output(level, cluster_trajectories, semantic_trajectories, u, k, w, f)
             f.close()    
 
+    
     """
-
     if argv[1] == 'c':
         global CLUSTER_RESULT
         CLUSTER_RESULT = CLUSTER_RESULT + "-" + argv[0] + "k"+ str(MAX_KTH) + "w" + str(GPS_WEIGHT) + "_T" + argv[2] + ".txt"
