@@ -118,9 +118,9 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", spatial_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
-    ouput_pattern(sequences, location_sequences, u, membership)
-    output_each_pattern(sequences, location_sequences, u, membership, 10)
-    ouput_pattern(sequences, location_sequences, u, membership)
+    #ouput_pattern(sequences, location_sequences, u, membership)
+    #output_each_pattern(sequences, location_sequences, u, membership, 10)
+    #ouput_pattern(sequences, location_sequences, u, membership)
     
 
     print("--------------------------------------")
