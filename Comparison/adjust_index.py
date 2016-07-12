@@ -16,13 +16,13 @@ import Liu.TrajectoryClustering.locationlevel as FCM_T
 import Liu.TrajectoryClustering.clusterlevel as FCM_C
 
 """file path"""
-ATTR_RESULT = "./data/Evaluate/Index_OCT_"
+ATTR_RESULT = "./data/Evaluate/Index_OCT+_"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 35
-MAX_KTH = 6
-GPS_WEIGHT = 0.7
+CLUSTER_NUM = 40
+MAX_KTH = 3
+GPS_WEIGHT = float('nan')
 FILTER_TIME_S = 1443672000 #2015/10/01 @ UTC-4 
 FILTER_TIME_E = 1446350400 #2015/11/01 @ UTC-4
 
@@ -108,11 +108,13 @@ def main(*argv):
     print("--------------------------------------")
 
     # the test set
-    cluster = list(range(20, 65, 5))
-    cluster.extend([80, 100])
-
-    k_range = list(range(1, 8))
-    k_range.extend([10, 20])
+    #cluster = list(range(20, 65, 5))
+    #cluster.extend([80, 100])
+    cluster = list(range(65, 80, 5))
+    
+    k_range = list(range(1, 11))
+    k_range.extend([15, 20])
+    #k_range = list(range(11,15))
     
     w_range = [x / 10 for x in range(10, 4, -1)]
     #w_range = [x/10 for x in range(4, -1, -1)]

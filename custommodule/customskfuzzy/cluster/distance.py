@@ -45,6 +45,7 @@ def _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v):
             ml[i, j] = round(max(ml[i - 1, j - 1] + sim, ml[i, j - 1]), 12)
     return ml[len_u, len_v]
 
+@jit
 def _sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1[:,0]).sum())
@@ -79,7 +80,7 @@ def _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v):
             ml[i, j] = min(ml[i - 1, j] + 2, ml[i, j - 1] + 2, ml[i - 1, j - 1] + dij)
     return ml[len_u, len_v]
 
-
+@jit
 def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1).sum())

@@ -20,8 +20,8 @@ import Liu.custommodule.location as clocation
 import Liu.custommodule.user as cuser
 
 """parameters"""
-FILTER_TIME_S = 1448942400 #2015/12/01 @ UTC-4
-FILTER_TIME_E = 1451620800 #2016/01/01 @ UTC-4
+FILTER_TIME_S = 1443672000 #2015/11/01 @ UTC-4
+FILTER_TIME_E = 1446350400 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 30
 ERROR = 0.000001
 MAX_KTH = 30
@@ -74,13 +74,13 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, u, locations.keys())
     locations = ccluster.fit_locations_cluster(locations, cluster_membership, locations.keys())
 
-    """
+    
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + " >>u:" + str(u[x.cluster, i])) for i, x in enumerate(locations.values())], \
         cluster_membership, CLUSTER_NUM, OUTPUT_MAP)
 
     ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
-    """
+    
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

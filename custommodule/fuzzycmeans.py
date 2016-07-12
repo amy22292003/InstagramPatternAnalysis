@@ -13,8 +13,8 @@ import custommodule.location as clocation
 
 """parameters"""
 RAND_SEED_K = 0
-RAND_SEED_INIT = 1
-CLUSTER_DIST_THRESHOLD = 0.8
+RAND_SEED_INIT = 0
+CLUSTER_DIST_THRESHOLD = 0.95 #H 0.8 #L
 
 def get_tag_vector(corpus):
     print("[fuzzy c means] getting tag vector...")
@@ -66,7 +66,7 @@ def cmeans_intersect(coordinate, similarity, cluster_num, *para, w = 0.4, e = 0.
 
 def cmeans_coordinate(coordinate, cluster_num, *para, e = 0.01, algorithm="Original"):
     print("[fuzzy c means] - gps")
-    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_coordinate(coordinate, cluster_num, 2, e, 100, algorithm, *para)
+    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cluster.cmeans_coordinate(coordinate, cluster_num, 2, e, 200, algorithm, *para)
     cluster_membership = np.argmax(u, axis=0)
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 

@@ -21,12 +21,12 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 
 """parameters"""
 SPLIT_DAY = 1
-FILTER_TIME_S = 1446350400 #1448942400 #2015/12/01 @ UTC-4
+FILTER_TIME_S = 1446350400 # 2015/11/01 #1448942400 #2015/12/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 60
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0.9
+GPS_WEIGHT = 0
 
 """file path"""
 OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_c"
@@ -113,6 +113,7 @@ def main(*argv):
     sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
     sequences = ctrajectory.remove_adjacent_location(sequences)
     sequences = ctrajectory.remove_short(sequences)
+    print("  remain users #:", len(set([x[0].uid for x in sequences])))
 
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
     spatial_array = ctrajectory.get_vector_array(location_sequences, longest_len)
@@ -120,11 +121,11 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Location", spatial_array, CLUSTER_NUM, MAX_KTH, semantic_array, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
-    """
+    
     ouput_pattern(sequences, location_sequences, u, membership)
     output_each_pattern(sequences, location_sequences, u, membership, 5)
     ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
-    """
+    
     
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()), ", SPEND:", datetime.datetime.now() - start_time)
