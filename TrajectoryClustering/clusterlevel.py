@@ -10,7 +10,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 sys.path.append(PACKAGE_PARENT)
 
-import Liu.custommodule.cluster as ccluster
+import Liu.custommodule.locationcluster as ccluster
 import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.fuzzycmeans as cfuzzy
 import Liu.custommodule.location as clocation

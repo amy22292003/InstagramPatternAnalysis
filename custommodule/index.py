@@ -51,7 +51,7 @@ def _center(level, u, k, seed=RAND_SEED_K):
 def _distance_c_c(level, c, k, w, data1, data2, center):
     center_data1 = np.array(data1)[center]
     center_data2 = np.array(data2)[center]
-    distance = cskfuzzy.cluster.get_distance(level, w, center_data1, center_data2)
+    distance = cskfuzzy.get_distance(level, w, center_data1, center_data2)
     #distance = distance / np.amax(distance)
 
     each_cluster = np.zeros((c, c))
@@ -65,7 +65,7 @@ def _distance_c_c(level, c, k, w, data1, data2, center):
 def _distance_c_x(level, c, k, w, data1, data2, center):
     center_data1 = np.array(data1)[center]
     center_data2 = np.array(data2)[center]
-    distance = cskfuzzy.cluster.distance.get_distance(level, w, data1, data2, center_data1, center_data2)
+    distance = cskfuzzy.distance.get_distance(level, w, data1, data2, center_data1, center_data2)
     #distance = distance / np.amax(distance)
 
     each_cluster = np.zeros((c, c))

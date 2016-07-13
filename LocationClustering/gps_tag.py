@@ -5,6 +5,7 @@ import numpy
 import random 
 import sys
 import custommodule.fuzzycmeans as cfuzzy
+import custommodule.lda as clda
 import custommodule.location as clocation
 import custommodule.cpygmaps as cpygmaps
 import custommodule.user as cuser
@@ -130,7 +131,7 @@ coordinate = numpy.array([(float(x.lat), float(x.lng)) for x in locations.values
 
 # tags distance: tfidf
 corpus = get_corpus(locations.values())
-tfidf, tags_name = cfuzzy.get_tfidf(corpus)
+tfidf, tags_name = clda.get_tfidf(corpus)
 print("END getting data:", datetime.datetime.now())
 tfidf, tags_name = filter_tag(tfidf.T, tags_name)
 #print("tfidf:", tfidf.shape)

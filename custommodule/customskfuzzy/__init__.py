@@ -1,69 +1,25 @@
 """
-scikit-fuzzy (a.k.a. `skfuzzy`): Fuzzy Logic Toolbox for Python.
-
-This package implements many useful tools and functions for computation and
-projects involving fuzzy logic, also known as grey logic.
-
-Most of the functionality is actually located in subpackages, but like numpy we
-bring most of the core functionality into the base namespace.
-
-Recommended Use
----------------
->>> import skfuzzy as fuzz
+Fuzzy clustering subpackage, containing fuzzy c-means clustering algorithm.
+This can be either supervised or unsupervised, depending if U_init kwarg is
+used (if guesses are provided, it is supervised).
 
 """
-__all__ = []
+__all__ = ['cmeans',
+           'cmeans_predict',
+           'cmeans_intersect',
+           'cmeans_location',
+           'cmeans_nocenter',
+           'cmeans_sequence'
+           ]
 
-"""
-try:
-    from .version import version as __version__
-except ImportError:
-    __version__ = "unbuilt-dev"
-else:
-    del version
+from ._cmeans import cmeans, cmeans_predict
 
-"""
-######################
-# Subpackage imports #
-######################
+from ._cmeans_intersect import cmeans as cmeans_intersect
 
-"""
-# Core fuzzy mathematics subpackage
-import skfuzzy.fuzzymath as _fuzzymath
-from skfuzzy.fuzzymath import *
-__all__.extend(_fuzzymath.__all__)
+from ._cmeans_location import cmeans as cmeans_location
 
-# Fuzzy membership function subpackage
-import skfuzzy.membership as _membership
-from skfuzzy.membership import *
-__all__.extend(_membership.__all__)
-"""
+from ._cmeans_nocenter import cmeans as cmeans_nocenter
 
-# Clustering subpackage including fuzzy c-means
-#import skfuzzy.cluster as _cluster
-#from skfuzzy.cluster import *
-from . import cluster as _cluster
-#from _cluster import *
-__all__.extend(_cluster.__all__)
+from ._cmeans_sequence import cmeans as cmeans_sequence
 
-"""
-# Interval subpackage
-import skfuzzy.intervals as _intervals
-from skfuzzy.intervals import *
-__all__.extend(_intervals.__all__)
-
-# Filtering subpackage, including 1D and 2D FIRE functions
-import skfuzzy.filters as _filters
-from skfuzzy.filters import *
-__all__.extend(_filters.__all__)
-
-# Defuzzification subpackage
-import skfuzzy.defuzzify as _defuzz
-from skfuzzy.defuzzify import *
-__all__.extend(_defuzz.__all__)
-
-# Image processing subpackage
-import skfuzzy.image as _image
-from skfuzzy.image import *
-__all__.extend(_image.__all__)
-"""
+from .distance import *

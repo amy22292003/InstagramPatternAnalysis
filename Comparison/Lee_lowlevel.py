@@ -10,7 +10,7 @@ FILE_DIR = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspe
 sys.path.insert(0, os.path.normpath(os.path.join(FILE_DIR, PACKAGE_PARENT)))
 sys.path.insert(0, PACKAGE_PARENT)
 
-import Liu.custommodule.cluster as ccluster
+import Liu.custommodule.locationcluster as ccluster
 import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.trajectory as ctrajectory
 import Liu.LocationClustering.gps_locationfreq as locationclustering

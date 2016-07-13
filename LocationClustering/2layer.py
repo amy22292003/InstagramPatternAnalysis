@@ -10,6 +10,7 @@ import operator
 import random 
 import sys
 import custommodule.fuzzycmeans as cfuzzy
+import custommodule.lda as clda
 import custommodule.location as clocation
 import custommodule.cpygmaps as cpygmaps
 import custommodule.user as cuser
@@ -69,7 +70,7 @@ def each_cluster(locations, users):
         for a_location in a_group:
             doc = " ".join([" ".join(x.tags) for x in a_location.posts])
             corpus.append(doc)
-        tfidf, tags_name = cfuzzy.get_tfidf(corpus)
+        tfidf, tags_name = clda.get_tfidf(corpus)
         cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans(tfidf.T, CLUSTER_NUM_2)
         #set_location_cluster(a_group, membership, "cluster2")
 

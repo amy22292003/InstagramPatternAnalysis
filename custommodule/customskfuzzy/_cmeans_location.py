@@ -6,7 +6,7 @@ import sys
 from scipy.spatial.distance import cdist
 
 """parameters"""
-RAND_SEED_INIT = 16
+RAND_SEED_INIT = 4
 
 # data1:coordinate; similarity2:tag intersect similarity
 def _cmeans0_ori(data, u_old, c, m, *para):

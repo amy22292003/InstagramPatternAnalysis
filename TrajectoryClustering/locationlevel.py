@@ -11,7 +11,7 @@ FILE_DIR = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspe
 sys.path.insert(0, os.path.normpath(os.path.join(FILE_DIR, PACKAGE_PARENT)))
 sys.path.insert(0, PACKAGE_PARENT)
 
-import Liu.custommodule.cluster as ccluster
+import Liu.custommodule.locationcluster as ccluster
 import Liu.custommodule.cpygmaps as cpygmaps
 import Liu.custommodule.fuzzycmeans as cfuzzy
 import Liu.custommodule.location as clocation
@@ -26,11 +26,11 @@ FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 60
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0
+GPS_WEIGHT = 1
 
 """file path"""
 OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_c"
-OUTPUT_PATTERN = "./data/Result/Lowlevel_NOVDEC"
+OUTPUT_PATTERN = "./data/Result/Lowlevel_NOVDEC_"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def output_each_pattern(sequences, location_sequences, u, membership, k = None):
@@ -123,7 +123,7 @@ def main(*argv):
 
     
     ouput_pattern(sequences, location_sequences, u, membership)
-    output_each_pattern(sequences, location_sequences, u, membership, 5)
+    output_each_pattern(sequences, location_sequences, u, membership, 8)
     ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     
     

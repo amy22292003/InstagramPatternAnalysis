@@ -9,8 +9,8 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 sys.path.append(PACKAGE_PARENT)
 
-import Liu.custommodule.cluster as ccluster
-import Liu.custommodule.fuzzycmeans as cfuzzy
+import Liu.custommodule.locationcluster as ccluster
+import Liu.custommodule.lda as clda
 import Liu.custommodule.location as clocation
 import Liu.custommodule.tag as ctag
 import Liu.custommodule.user as cuser
@@ -50,8 +50,8 @@ def main():
 
     corpus = ctag.get_location_posts_corpus(locations)
     
-    vector, tag_name = cfuzzy.get_tag_vector(corpus)
-    topic_word, doc_topic = cfuzzy.fit_lda(vector, tag_name, TOPIC_NUM)
+    vector, tag_name = clda.get_tag_vector(corpus)
+    topic_word, doc_topic = clda.fit_lda(vector, tag_name, TOPIC_NUM)
     ccluster.output_topics(topic_word, doc_topic, tag_name, [x.lid for x in locations.values()], OUTPUT_TAG_TOPIC, OUTPUT_LOCATION_TOPIC)
 
     print("--------------------------------------")
