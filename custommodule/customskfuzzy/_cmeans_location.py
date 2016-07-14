@@ -4,9 +4,10 @@ cmeans.py : Fuzzy C-means clustering algorithm.
 import numpy as np
 import sys
 from scipy.spatial.distance import cdist
+import custommodule.cpygmaps as cpygmaps
 
 """parameters"""
-RAND_SEED_INIT = 4
+RAND_SEED_INIT = 0
 
 # data1:coordinate; similarity2:tag intersect similarity
 def _cmeans0_ori(data, u_old, c, m, *para):
@@ -33,10 +34,40 @@ def _cmeans0_ori(data, u_old, c, m, *para):
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	return cntr, u, jm, d
 
-def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
+def _cmeans0_kth(data, u_old, c, m, *para):
 	"""
 	Single step in generic fuzzy c-means clustering algorithm.
 	data2 is for intersect counting
+	"""
+	k = para[0]
+
+	# Normalizing, then eliminating any potential zero values.
+	u_old /= np.ones((c, 1)).dot(np.atleast_2d(u_old.sum(axis=0)))
+	u_old = np.fmax(u_old, np.finfo(np.float64).eps)
+
+	um = u_old ** m
+
+	# remain the belonging rate >= the k-th max location of each cluster in um_c
+	filter_k = lambda row:row < sorted(row, reverse=True)[k-1]
+	fail_indices = np.apply_along_axis(filter_k, axis=1, arr=u_old)
+	um[fail_indices] = 0
+
+	# Calculate cluster centers
+	# data1:2861,2; um:30,2861
+	data = data.T
+	cntr = um.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um.sum(axis=1))).T)
+	d = _distance(data, cntr) # euclidean distance
+	
+	d = np.fmax(d, np.finfo(np.float64).eps)
+	jm = (um * d ** 2).sum()
+
+	u = d ** (- 2. / (m - 1))
+	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
+	return cntr, u, jm, d
+
+def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
+	"""
+	Single step in fuzzy c-means clustering algorithm.
 	"""
 	# parameters
 	k = para[0]
@@ -65,27 +96,18 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	# data1:2861,2; um:30,2861
 	data = data.T
 	cntr = um.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	d = _distance(data, cntr) # euclidean distance
+	d = _distance(data, cntr) * 100 # euclidean distance
 
-	"""
-	data = data.T
-	print("data.shape:", data.shape)
-	dx = _distance(data, data) / np.ones((data.shape[0], 1)).dot(np.atleast_2d(location_frequency)).T
-	print("um.shape:", um.shape, "dx.shape:", dx.shape, dx[0:5,0:2])
-	print(" /.shape:", np.ones((data.shape[0],1)).dot(np.atleast_2d(um.sum(axis=1))).T.shape, np.ones((data.shape[0],1)).dot(np.atleast_2d(um.sum(axis=1))).T[0:5,0:3])
-	d = um.dot(dx) / np.ones((data.shape[0],1)).dot(np.atleast_2d(um.sum(axis=1))).T
-	print("d.shape:", d.shape, d[0:5,0:3])
-	d = np.fmax(d, np.finfo(np.float64).eps)
-	"""
 
 	jm = (um * d ** 2).sum()
 
-	u = d ** (- 2. / (m - 1)) * cluster_frequency.dot(np.ones((1, d.shape[1])))
+	u = (d ** (- 2. / (m - 1))) * cluster_frequency.dot(np.ones((1, d.shape[1])))
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	#print("  - d:", d[0:5, 0:3], "\n  - u:", u[0:5, 0:3])
 	return cntr, u, jm, d
 
 def _distance(data, centers):
+
 	return cdist(data, centers).T
 
 def _fp_coeff(u):
@@ -94,9 +116,6 @@ def _fp_coeff(u):
 	return np.trace(u.dot(u.T)) / float(n)
 
 def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = RAND_SEED_INIT):
-	"""
-	data2 is for intersect counting
-	"""
 	# Setup u0
 	if init is None:
 		np.random.seed(seed=seed)
@@ -115,6 +134,8 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = RAN
 	#select cmeans function
 	if algorithm is "Original":
 		_cmeans0 = _cmeans0_ori
+	elif algorithm is "kthCluster":
+		_cmeans0 = _cmeans0_kth
 	elif algorithm is "kthCluster_LocationFrequency":
 		_cmeans0 = _cmeans0_kth_lfreq
 	else:
@@ -135,6 +156,7 @@ def cmeans(data, c, m, error, maxiter, algorithm, *para, init = None, seed = RAN
 		# Stopping rule
 		if np.linalg.norm(u - u2) / (u.shape[0] * u.shape[1]) < error:
 			break
+
 	print("  error:", error_list)
 	print(">>> p=", p)
 	#print("  Final u.sum:", u.sum(axis=0), "\n", u.sum(axis=1))

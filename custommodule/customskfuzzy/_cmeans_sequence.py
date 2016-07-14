@@ -33,10 +33,8 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	for i in range(c):
 		indices = list(np.nonzero(large_k[i, :])[0])
 		if len(indices) > k:
-			rand_k = random.sample(indices, k)
-			large_k_indices.extend(rand_k)
-		else:
-			large_k_indices.extend(indices)
+			indices = random.sample(indices, k)
+		large_k_indices.extend(indices)
 	print("  unique center #:", len(set(large_k_indices)))
 	print("  center:", large_k_indices)
 
@@ -58,9 +56,12 @@ def _cmeans0_2distw(data1, u_old, c, m, level, *para):
 	return u, jm, d, large_k_indices
 
 def _distance(level, w, data1, data2, target_indices):
-	targets1 = np.array(data1)[target_indices]
-	targets2 = np.array(data2)[target_indices]
-	distance = cdistance.get_distance(level, w, data1, data2, targets1, targets2)
+	uni_target = list(set(target_indices))
+	targets1 = np.array(data1)[uni_target]
+	targets2 = np.array(data2)[uni_target]
+	uni_distance = cdistance.get_distance(level, w, data1, data2, targets1, targets2)
+	indices = [uni_target.index(i) for i in target_indices]
+	distance = uni_distance[indices, :]
 	#distance = distance / np.amax(distance)
 	return distance
 

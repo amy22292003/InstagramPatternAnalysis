@@ -104,22 +104,16 @@ def _lcs(ml, s1, s2, i, j):
         else:
             return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
 """
-
 """
-def get_target_distance(level, targets, sequences):
-    # Set distance function of the clustering level (location or cluster)
-    start_t = datetime.datetime.now()
-    if level is "Location":
-        distance_func = _sequence_distance_target
-    elif level is "Cluster":
-        distance_func = 1 - _longest_common_sequence_target
-    else:
-        print("Error, nonexistent clustering level:", level)
-        sys.exit()
-    distance = distance_func(targets, sequences)
-    print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
-    print("   [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
-    return distance
+@jit
+def location_distance(data, center):
+    distance = numpy.empty((center.shape[0], data.shape[0]))
+    for i in range(center.shape[0]):
+        for j in range(data.shape[0]):
+            d = 
+            for k in range(data.shape[1]):
+
+            distance[i, j] = 
 """
 
 def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2 = None):

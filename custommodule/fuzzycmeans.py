@@ -13,9 +13,9 @@ RAND_SEED_INIT = 0
 CLUSTER_DIST_THRESHOLD = 0.95 #H 0.8 #L
 
 """Location Clustering"""
-def cmeans_location(coordinate, cluster_num, *para, e = 0.01, algorithm="Original"):
+def cmeans_location(coordinate, cluster_num, *para, e = 0.01, algorithm="Original", seed = 0):
     print("[fuzzy c means] - gps")
-    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cmeans_location(coordinate, cluster_num, 2, e, 200, algorithm, *para)
+    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cmeans_location(coordinate, cluster_num, 2, e, 200, algorithm, seed = seed, *para)
     cluster_membership = np.argmax(u, axis=0)
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
@@ -51,10 +51,13 @@ def _get_init_u(level, cluster_num, sequences1, sequences2, k, w):
     print("--each cluster initial # before random choose:", u.sum(axis=1))
     for i in range(cluster_num):
         if sum(u[i, :]) > k:
-            indices = [i for i, x in enumerate(u[i, :]) if x == 1]
-            rand_k = random.sample(indices, k)
+            #print(np.where(u[i, :] == 1))
+            indices = set(np.where(u[i, :] == 1)[0])
+            indices.remove(init[i])
+            rand_k = random.sample(indices , k - 1)
             u[i, :] = 0
             u[i, :][rand_k] = 1
+            u[i, init[i]] = 1
     print("--each cluster initial #:", u.sum(axis=1))
     return u
 

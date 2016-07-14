@@ -123,7 +123,7 @@ def main(*argv):
     
     ouput_pattern(sequences, location_sequences, u, membership)
     output_each_pattern(sequences, location_sequences, u, membership, 8)
-    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    #ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     
 
     print("--------------------------------------")
