@@ -46,7 +46,6 @@ def _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v):
             ml[i, j] = round(max(ml[i - 1, j - 1] + sim, ml[i, j - 1]), 12)
     return ml[len_u, len_v]
 
-@jit
 def _sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1[:,0]).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1[:,0]).sum())
@@ -56,6 +55,7 @@ def _sequence_distance(u_1, u_2, v_1, v_2, w):
         d = 1 - _dynamic_programming(w, u_1, u_2, v_1, v_2, len_u, len_v) / float(len_v)
     return d
 
+"""
 @jit
 def _lcs_length(w, u_1, u_2, v_1, v_2):
     ml = numpy.zeros([len(u_1) + 1, len(v_1) + 1])
@@ -66,6 +66,21 @@ def _lcs_length(w, u_1, u_2, v_1, v_2):
             else:
                 ml[i, j] = max(ml[i - 1, j], ml[i, j - 1])
     return ml[len(s1), len(s2)]
+
+@jit
+def _lcs(ml, u_1, u_2, v_1, v_2, i, j):
+    if i == 0 or j == 0:
+        return deque([]), deque([])
+    else:
+        dij = min(1, abs(u_1[i - 1] - v_1[j - 1])) + min(1, abs(u_2[i - 1] - v_2[j - 1]))
+        if (ml[i, j] - dij) == ml[i - 1, j - 1]:
+            u, v = _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j - 1)
+            return u + deque([i - 1]), v + deque([j - 1])
+        elif ml[i - 1, j] <= ml[i, j - 1]:
+            return _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j)
+        else:
+            return _lcs(ml, u_1, u_2, v_1, v_2, i, j - 1)
+"""
 
 @jit
 def _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v):
@@ -81,7 +96,6 @@ def _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v):
             ml[i, j] = min(ml[i - 1, j] + 2, ml[i, j - 1] + 2, ml[i - 1, j - 1] + dij)
     return ml[len_u, len_v]
 
-@jit
 def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     len_u = len(u_1) - int(numpy.isnan(u_1).sum())
     len_v = len(v_1) - int(numpy.isnan(v_1).sum())
@@ -89,21 +103,6 @@ def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     #len_v = len(v_1)
     d = _edit_distance(u_1, u_2, v_1, v_2, len_u, len_v) / (2 * max(len_u, len_v))
     return d
-
-
-@jit
-def _lcs(ml, u_1, u_2, v_1, v_2, i, j):
-    if i == 0 or j == 0:
-        return deque([]), deque([])
-    else:
-        dij = min(1, abs(u_1[i - 1] - v_1[j - 1])) + min(1, abs(u_2[i - 1] - v_2[j - 1]))
-        if (ml[i, j] - dij) == ml[i - 1, j - 1]:
-            u, v = _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j - 1)
-            return u + deque([i - 1]), v + deque([j - 1])
-        elif ml[i - 1, j] <= ml[i, j - 1]:
-            return _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j)
-        else:
-            return _lcs(ml, u_1, u_2, v_1, v_2, i, j - 1)
 
 def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2 = None):
     # Set distance function of the clustering level (location or cluster)
