@@ -29,7 +29,7 @@ MAX_KTH = 3
 GPS_WEIGHT = 0.9
 
 """file path"""
-OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_c"
+OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_full_c"
 OUTPUT_PATTERN = "./data/Result/Lowlevel_NOVDEC_"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
@@ -54,6 +54,29 @@ def output_each_pattern(sequences, location_sequences, u, membership, k = None):
             color = range(len(sorted_indices))
             if len(sorted_indices) > 0:
                 cpygmaps.output_patterns(output, color, len(output), OUTPUT_MAP + "_" + str(c) + ".html")
+
+def output_specify_pattern(sequences, location_sequences, u, membership, c_list, k = None):
+    #u_threshold = 0.15
+    time_zone = timezone('America/New_York')
+    for c in c_list:
+        indices = [i for i, x in enumerate(membership) if x == c]
+        if len(indices) is not 0:
+            sorted_u = sorted(u[c, indices], reverse = True)
+            sorted_indices = sorted(indices, key = lambda x:u[c, x])
+            sorted_indices = sorted_indices[::-1]
+            if k is not None and len(sorted_indices) > k:
+                top_k = sorted_u[k - 1]
+                sorted_indices = [i for i in sorted_indices if u[c, i] >= top_k]
+            output = []
+            for ti, i in enumerate(sorted_indices):
+                output.append([(location_sequences[i][li].lat, location_sequences[i][li].lng, 
+                    str(ti) + "(" + str(li) + "/" + str(len(sequences[i]) - 1) +  ")>>" +
+                    datetime.datetime.fromtimestamp(int(x.time), tz=time_zone).strftime('%Y-%m-%d %H:%M') + 
+                    " " + x.lname) for li, x in enumerate(sequences[i])])
+            color = range(len(sorted_indices))
+            if len(sorted_indices) > 0:
+                cpygmaps.output_patterns(output, color, len(output), OUTPUT_MAP + "_" + str(c) + ".html")
+
 
 def ouput_pattern(sequences, location_sequences, u, membership, k = 3):
     print("Output patterns on map...")
@@ -121,10 +144,10 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Location", spatial_array, CLUSTER_NUM, MAX_KTH, semantic_array, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
-    
-    ouput_pattern(sequences, location_sequences, u, membership)
-    output_each_pattern(sequences, location_sequences, u, membership, 8)
-    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    output_specify_pattern(sequences, location_sequences, u, membership, [7, 28, 30, 33, 38])
+    #ouput_pattern(sequences, location_sequences, u, membership)
+    #output_each_pattern(sequences, location_sequences, u, membership, 8)
+    #ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     
     
     print("--------------------------------------")
