@@ -1,3 +1,4 @@
+from collections import deque
 import datetime
 from decimal import *
 import math
@@ -90,31 +91,19 @@ def _cluster_sequence_distance(u_1, u_2, v_1, v_2, w):
     return d
 
 
-"""
-def _lcs(ml, s1, s2, i, j):
-    if i == 0 or j == 0:
-        return set()
-    elif s1[i - 1] == s2[j - 1]:
-        return set([sub_s + s1[i - 1] for sub_s in _lcs(ml, s1, s2, i - 1, j - 1)])
-    else:
-        if ml[i, j - 1] > ml[i - 1, j]:
-            return _lcs(ml, s1, s2, i, j - 1)
-        elif ml[i - 1, j] > ml[i, j - 1]:
-            return _lcs(ml, s1, s2, i - 1, j)
-        else:
-            return _lcs(ml, s1, s2, i, j - 1) | _lcs(ml, s1, s2, i - 1, j)
-"""
-"""
 @jit
-def location_distance(data, center):
-    distance = numpy.empty((center.shape[0], data.shape[0]))
-    for i in range(center.shape[0]):
-        for j in range(data.shape[0]):
-            d = 
-            for k in range(data.shape[1]):
-
-            distance[i, j] = 
-"""
+def _lcs(ml, u_1, u_2, v_1, v_2, i, j):
+    if i == 0 or j == 0:
+        return deque([]), deque([])
+    else:
+        dij = min(1, abs(u_1[i - 1] - v_1[j - 1])) + min(1, abs(u_2[i - 1] - v_2[j - 1]))
+        if (ml[i, j] - dij) == ml[i - 1, j - 1]:
+            u, v = _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j - 1)
+            return u + deque([i - 1]), v + deque([j - 1])
+        elif ml[i - 1, j] <= ml[i, j - 1]:
+            return _lcs(ml, u_1, u_2, v_1, v_2, i - 1, j)
+        else:
+            return _lcs(ml, u_1, u_2, v_1, v_2, i, j - 1)
 
 def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2 = None):
     # Set distance function of the clustering level (location or cluster)
