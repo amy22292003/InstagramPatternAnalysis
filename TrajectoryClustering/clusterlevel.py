@@ -29,7 +29,7 @@ GPS_WEIGHT = float('nan')
 
 
 """file path"""
-OUTPUT_MAP = "./data/Result/Highlevelmap_c"
+OUTPUT_MAP = "./data/Result/Highlevelmap_"
 OUTPUT_PATTERN = "./data/Result/Highlevel_"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
@@ -57,6 +57,28 @@ def output_each_pattern(sequences, location_sequences, u, membership, k = None):
                 if len(a_trajectory) > 0:
                     output.append(a_trajectory)
                     number += 1
+            color = range(len(sorted_indices))
+            if len(sorted_indices) > 0:
+                cpygmaps.output_patterns(output, color, len(output), OUTPUT_MAP + "_" + str(c) + ".html")
+
+def output_specify_pattern(sequences, location_sequences, u, membership, c_list, k = None):
+    #u_threshold = 0.15
+    time_zone = timezone('America/New_York')
+    for c in c_list:
+        indices = [i for i, x in enumerate(membership) if x == c]
+        if len(indices) is not 0:
+            sorted_u = sorted(u[c, indices], reverse = True)
+            sorted_indices = sorted(indices, key = lambda x:u[c, x])
+            sorted_indices = sorted_indices[::-1]
+            if k is not None and len(sorted_indices) > k:
+                top_k = sorted_u[k - 1]
+                sorted_indices = [i for i in sorted_indices if u[c, i] >= top_k]
+            output = []
+            for ti, i in enumerate(sorted_indices):
+                output.append([(location_sequences[i][li].lat, location_sequences[i][li].lng, 
+                    str(ti) + "(" + str(li) + "/" + str(len(sequences[i]) - 1) +  ")>>" +
+                    datetime.datetime.fromtimestamp(int(x.time), tz=time_zone).strftime('%Y-%m-%d %H:%M') + 
+                    " " + x.lname) for li, x in enumerate(sequences[i])])
             color = range(len(sorted_indices))
             if len(sorted_indices) > 0:
                 cpygmaps.output_patterns(output, color, len(output), OUTPUT_MAP + "_" + str(c) + ".html")
@@ -199,6 +221,9 @@ def main(*argv):
     locations = ccluster.fit_locations_cluster(locations, semantic_cluster, location_id, "semantic_cluster")
     print("  users # :", len(users))
 
+
+
+
     # Getting sequences cluster
     #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
@@ -216,7 +241,7 @@ def main(*argv):
 
     
     #ouput_pattern(sequences, location_sequences, u, membership)
-    output_each_pattern(sequences, location_sequences, u, membership, 20)
+    #output_each_pattern(sequences, location_sequences, u, membership, 20)
     #ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     
     """
