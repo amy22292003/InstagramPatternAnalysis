@@ -3,8 +3,8 @@ cmeans.py : Fuzzy C-means clustering algorithm.
 """
 import numpy as np
 import sys
-from scipy.spatial.distance import cdist
 import custommodule.cpygmaps as cpygmaps
+from . import distance as cdistance
 
 """parameters"""
 RAND_SEED_INIT = 0
@@ -25,7 +25,8 @@ def _cmeans0_ori(data, u_old, c, m, *para):
 	# data1:2861,2; um:30,2861
 	data = data.T
 	cntr = um.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	d = _distance(data, cntr) # euclidean distance
+	d = cdistance.get_center_distance(data, cntr)
+	#d = _distance(data, cntr) # euclidean distance
 
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -56,7 +57,7 @@ def _cmeans0_kth(data, u_old, c, m, *para):
 	# data1:2861,2; um:30,2861
 	data = data.T
 	cntr = um.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	d = _distance(data, cntr) # euclidean distance
+	d = cdistance.get_center_distance(data, cntr)
 	
 	d = np.fmax(d, np.finfo(np.float64).eps)
 	jm = (um * d ** 2).sum()
@@ -86,6 +87,7 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	filter_k = lambda row:row < sorted(row, reverse=True)[k-1]
 	fail_indices = np.apply_along_axis(filter_k, axis=1, arr=u_old)
 	um[fail_indices] = 0
+	um_f = um * (np.ones((um.shape[0], 1)).dot(np.atleast_2d(location_frequency)))
 
 	# cluster freqeuncy
 	true_indices = np.invert(fail_indices)
@@ -93,11 +95,11 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	cluster_frequency = cluster_frequency / np.amax(cluster_frequency)
 
 	# Calculate cluster centers
-	# data1:2861,2; um:30,2861
 	data = data.T
-	cntr = um.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um.sum(axis=1))).T)
-	d = _distance(data, cntr) * 100 # euclidean distance
-
+	# data1:2861,2; um:30,2861
+	cntr = um_f.dot(data) / (np.ones((data.shape[1],1)).dot(np.atleast_2d(um_f.sum(axis=1))).T)
+	#d = _distance(data, cntr) * 100 # euclidean distance
+	d = cdistance.get_center_distance(data, cntr)
 
 	jm = (um * d ** 2).sum()
 
@@ -105,10 +107,6 @@ def _cmeans0_kth_lfreq(data, u_old, c, m, *para):
 	u /= np.ones((c, 1)).dot(np.atleast_2d(u.sum(axis=0)))
 	#print("  - d:", d[0:5, 0:3], "\n  - u:", u[0:5, 0:3])
 	return cntr, u, jm, d
-
-def _distance(data, centers):
-
-	return cdist(data, centers).T
 
 def _fp_coeff(u):
 	n = u.shape[1]

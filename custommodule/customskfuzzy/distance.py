@@ -1,3 +1,4 @@
+from scipy.spatial.distance import cdist
 from collections import deque
 import datetime
 from decimal import *
@@ -137,3 +138,6 @@ def get_distance(level, w, sequences_1, sequences_2, targets_1 = None, targets_2
     print("   [distance] max/min/mean/std:", distance.shape, numpy.amax(distance), numpy.amin(distance), numpy.mean(distance), numpy.std(distance))
     print("   [distance] ", datetime.datetime.now(), ">> spend:", datetime.datetime.now() - start_t)
     return distance
+
+def get_center_distance(data, centers):
+    return cdist(data, centers).T

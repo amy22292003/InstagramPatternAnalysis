@@ -10,17 +10,52 @@ import custommodule.location as clocation
 """parameters"""
 RAND_SEED_K = 0
 RAND_SEED_INIT = 0
-CLUSTER_DIST_THRESHOLD = 0.95 #H 0.8 #L
+CLUSTER_DIST_THRESHOLD = 0.8 #0.95 #H 0.8 #L
 
 """Location Clustering"""
+def _get_point_init(coordinate, location_frequency, cluster_num, k, y):
+    random.seed(RAND_SEED_K)
+    sorted_idx = sorted(range(len(location_frequency)), key=lambda x: location_frequency[x])
+    init = random.sample(sorted_idx[:y], cluster_num)
+    print("[fuzzy c means] init:", init)
+
+    # get enough k sequences for each cluster
+    centers = coordinate.T[init, :]
+    distance = cskfuzzy.get_center_distance(coordinate.T, centers)
+    filter_k = lambda row:row <= sorted(row)[k - 1]
+    large_k_indices = np.apply_along_axis(filter_k, axis=1, arr=distance)
+    u = large_k_indices.astype(int)
+
+    random.seed(RAND_SEED_K)
+    print("--each cluster initial # before random choose:", u.sum(axis=1))
+    for i in range(cluster_num):
+        if sum(u[i, :]) > k:
+            #print(np.where(u[i, :] == 1))
+            indices = set(np.where(u[i, :] == 1)[0])
+            indices.remove(init[i])
+            rand_k = random.sample(indices , k - 1)
+            u[i, :] = 0
+            u[i, :][rand_k] = 1
+            u[i, init[i]] = 1
+    print("--each cluster initial #:", u.sum(axis=1))
+    return u
+
 def cmeans_location(coordinate, cluster_num, *para, e = 0.01, algorithm="Original", seed = 0):
     print("[fuzzy c means] - gps")
-    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cmeans_location(coordinate, cluster_num, 2, e, 200, algorithm, seed = seed, *para)
+    k = para[0]
+    location_frequency = para[1]
+    y = para[2]
+
+    # standardize and normalize
+    location_frequency = (location_frequency - min(location_frequency)) / (max(location_frequency) - min(location_frequency))
+
+    u = _get_point_init(coordinate, location_frequency, cluster_num, k, y)
+    cntr, u, u0, d, jm, p, fpc = cskfuzzy.cmeans_location(coordinate, cluster_num, 2, e, 200, algorithm, k, location_frequency, init = u, seed = seed)
     cluster_membership = np.argmax(u, axis=0)
     return cntr, u, u0, d, jm, p, fpc, cluster_membership
 
 """Sequence Clustering"""
-def _get_init_u(level, cluster_num, sequences1, sequences2, k, w):
+def _get_sequence_init(level, cluster_num, sequences1, sequences2, k, w):
     distance = np.ones((cluster_num, len(sequences1)))
 
     np.random.seed(RAND_SEED_INIT)
@@ -67,7 +102,7 @@ def sequences_clustering_i(level, sequences, cluster_num, *para, e = 0.001, algo
     sequences2 = para[1]
     w = para[2]
 
-    u = _get_init_u(level, cluster_num, sequences, sequences2, k, w)
+    u = _get_sequence_init(level, cluster_num, sequences, sequences2, k, w)
     u, u0, d, jm, p, fpc, center = cskfuzzy.cmeans_sequence(sequences, cluster_num, 2, e, 30, algorithm, level, k, sequences2, w, init = u)
 
     print("-- looping time:", p)

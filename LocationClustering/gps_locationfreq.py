@@ -25,16 +25,18 @@ FILTER_TIME_S = 1446350400 #2015/11/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #2016/01/01 @ UTC-4
 CLUSTER_NUM = 30
 ERROR = 0.000001
-MAX_KTH = 60
+MAX_KTH = 30
+Y = 60
 
 """file path"""
 USER_POSTS_FILE = "./data/TravelerPosts"
+#USER_POSTS_FILE = "./data/TestPosts"
 OUTPUT_MAP = "./data/Result/LocationMap_" + str(CLUSTER_NUM) +\
-    "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
+    "k" + str(MAX_KTH) + "y" + str(Y) + "e" + str(ERROR) + ".html"
 OUTPUT_REPRESENTATIVES = "./data/Result/LocationRepre_" + str(CLUSTER_NUM) +\
-    "k" + str(MAX_KTH) + "e" + str(ERROR) + ".html"
+    "k" + str(MAX_KTH) + "y" + str(Y) + "e" + str(ERROR) + ".html"
 OUTPUT_CLUSTER = "./data/Result/LocationCluster_" + str(CLUSTER_NUM) +\
-    "k" + str(MAX_KTH) + "e" + str(ERROR) + ".txt"
+    "k" + str(MAX_KTH) + "y" + str(Y) + "e" + str(ERROR) + ".txt"
 
 
 def filter_users_timeperiod(users, starttime, endtime):
@@ -100,18 +102,20 @@ def main(*argv):
     location_frequency = numpy.array([x.usercount for x in locations.values()])
     
     # clustering locations
-    cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans_location(coordinate.T, CLUSTER_NUM, MAX_KTH, location_frequency, e=ERROR, algorithm="Original")#"kthCluster_LocationFrequency")
+    cntr, u, u0, d, jm, p, fpc, membership = cfuzzy.cmeans_location(coordinate.T, CLUSTER_NUM, MAX_KTH, location_frequency, Y, e=ERROR, algorithm="kthCluster_LocationFrequency")
     locations = ccluster.fit_locations_membership(locations, u, locations.keys())
     locations = ccluster.fit_locations_cluster(locations, membership, locations.keys())
     
-    """
+    
     # output result
+    """
     cpygmaps.output_clusters(\
         [(float(x.lat), float(x.lng), str(x.cluster) + " >> " + x.lname + "(" + x.lid + ")>>u:" + str(u[x.cluster, i])) \
             for i, x in enumerate(locations.values())], membership, CLUSTER_NUM, OUTPUT_MAP)
     output_representatives(coordinate, u, MAX_KTH)
-    ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
     """
+    #ccluster.output_location_cluster(locations.values(), "cluster", OUTPUT_CLUSTER)
+    
 
     print("--------------------------------------")
     print("ENDTIME:", (datetime.datetime.now()))

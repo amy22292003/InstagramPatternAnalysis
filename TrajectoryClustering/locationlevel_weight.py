@@ -23,21 +23,21 @@ import Liu.LocationClustering.gps_locationfreq as locationclustering
 SPLIT_DAY = 1
 FILTER_TIME_S = 1446350400 # 2015/11/01 #1448942400 #2015/12/01 @ UTC-4
 FILTER_TIME_E = 1451620800 #1451620800 #2016/01/01 @ UTC-4
-CLUSTER_NUM = 60
+CLUSTER_NUM = 2
 ERROR = 0.000001
 MAX_KTH = 3
-GPS_WEIGHT = 0.9
+GPS_WEIGHT = 0
 
 """file path"""
-OUTPUT_MAP = "./data/Result/Lowlevelmap_NOVDEC_c_remove"
-OUTPUT_PATTERN = "./data/Result/Lowlevel_NOVDEC_remove_"
+USER_POSTS_FILE = "./data/TestPosts"
+OUTPUT_MAP = "./data/Result/Lowlevelmap_test_c"
+OUTPUT_PATTERN = "./data/Result/Lowlevel_test_w0c"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def output_each_pattern(sequences, location_sequences, u, membership, k = None):
     #u_threshold = 0.15
     time_zone = timezone('America/New_York')
     for c in range(u.shape[0]):
-    #for c in [39]:
         indices = [i for i, x in enumerate(membership) if x == c]
         if len(indices) is not 0:
             sorted_u = sorted(u[c, indices], reverse = True)
@@ -76,6 +76,7 @@ def ouput_pattern(sequences, location_sequences, u, membership, k = 3):
                     " " + x.lname) for li, x in enumerate(sequences[i])])
     cpygmaps.output_patterns(output, membership, u.shape[0], OUTPUT_MAP + "_all.html")
 
+"""
 def get_specific(sequences):
     print("before filter:", len(sequences))
     filter_sequences = []
@@ -139,18 +140,7 @@ def from_to(location_sequences, membership, c, ll):
     f.write(":\t" + str(cc) + "\n")
     f.close()
     return tag
-
-def filter_sequence(sequences, location_sequences, u, membership):
-    ll = set(["Museum", "Central Park", "Jacqueline Kennedy Onassis Reservoir"])
-    new_seq = []
-    new_l_seq = []
-    for index, a_sequence in enumerate(sequences):
-        #print("old:", len(a_sequence))
-        new_indices = [i for i, x in enumerate(a_sequence) if any([y in x.lname for y in ll])]
-        #print("  new:", len(new_indices))
-        new_seq.append(numpy.array(a_sequence)[new_indices])
-        new_l_seq.append(numpy.array(location_sequences[index])[new_indices])
-    return new_seq, new_l_seq
+"""
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -185,14 +175,16 @@ def main(*argv):
     locations = ccluster.fit_locations_membership(locations, numpy.transpose(doc_topic), location_id, "semantic_mem")
     print("  users # :", len(users))
 
+    users = cuser.open_users_posts_afile(USER_POSTS_FILE)
+
     # Getting sequences of posts & locations
     #sequences = ctrajectory.split_trajectory([a_user.posts for a_user in users.values() if len(a_user.posts) != 0], SPLIT_DAY)
     sequences = ctrajectory.split_trajectory_byday([a_user.posts for a_user in users.values() if len(a_user.posts) != 0])
-    sequences = ctrajectory.remove_adjacent_location(sequences)
+    #sequences = ctrajectory.remove_adjacent_location(sequences)
 
     #sequences = get_specific(sequences) 
 
-    sequences = ctrajectory.remove_short(sequences)
+    #sequences = ctrajectory.remove_short(sequences)
     print("  remain users #:", len(set([x[0].uid for x in sequences])))
 
     location_sequences, longest_len = ctrajectory.convertto_location_sequences(sequences, locations)
@@ -201,13 +193,12 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Location", spatial_array, CLUSTER_NUM, MAX_KTH, semantic_array, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
-    #sequences, location_sequences = filter_sequence(sequences, location_sequences, u, membership)
-    #ouput_pattern(sequences, location_sequences, u, membership)
-    #output_each_pattern(sequences, location_sequences, u, membership)
-    #ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
     
-    """
-    ll = count(sequences, location_sequences, u, membership, 39)
+    #ouput_pattern(sequences, location_sequences, u, membership)
+    output_each_pattern(sequences, location_sequences, u, membership, 20)
+    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    
+    """ll = count(sequences, location_sequences, u, membership, 39)
     tag = from_to(location_sequences, membership, 39, ll)
     tag.extend(from_to(location_sequences, membership, 39, [ll[1]] + [ll[0]]))
     tag.extend(from_to(location_sequences, membership, 39, [ll[0]] + [ll[0]]))
