@@ -140,7 +140,7 @@ def output_clusters(post_sequences, membership, u, file_path):
             sorted_indices = sorted(indices, key=lambda x:u[c, x])
             sorted_indices = sorted_indices[::-1]
             for i in sorted_indices:
-                f.write(str(u[c, i]) + "\t> ")
+                f.write(str(i) + "|" + str(u[c, i]) + "\t> ")
                 for a_post in post_sequences[i]:
                     tag_str = ".".join(a_post.tags)
                     f.write("(" + datetime.datetime.fromtimestamp(int(a_post.time), tz=time_zone).strftime('%Y-%m-%d %H:%M') +

@@ -8,7 +8,7 @@ import custommodule.customskfuzzy as cskfuzzy
 import custommodule.location as clocation
 
 """parameters"""
-RAND_SEED_K = 0
+RAND_SEED_K = 5
 RAND_SEED_INIT = 0
 CLUSTER_DIST_THRESHOLD = 0.8 #0.95 #H 0.8 #L
 
@@ -59,7 +59,11 @@ def _get_sequence_init(level, cluster_num, sequences1, sequences2, k, w):
     distance = np.ones((cluster_num, len(sequences1)))
 
     np.random.seed(RAND_SEED_INIT)
+    #init = np.array([4263, 3584]) #low
+    #init = np.array([6541, 1470]) #high
+    #init = np.append(init, np.random.randint(0, len(sequences1) - 1, 1))
     init = np.random.randint(0, len(sequences1) - 1, 1)
+    print("--init 3:", init)
     distance[0,:] = cskfuzzy.get_distance(level, w, sequences1, sequences2, np.array(sequences1)[init], np.array(sequences2)[init])   
     
     random.seed(RAND_SEED_INIT)

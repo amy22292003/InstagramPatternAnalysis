@@ -20,7 +20,7 @@ ATTR_RESULT = "./data/Evaluate/Index_OCT_"
 RESULT = "./data/Evaluate/Index"
 
 """parameters"""
-CLUSTER_NUM = 60
+CLUSTER_NUM = 65
 MAX_KTH = 3
 GPS_WEIGHT = 0.7
 FILTER_TIME_S = 1443672000 #2015/10/01 @ UTC-4 
@@ -108,12 +108,11 @@ def main(*argv):
     print("--------------------------------------")
 
     # the test set
-    cluster = list(range(30, 85, 5))
+    cluster = list(range(35, 85, 5))
     #cluster.extend([80, 100])
     
-    k_range = list(range(1, 11))
+    k_range = list(range(3, 4))
     #k_range.extend([15, 20])
-    #k_range = list(range(11,15))
     
     w_range = [x / 10 for x in range(10, 4, -1)]
     #w_range = [x/10 for x in range(4, -1, -1)]

@@ -31,13 +31,14 @@ GPS_WEIGHT = float('nan')
 """file path"""
 OUTPUT_MAP = "./data/Result/Highlevelmap_"
 OUTPUT_PATTERN = "./data/Result/Highlevel_"
+OUTPUT_ANALYSIS = "./data/Result/Analysis_high_"
 #"./data/LocationTopic/LocationTopic_c30.txt"
 
 def output_each_pattern(sequences, location_sequences, u, membership, k = None):
     #u_threshold = 0.15
     time_zone = timezone('America/New_York')
     for c in range(u.shape[0]):
-    #for c in [40]:
+    #for c in [26]:
         indices = [i for i, x in enumerate(membership) if x == c]
         if len(indices) is not 0:
             sorted_u = sorted(u[c, indices], reverse = True)
@@ -103,6 +104,22 @@ def ouput_pattern(sequences, location_sequences, u, membership, k = 3):
                     " " + x.lname) for li, x in enumerate(sequences[i])])
     cpygmaps.output_patterns(output, membership, u.shape[0], OUTPUT_MAP + "_all.html")
 
+ll = [set(["Statue of Liberty"]),
+    set(["World Trade", "Worldtrade", "World Financial Center", "September","Battery Park","Wall Street", "Wallstreet", "Stock Exchange", "Financial District", "Trinity", "American Indian", " Bowling Green", "Fraunces Tavern Restaurant", "IKEA water taxi", "South Street Seaport", "Fulton", "South Street Seaport", "City Hall", "Conrad New York Hotel", " Stone Street Tavern", "Le District"]), 
+    set(["Brooklyn Bridge", "Brooklyn Ice Cream Factory", "The River Café", "Juliana's Pizza", "Jane's Carousel", "Brooklyn Heights", "Jacques Torres Chocolate", "Dumbo", "Manhattan Bridge", "Superfine"])]
+
+def filter_sequence(sequences, location_sequences, u, membership):
+    new_seq = []
+    new_l_seq = []
+    new_memidx = []
+    for index, a_sequence in enumerate(sequences):
+        new_indices = [i for i, x in enumerate(a_sequence) if any([lstr in x.lname for lset in ll for lstr in lset])]
+        if len(new_indices) > 0:
+            new_seq.append(numpy.array(a_sequence)[new_indices])
+            new_l_seq.append(numpy.array(location_sequences[index])[new_indices])
+            new_memidx.append(index)
+    return new_seq, new_l_seq, numpy.array(membership)[new_memidx]
+
 def get_specific(sequences):
     print("before filter:", len(sequences))
     filter_sequences = []
@@ -113,6 +130,77 @@ def get_specific(sequences):
     print("after filter:", len(filter_sequences))
     return filter_sequences
 
+def output_cluster_detail(sequences, location_sequences, u, membership, c, file = OUTPUT_ANALYSIS):
+    file = file + str(c) + ".txt"
+    # basic information
+    this_indices = [i for i in range(len(membership)) if membership[i] == c]
+    this_l_sequences = numpy.array(location_sequences)[this_indices]
+    unique_locations = list(set([y for x in this_l_sequences for y in x]))
+    counts = []
+    for a_location in unique_locations:
+        location_count = [any(y.lid == a_location.lid for y in x) for x in this_l_sequences]
+        counts.append(sum(location_count))
+    f = open(file, "w")
+    f.write("# or sequences:" + str(len(this_indices)) + "\tlocation #:" + str(len(unique_locations)) + "\n")
+
+    output_counts(counts, unique_locations, this_l_sequences, f)
+    idx1 = area2_count(this_l_sequences, unique_locations, ll[0], ll[1], f)
+    idx2 = area2_count(this_l_sequences, unique_locations, ll[1], ll[2], f)
+    #idx3 = area2_count(this_l_sequences, unique_locations, ll[0], ll[2], f)
+    idx = idx1 | idx2
+    print("the third place inter>>>", len(idx))
+    f.write("the third place unique>>>" + str(len(idx)))
+    f.write("\nexcept>>>\n")
+    idx_1e = area2_count(this_l_sequences, unique_locations, ll[1], ll[0], f, True)
+    idx_2e = area2_count(this_l_sequences, unique_locations, ll[1], ll[2], f, True)
+    print("only in Finitial>>>", len(idx_1e & idx_2e))
+    f.write("only in Finitial>>>" + str(len(idx_1e & idx_2e)))
+    f.write("\naboves:" + str(len(idx | idx_1e | idx_2e)))
+    f.close()
+
+def output_counts(counts, unique_locations, this_l_sequences, f):
+    #count of locations
+    sorted_indices = sorted(range(len(counts)), key=lambda x:counts[x])
+    for i in reversed(sorted_indices):
+        f.write(unique_locations[i].lid + "\t" + unique_locations[i].lname + "\t" + str(counts[i]) + "\n")
+    f.write("\n\n--Cluster counts>>\n")
+
+    #count of cluster
+    for lstr in ll:
+        this_lid = [x.lid for x in unique_locations if any([y in x.lname for y in lstr])]
+        uni = [any(y.lid in set(this_lid) for y in x) for x in this_l_sequences]
+        print(lstr, "(", this_lid, ") --", sum(uni))
+        for x in lstr:
+            f.write(x + ", ")
+        f.write(" (" + str(len(this_lid)) + ")\t" + str(sum(uni)) + "\n")
+
+def area2_count(this_l_sequences, unique_locations, area1, area2, f, is_except = False):
+    area1_lid = set([x.lid for x in unique_locations if any([y in x.lname for y in area1])])
+    area1_lname = [x.lname for x in unique_locations if any([y in x.lname for y in area1])]
+    area2_lid = set([x.lid for x in unique_locations if any([y in x.lname for y in area2])])
+    area2_lname = [x.lname for x in unique_locations if any([y in x.lname for y in area2])]
+    unique_trajectories = []
+    count = 0
+    unique_idx = []
+    for i, seq in enumerate(this_l_sequences):
+        this_lid = set([x.lid for x in seq])
+        if is_except:
+            if any([x in area1_lid for x in this_lid]) and not any(x in area2_lid for x in  this_lid):
+                count += 1
+                unique_idx.append(i)
+        else:
+            if any([x in area1_lid for x in this_lid]) and any(x in area2_lid for x in  this_lid):
+                count += 1
+                unique_idx.append(i)
+    print(area1, "<->", area2, count)
+    for x in area1_lname:
+        f.write(x + ", ")
+    f.write("  <--->  ")
+    for x in area2_lname:
+        f.write(x + ", ")
+    f.write(":\t" + str(count) + "\n")
+    return set(unique_idx)
+"""
 def count(sequences, location_sequences, u, membership, c):
     this_indices = [i for i in range(len(membership)) if membership[i] == c]
     this_sequences = numpy.array(location_sequences)[this_indices]
@@ -166,18 +254,6 @@ def from_to(location_sequences, membership, c, ll):
     #for x in from_lname:
     one_to_two(ll[0], ll[1], f)
     f.write(":\t" + str(cc) + "\n")
-    """
-    other_lid = set([x.lid for x in unique_locations if any([y in x.lname for y in ll[2]])])
-    from_ = [all([x.lid in from_lid and x.lid not in (to_lid|other_lid) for x in seq]) for seq in this_sequences]
-    to = [all([x.lid in to_lid and x.lid not in (from_lid|other_lid) for x in seq]) for seq in this_sequences]
-    other = [all([x.lid in other_lid and x.lid not in (from_lid|to_lid) for x in seq]) for seq in this_sequences]
-    one_to_two(ll[0], ll[0], f)
-    f.write(":\t" + str(sum(from_)) + "\n")
-    one_to_two(ll[1], ll[1], f)
-    f.write(":\t" + str(sum(to)) + "\n")
-    one_to_two(ll[2], ll[2], f)
-    f.write(":\t" + str(sum(other)) + "\n")
-    """
     f.close()
     return tag
 
@@ -187,7 +263,7 @@ def one_to_two(a, b, f):
     f.write("  --->  ")
     for x in b:
         f.write(x + ", ")
-
+"""
 
 def main(*argv):
     start_time = datetime.datetime.now()
@@ -239,10 +315,12 @@ def main(*argv):
 
     u, u0, d, jm, p, fpc, center, membership = cfuzzy.sequences_clustering_i("Cluster", spatial_sequences, CLUSTER_NUM, MAX_KTH, semantic_sequences, GPS_WEIGHT, e = ERROR, algorithm="2WeightedDistance")
 
-    
+    #sequences, location_sequences, membership = filter_sequence(sequences, location_sequences, u, membership)
     #ouput_pattern(sequences, location_sequences, u, membership)
-    #output_each_pattern(sequences, location_sequences, u, membership, 20)
-    #ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    output_each_pattern(sequences, location_sequences, u, membership, 30)
+    ctrajectory.output_clusters(sequences, membership, u, OUTPUT_PATTERN)
+    
+    #output_cluster_detail(sequences, location_sequences, u, membership, 26, file = OUTPUT_ANALYSIS)
     
     """
     ll = count(sequences, location_sequences, u, membership, 40)
